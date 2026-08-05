@@ -11,14 +11,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
+@font-face{
+    font-family:"Food Delight";
+    src:url("FoodDelight.ttf") format("truetype");
+    font-weight:normal;
+    font-style:normal;
+}
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
     font-family:'Inter',sans-serif;
 }
-body {
-    font-family: "Anton", sans-serif;
+body{
+    margin:0;
+    font-family:"Anton",sans-serif;
+    background:
+        linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
+        url("img.png") center center / cover no-repeat fixed;
+    color:#fff;
 }
 
 h1, h2, h3, .title {
@@ -31,14 +42,14 @@ h1, h2, h3, .title {
 /* Hero */
 
 .hero{
-    min-height:45vh;
+    min-height:100vh;
     display:flex;
     flex-direction:column;
     justify-content:center;
     align-items:center;
     text-align:center;
-    padding:50px 20px;
-    background:linear-gradient(180deg,#ffffff,#f5f5f7);
+    padding:80px 20px;
+    background:transparent;
 }
 
 .hero h1{
@@ -66,6 +77,7 @@ h1, h2, h3, .title {
     font-weight:700;
     margin:50px 0 25px;
     letter-spacing: 4px;
+    color:#ffffff;
 }
 
 .card{
@@ -169,10 +181,10 @@ h1, h2, h3, .title {
 }
 
 .hero h1{
-    font-family:"Anton",sans-serif;
+    font-family:"Food DelighT",sans-serif;
     font-size:clamp(60px,8vw,110px);
     letter-spacing:8px;
-    color:#111;
+    color:#ffffff;
 }
 
 .hero p{
@@ -284,6 +296,29 @@ h1, h2, h3, .title {
     color:#777;
     font-size:18px;
 }
+.hero h1{
+    color:#000000;
+}
+.hero p,
+.sectionTitle,
+.name,
+.price,
+.header,
+.item,
+.footer{
+    color:#000000;
+}
+
+.header{
+    color:#6e6e73;
+}
+
+.footer{
+    color:#ffffff;
+}
+.sectionTitle{
+    color:#ffffff;
+}
 </style>
 
 </head>
@@ -297,7 +332,7 @@ h1, h2, h3, .title {
 
     <img
         class="hero-image"
-        src="https://images.unsplash.com/photo-1544025162-d76694265947?w=1600&q=80"
+        src="image.png"
         alt="Indian Food">
 
 </section>
@@ -314,12 +349,11 @@ h1, h2, h3, .title {
 </div>
 
 <div class="item"><div class="name">Roti</div><div class="price">₹10</div></div>
-<div class="item"><div class="name">Roti with Ghee</div><div class="price">₹18</div></div>
-<div class="item"><div class="name">Paratha</div><div class="price">₹30</div></div>
+<div class="item"><div class="name">Roti with Ghee</div><div class="price">₹15</div></div>
+<div class="item"><div class="name">Paratha</div><div class="price">₹20</div></div>
 <div class="item"><div class="name">Lachha Paratha</div><div class="price">₹25</div></div>
-<div class="item"><div class="name">Aaloo Paratha</div><div class="price">₹40</div></div>
-<div class="item"><div class="name">Sattu Paratha</div><div class="price">₹40</div></div>
-<div class="item"><div class="name">Pudi</div><div class="price">₹40</div></div>
+<div class="item"><div class="name">Aaloo Paratha</div><div class="price">₹30</div></div>
+<div class="item"><div class="name">Sattu Paratha</div><div class="price">₹30</div></div>
 
 </div>
 
@@ -333,7 +367,7 @@ h1, h2, h3, .title {
 </div>
 
 <div class="item"><div class="name">Fried Rice</div><div class="price">₹120</div></div>
-<div class="item"><div class="name">Jeera Rice</div><div class="price">₹90</div></div>
+<div class="item"><div class="name">Jeera Rice</div><div class="price">₹100</div></div>
 
 </div>
 
@@ -346,11 +380,11 @@ h1, h2, h3, .title {
 <div style="text-align:right;">Price</div>
 </div>
 
-<div class="item"><div class="name">Malai Kofta</div><div class="price">₹330</div></div>
-<div class="item"><div class="name">Shahi Paneer</div><div class="price">₹300</div></div>
-<div class="item"><div class="name">Kadhai Paneer</div><div class="price">₹300</div></div>
-<div class="item"><div class="name">Matar Paneer</div><div class="price">₹300</div></div>
-<div class="item"><div class="name">Palak Paneer</div><div class="price">₹300</div></div>
+<div class="item"><div class="name">Malai Kofta</div><div class="price">₹260</div></div>
+<div class="item"><div class="name">Kadhai Paneer</div><div class="price">₹230</div></div>
+<div class="item"><div class="name">Matar Paneer</div><div class="price">₹210</div></div>
+<div class="item"><div class="name">Palak Paneer</div><div class="price">₹210</div></div>
+
 
 </div>
 
@@ -362,15 +396,14 @@ h1, h2, h3, .title {
 <div>Item</div>
 <div style="text-align:right;">Price</div>
 </div>
-
-<div class="item"><div class="name">Bhindi Bhujia</div><div class="price">₹80</div></div>
-<div class="item"><div class="name">Bharwa Karela</div><div class="price">₹230</div></div>
-<div class="item"><div class="name">Baigan Bharta</div><div class="price">₹160</div></div>
-<div class="item"><div class="name">Lauki Sabji</div><div class="price">₹80</div></div>
-<div class="item"><div class="name">Aaloo Sabji</div><div class="price">₹100</div></div>
+<div class="item"><div class="name">Bhindi Bhujia</div><div class="price">₹100</div></div>
+<div class="item"><div class="name">Bharwa Karela</div><div class="price">₹170</div></div>
+<div class="item"><div class="name">Baigan Bharta</div><div class="price">₹150</div></div>
+<div class="item"><div class="name">Lauki Sabji</div><div class="price">₹100</div></div>
+<div class="item"><div class="name">Aaloo Sabji</div><div class="price">₹120</div></div>
 <div class="item"><div class="name">Aaloo Baigan</div><div class="price">₹120</div></div>
-<div class="item"><div class="name">Kofta Sabji</div><div class="price">₹150</div></div>
-<div class="item"><div class="name">Gatte Ki Sabji</div><div class="price">₹120</div></div>
+<div class="item"><div class="name">Kofta Sabji</div><div class="price">₹160</div></div>
+<div class="item"><div class="name">Gatte Ki Sabji</div><div class="price">₹150</div></div>
 <div class="item"><div class="name">Bhujia Sabji</div><div class="price">₹120</div></div>
 
 </div>
