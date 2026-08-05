@@ -327,6 +327,7 @@ h1, h2, h3, .title {
     inset:0;
     z-index:9999;
     pointer-events:none;
+    overflow:hidden;
 }
 
 .door{
@@ -334,24 +335,56 @@ h1, h2, h3, .title {
     top:0;
     width:50%;
     height:100%;
+    background:rgba(135,206,235,.18);
     backdrop-filter:blur(14px);
     -webkit-backdrop-filter:blur(14px);
-    background:rgba(120,180,255,.15);
-    border:8px solid #8f8f8f;
+
+    border:8px solid #8c8c8c;
+
     box-shadow:
-        inset 0 0 40px rgba(255,255,255,.25),
-        0 0 30px rgba(0,0,0,.3);
-    transition:transform .1s linear;
+        inset 0 0 25px rgba(255,255,255,.35),
+        inset 0 0 80px rgba(255,255,255,.15),
+        0 0 30px rgba(0,0,0,.35);
 }
 
-.left{
+.left-door{
     left:0;
     border-right:4px solid #666;
+    animation:openLeft 3.5s ease-in-out forwards;
 }
 
-.right{
+.right-door{
     right:0;
     border-left:4px solid #666;
+    animation:openRight 3.5s ease-in-out forwards;
+}
+
+@keyframes openLeft{
+    0%{
+        transform:translateX(0);
+    }
+    80%{
+        transform:translateX(-100%);
+    }
+    100%{
+        transform:translateX(-100%);
+        opacity:0;
+        visibility:hidden;
+    }
+}
+
+@keyframes openRight{
+    0%{
+        transform:translateX(0);
+    }
+    80%{
+        transform:translateX(100%);
+    }
+    100%{
+        transform:translateX(100%);
+        opacity:0;
+        visibility:hidden;
+    }
 }
 </style>
 
@@ -359,8 +392,8 @@ h1, h2, h3, .title {
 <body>
 
 <div class="glass-door">
-    <div class="door left"></div>
-    <div class="door right"></div>
+    <div class="door left-door"></div>
+    <div class="door right-door"></div>
 </div>
 
 <section class="hero">
@@ -468,17 +501,6 @@ h1, h2, h3, .title {
 <div class="footer">
 Made Fresh Daily • Quality Ingredients • Thank You for Choosing CLOUD KITCHEN
 </div>
-<script>
-const leftDoor = document.querySelector(".left");
-const rightDoor = document.querySelector(".right");
 
-window.addEventListener("scroll", () => {
-    const max = window.innerHeight;
-    const progress = Math.min(window.scrollY / max, 1);
-
-    leftDoor.style.transform = `translateX(${-progress*100}%)`;
-    rightDoor.style.transform = `translateX(${progress*100}%)`;
-});
-</script>
 </body>
 </html>
