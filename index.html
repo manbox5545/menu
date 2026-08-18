@@ -2,630 +2,869 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CLOUD KITCHEN Menu</title>
-<!-- Put this inside <head> -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Prachi Cloud Kitchen</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 @font-face{
-    font-family:"Food Delight";
-    src:url("FoodDelight.ttf") format("truetype");
-    font-weight:normal;
-    font-style:normal;
+  font-family:FoodDelight;
+  src:url("FoodDelight.ttf") format("truetype");
 }
+
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Inter',sans-serif;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
+
 body{
-    margin:0;
-    font-family:"Anton",sans-serif;
-    background:
-        linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
-        url("img.png") center center / cover no-repeat fixed;
-    color:#fff;
+  font-family:Inter,sans-serif;
+  color:#000;
+  background:#fff;
+  transition:.3s;
 }
 
-h1, h2, h3, .title {
-    font-family: "Anton", sans-serif;
-    font-weight: 400;
-    letter-spacing: 15px;
-    text-transform: uppercase;
-}
-
-/* Hero */
+/* ---------- HERO ---------- */
 
 .hero{
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    padding:80px 20px;
-    background:transparent;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:70px 20px;
 }
 
 .hero h1{
-    font-size:clamp(48px,8vw,90px);
-    font-weight:800;
-    letter-spacing: 5px;
-    text-shadow:
-        0 4px 10px rgba(0,0,0,0.7),
-        0 10px 30px rgba(0,0,0,0.9);
+  font-family:FoodDelight,Anton,sans-serif;
+  font-size:clamp(55px,8vw,110px);
+  letter-spacing:7px;
 }
 
 .hero p{
-    margin-top:15px;
-    color:#6e6e73;
-    font-size:22px;
-}
-
-/* Menu */
-
-.menu{
-    max-width:1000px;
-    margin:auto;
-    padding:20px;
-}
-
-.sectionTitle{
-    font-size:42px;
-    font-weight:700;
-    margin:50px 0 25px;
-    letter-spacing: 4px;
-    color:#ffffff;
-}
-
-.card{
-    background:white;
-    border-radius:28px;
-    overflow:hidden;
-    box-shadow:0 12px 40px rgba(0,0,0,.06);
-}
-
-.header{
-    display:grid;
-    grid-template-columns:1fr 120px;
-    padding:25px 35px;
-    background:#fafafa;
-    font-size:18px;
-    font-weight:700;
-    color:#6e6e73;
-    border-bottom:1px solid #ececec;
-}
-
-.item{
-    display:grid;
-    grid-template-columns:1fr 120px;
-    align-items:center;
-    padding:24px 35px;
-    transition:.25s;
-    border-bottom:1px solid #f1f1f1;
-}
-
-.item:last-child{
-    border-bottom:none;
-}
-
-.item:hover{
-    background:#fbfbfd;
-    transform:scale(1.01);
-}
-
-.name{
-    font-size:24px;
-    font-weight:600;
-}
-
-.price{
-    text-align:right;
-    font-size:24px;
-    font-weight:700;
-}
-
-.footer{
-    text-align:center;
-    padding:60px 20px;
-    color:#86868b;
-    font-size:17px;
-}
-
-@media(max-width:700px){
-
-.hero{
-    min-height:35vh;
-}
-
-.hero p{
-    font-size:18px;
-}
-
-.sectionTitle{
-    font-size:32px;
-}
-
-.header{
-    grid-template-columns:1fr 90px;
-    padding:18px;
-}
-
-.item{
-    grid-template-columns:1fr 90px;
-    padding:18px;
-}
-
-.name{
-    font-size:19px;
-}
-
-.price{
-    font-size:20px;
-}
-
-}
-/* HERO */
-
-.hero{
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    padding:80px 20px;
-    background:#ffffff;
-}
-
-.hero h1{
-    font-family:"Food DelighT",sans-serif;
-    font-size:clamp(60px,8vw,110px);
-    letter-spacing:8px;
-    color:#ffffff;
-}
-
-.hero p{
-    margin-top:18px;
-    font-size:22px;
-    color:#6e6e73;
+  margin-top:15px;
+  font-size:22px;
+  color:#6e6e73;
 }
 
 .hero-image{
-    width:min(1100px,90%);
-    margin-top:60px;
-    border-radius:30px;
-    object-fit:cover;
-    box-shadow:
-    0 40px 90px rgba(0,0,0,.12);
-    transition:.5s;
+  width:min(1100px,90%);
+  margin-top:55px;
+  border-radius:28px;
+  object-fit:cover;
+  box-shadow:0 30px 70px #0002;
+  transition:.3s;
 }
 
 .hero-image:hover{
-    transform:scale(1.02);
+  transform:scale(1.015);
 }
 
-/* FEATURED */
+/* ---------- TOP BUTTONS ---------- */
 
-.featured{
-    max-width:1400px;
-    margin:120px auto;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:40px;
-    padding:0 40px;
+#themeBtn,
+#cartBtn{
+  position:fixed;
+  top:20px;
+  width:55px;
+  height:55px;
+  border:0;
+  border-radius:50%;
+  background:#fff;
+  color:#111;
+  font-size:23px;
+  cursor:pointer;
+  z-index:10001;
+  box-shadow:0 8px 25px #0003;
 }
 
-.food-card{
-    background:white;
-    border-radius:28px;
-    overflow:hidden;
-    box-shadow:0 20px 60px rgba(0,0,0,.08);
-    transition:.35s;
+#cartBtn{
+  left:20px;
 }
 
-.food-card:hover{
-    transform:translateY(-10px);
-    box-shadow:0 35px 90px rgba(0,0,0,.15);
+#themeBtn{
+  right:20px;
 }
 
-.food-card img{
-    width:100%;
-    height:260px;
-    object-fit:cover;
+#cartCount{
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  min-width:20px;
+  height:20px;
+  padding:2px 5px;
+  border-radius:20px;
+  background:#e53935;
+  color:white;
+  font-size:12px;
+  font-weight:700;
+  display:none;
 }
 
-.food-card h3{
-    padding:25px 25px 10px;
-    font-size:34px;
-    font-family:"Anton",sans-serif;
-    letter-spacing:2px;
-}
+/* ---------- MENU ---------- */
 
-.food-card p{
-    padding:0 25px 30px;
-    color:#666;
-    font-size:18px;
+.menu{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
 }
-
-/* MENU */
 
 .sectionTitle{
-    font-size:48px;
-    text-align:center;
-    margin:120px 0 40px;
-    font-family:"Anton",sans-serif;
-    letter-spacing:4px;
+  text-align:center;
+  font-family:Anton,sans-serif;
+  font-size:45px;
+  letter-spacing:4px;
+  margin:90px 0 35px;
 }
 
-.category-image{
-    width:100%;
-    max-width:1000px;
-    display:block;
-    margin:0 auto 35px;
-    border-radius:24px;
-    box-shadow:0 20px 60px rgba(0,0,0,.08);
+.card{
+  background:#fff;
+  border-radius:25px;
+  overflow:hidden;
+  box-shadow:0 15px 45px #00000012;
 }
 
-/* BUTTON */
-
-.orderBtn{
-    margin-top:40px;
-    display:inline-block;
-    padding:18px 40px;
-    border-radius:999px;
-    background:#111;
-    color:white;
-    text-decoration:none;
-    font-weight:600;
-    transition:.3s;
-}
-
-.orderBtn:hover{
-    background:#333;
-    transform:translateY(-3px);
-}
-
-/* FOOTER */
-
-.footer{
-    text-align:center;
-    padding:100px 20px;
-    color:#777;
-    font-size:18px;
-}
-.hero h1{
-    color:#000000;
-}
-.hero p,
-.sectionTitle,
-.name,
-.price,
 .header,
-.item,
-.footer{
-    color:#000000;
+.item{
+  display:grid;
+  grid-template-columns:1fr 110px;
+  align-items:center;
 }
 
 .header{
-    color:#6e6e73;
+  padding:22px 30px;
+  background:#fafafa;
+  color:#6e6e73;
+  font-weight:700;
+  border-bottom:1px solid #eee;
 }
 
-.footer {
-  background-color: #ffffff; /* Changes the background color (Dark Blue/Grey) */
-  color: #000000;            /* Changes the text color to white so it is readable */
-  padding: 20px;             /* Adds space inside the footer around the text */
-  text-align: center;        /* Centers the text */
+.item{
+  padding:21px 30px;
+  border-bottom:1px solid #eee;
+  cursor:pointer;
+  transition:.2s;
 }
 
-.sectionTitle{
-    color:#ffffff;
+.item:last-child{
+  border-bottom:0;
 }
+
+.item:hover{
+  background:#f7f7f7;
+  transform:scale(1.01);
+}
+
+.name{
+  font-size:22px;
+  font-weight:600;
+}
+
+.price{
+  text-align:right;
+  font-size:22px;
+  font-weight:700;
+}
+
+/* ---------- CART ---------- */
+
+.cart-overlay{
+  position:fixed;
+  inset:0;
+  background:#0006;
+  z-index:10002;
+  display:none;
+}
+
+.cart-overlay.show{
+  display:block;
+}
+
+.cart{
+  position:absolute;
+  top:85px;
+  left:20px;
+  width:min(420px,calc(100% - 40px));
+  max-height:75vh;
+  overflow:auto;
+  background:#fff;
+  color:#111;
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 20px 70px #0006;
+}
+
+.cart h2{
+  font-family:Anton,sans-serif;
+  letter-spacing:2px;
+  font-size:30px;
+  margin-bottom:15px;
+}
+
+.cart-empty{
+  text-align:center;
+  padding:35px 10px;
+  color:#777;
+}
+
+.cart-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  padding:15px 0;
+  border-bottom:1px solid #eee;
+}
+
+.cart-name{
+  font-weight:600;
+}
+
+.cart-price{
+  color:#666;
+  font-size:14px;
+  margin-top:4px;
+}
+
+.cart-controls{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.cart-controls button{
+  width:30px;
+  height:30px;
+  border:0;
+  border-radius:8px;
+  cursor:pointer;
+  background:#eee;
+  font-size:18px;
+}
+
+.cart-controls .delete{
+  background:#ffe5e5;
+}
+
+.cart-total{
+  display:flex;
+  justify-content:space-between;
+  margin-top:20px;
+  padding-top:15px;
+  border-top:2px solid #111;
+  font-size:20px;
+  font-weight:700;
+}
+
+/* ---------- FOOTER ---------- */
+
+.footer{
+  text-align:center;
+  padding:90px 20px 30px;
+  color:#777;
+}
+
+.footer h3{
+  color:#111;
+  margin-bottom:10px;
+}
+
+/* ---------- GLASS DOOR ---------- */
+
 .glass-door{
-    position:fixed;
-    inset:0;
-    z-index:9999;
-    pointer-events:none;
-    overflow:hidden;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  pointer-events:none;
+  overflow:hidden;
 }
 
 .door{
-    position:absolute;
-    top:0;
-    width:50%;
-    height:100%;
-    background:rgba(135,206,235,.18);
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
-
-    border:8px solid #8c8c8c;
-
-    box-shadow:
-        inset 0 0 25px rgba(255,255,255,.35),
-        inset 0 0 80px rgba(255,255,255,.15),
-        0 0 30px rgba(0,0,0,.35);
+  position:absolute;
+  top:0;
+  width:50%;
+  height:100%;
+  background:#87ceeb2e;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:8px solid #8c8c8c;
+  box-shadow:inset 0 0 25px #fff6,0 0 30px #0006;
 }
 
 .left-door{
-    left:0;
-    border-right:4px solid #4ca5c0;
-    animation:openLeft 3.5s ease-in-out forwards;
+  left:0;
+  border-right:4px solid #4ca5c0;
+  animation:openLeft 3.5s ease-in-out forwards;
 }
 
 .right-door{
-    right:0;
-    border-left:4px solid #4ca5c0;
-    animation:openRight 3.5s ease-in-out forwards;
+  right:0;
+  border-left:4px solid #4ca5c0;
+  animation:openRight 3.5s ease-in-out forwards;
 }
 
 @keyframes openLeft{
-    0%{
-        transform:translateX(0);
-    }
-    80%{
-        transform:translateX(-100%);
-    }
-    100%{
-        transform:translateX(-100%);
-        opacity:0;
-        visibility:hidden;
-    }
+  80%,100%{
+    transform:translateX(-100%);
+    opacity:0;
+    visibility:hidden;
+  }
 }
 
 @keyframes openRight{
-    0%{
-        transform:translateX(0);
-    }
-    80%{
-        transform:translateX(100%);
-    }
-    100%{
-        transform:translateX(100%);
-        opacity:0;
-        visibility:hidden;
-    }
-}
-#themeBtn{
-    position:fixed;
-    top:20px;
-    right:20px;
-    width:55px;
-    height:55px;
-    border:none;
-    border-radius:50%;
-    background:#fff;
-    color:#111;
-    font-size:24px;
-    cursor:pointer;
-    z-index:10000;
-    box-shadow:0 10px 25px rgba(0,0,0,.25);
+  80%,100%{
+    transform:translateX(100%);
+    opacity:0;
+    visibility:hidden;
+  }
 }
 
-/* DARK MODE */
+/* ---------- DARK MODE ---------- */
 
 body.dark{
-    background:
-    linear-gradient(rgba(0,0,0,.82),rgba(0,0,0,.82)),
-    url("img.png") center/cover fixed;
+  background:#111;
+  color:#fff;
 }
 
-/* Hero */
 body.dark .hero{
-    background:#111;
+  background:#111;
 }
 
 body.dark .hero h1{
-    color:#fff;
-    text-shadow:0 0 25px rgba(255,255,255,.3);
+  color:#fff;
 }
 
 body.dark .hero p{
-    color:#ddd;
+  color:#ddd;
 }
 
-/* Cards */
 body.dark .card{
-    background:#1b1b1b;
-    box-shadow:0 15px 40px rgba(0,0,0,.5);
+  background:#1b1b1b;
 }
 
-/* Header */
 body.dark .header{
-    background:#2b2b2b;
-    color:#fff;
-    border-bottom:1px solid #444;
+  background:#292929;
+  color:#fff;
+  border-color:#444;
 }
 
-/* Items */
 body.dark .item{
-    background:#1b1b1b;
-    border-bottom:1px solid #333;
+  background:#1b1b1b;
+  color:#fff;
+  border-color:#333;
 }
 
 body.dark .item:hover{
-    background:#2b2b2b;
+  background:#292929;
 }
 
-/* Text */
-body.dark .name,
-body.dark .price,
-body.dark .sectionTitle,
-body.dark .footer,
-body.dark h3,
-body.dark p{
-    color:#fff;
+body.dark .sectionTitle{
+  color:#fff;
 }
 
-/* Footer */
 body.dark .footer{
-    background:#111;
+  background:#111;
+  color:#aaa;
+}
+
+body.dark .footer h3{
+  color:#fff;
+}
+
+body.dark #themeBtn,
+body.dark #cartBtn{
+  background:#222;
+  color:#fff;
+}
+
+body.dark .cart{
+  background:#1b1b1b;
+  color:#fff;
+}
+
+body.dark .cart-item{
+  border-color:#333;
+}
+
+body.dark .cart-price{
+  color:#aaa;
+}
+
+body.dark .cart-controls button{
+  background:#333;
+  color:#fff;
+}
+
+body.dark .cart-total{
+  border-color:#fff;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media(max-width:700px){
+
+  .hero{
+    min-height:70vh;
+    padding:80px 15px 40px;
+  }
+
+  .hero p{
+    font-size:18px;
+  }
+
+  .sectionTitle{
+    font-size:30px;
+    margin:65px 0 25px;
+  }
+
+  .header,
+  .item{
+    grid-template-columns:1fr 85px;
+    padding:17px;
+  }
+
+  .name{
+    font-size:18px;
+  }
+
+  .price{
+    font-size:19px;
+  }
+
+  .hero-image{
+    width:95%;
+    margin-top:40px;
+  }
 }
 </style>
-
 </head>
+
 <body>
 
+<!-- CART BUTTON -->
+<button id="cartBtn">
+  🛒
+  <span id="cartCount">0</span>
+</button>
+
+<!-- THEME BUTTON -->
 <button id="themeBtn">🌙</button>
 
+<!-- GLASS DOORS -->
 <div class="glass-door">
-    <div class="door left-door"></div>
-    <div class="door right-door"></div>
+  <div class="door left-door"></div>
+  <div class="door right-door"></div>
 </div>
+
+<!-- CART POPUP -->
+<div class="cart-overlay" id="cartOverlay">
+
+  <div class="cart" id="cartPopup">
+
+    <h2>YOUR CART</h2>
+
+    <div id="cartItems">
+      <div class="cart-empty">
+        Your cart is empty 🛒
+      </div>
+    </div>
+
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cartTotal">₹0</span>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- HERO -->
 
 <section class="hero">
 
-    <h1>CLOUD KITCHEN</h1>
+  <h1>PRACHI CLOUD KITCHEN</h1>
 
-    <p>Fresh • Homemade • Delicious</p>
+  <p>Fresh • Homemade • Delicious</p>
 
-    <img
-        class="hero-image"
-        src="image.png"
-        alt="Indian Food">
+  <img
+    class="hero-image"
+    src="image.png"
+    alt="Indian Food">
 
 </section>
 
+<!-- MENU -->
+
 <div class="menu">
 
-<h2 class="sectionTitle">Indian Breads</h2>
+  <h2 class="sectionTitle">Indian Breads</h2>
 
-<div class="card">
+  <div class="card">
 
-<div class="header">
-<div>Item</div>
-<div style="text-align:right;">Price</div>
+    <div class="header">
+      <div>Item</div>
+      <div style="text-align:right">Price</div>
+    </div>
+
+    <div class="item" data-name="Roti" data-price="10">
+      <div class="name">Roti</div><div class="price">₹10</div>
+    </div>
+
+    <div class="item" data-name="Roti with Ghee" data-price="15">
+      <div class="name">Roti with Ghee</div><div class="price">₹15</div>
+    </div>
+
+    <div class="item" data-name="Paratha" data-price="20">
+      <div class="name">Paratha</div><div class="price">₹20</div>
+    </div>
+
+    <div class="item" data-name="Lachha Paratha" data-price="25">
+      <div class="name">Lachha Paratha</div><div class="price">₹25</div>
+    </div>
+
+    <div class="item" data-name="Aaloo Paratha" data-price="30">
+      <div class="name">Aaloo Paratha</div><div class="price">₹30</div>
+    </div>
+
+    <div class="item" data-name="Sattu Paratha" data-price="30">
+      <div class="name">Sattu Paratha</div><div class="price">₹30</div>
+    </div>
+
+  </div>
+
+
+  <h2 class="sectionTitle">Rice</h2>
+
+  <div class="card">
+
+    <div class="header">
+      <div>Item</div><div style="text-align:right">Price</div>
+    </div>
+
+    <div class="item" data-name="Fried Rice" data-price="120">
+      <div class="name">Fried Rice</div><div class="price">₹120</div>
+    </div>
+
+    <div class="item" data-name="Jeera Rice" data-price="100">
+      <div class="name">Jeera Rice</div><div class="price">₹100</div>
+    </div>
+
+    <div class="item" data-name="Poha" data-price="125">
+      <div class="name">Poha</div><div class="price">₹125</div>
+    </div>
+
+  </div>
+
+
+  <h2 class="sectionTitle">Paneer & Special Curries</h2>
+
+  <div class="card">
+
+    <div class="header">
+      <div>Item</div><div style="text-align:right">Price</div>
+    </div>
+
+    <div class="item" data-name="Kadhai Paneer" data-price="200">
+      <div class="name">Kadhai Paneer</div><div class="price">₹200</div>
+    </div>
+
+    <div class="item" data-name="Matar Paneer" data-price="180">
+      <div class="name">Matar Paneer</div><div class="price">₹180</div>
+    </div>
+
+    <div class="item" data-name="Palak Paneer" data-price="180">
+      <div class="name">Palak Paneer</div><div class="price">₹180</div>
+    </div>
+
+    <div class="item" data-name="Litti chokha 2pcs." data-price="30">
+      <div class="name">Litti chokha 2pcs.</div><div class="price">₹30</div>
+    </div>
+
+  </div>
+
+
+  <h2 class="sectionTitle">Vegetable Curries</h2>
+
+  <div class="card">
+
+    <div class="header">
+      <div>Item</div><div style="text-align:right">Price</div>
+    </div>
+
+    <div class="item" data-name="Bhindi Bhujia" data-price="100">
+      <div class="name">Bhindi Bhujia</div><div class="price">₹100</div>
+    </div>
+
+    <div class="item" data-name="Bharwa Karela" data-price="170">
+      <div class="name">Bharwa Karela</div><div class="price">₹170</div>
+    </div>
+
+    <div class="item" data-name="Baigan Bharta" data-price="150">
+      <div class="name">Baigan Bharta</div><div class="price">₹150</div>
+    </div>
+
+    <div class="item" data-name="Lauki Sabji" data-price="100">
+      <div class="name">Lauki Sabji</div><div class="price">₹100</div>
+    </div>
+
+    <div class="item" data-name="Aaloo Sabji" data-price="120">
+      <div class="name">Aaloo Sabji</div><div class="price">₹120</div>
+    </div>
+
+    <div class="item" data-name="Aaloo Baigan" data-price="120">
+      <div class="name">Aaloo Baigan</div><div class="price">₹120</div>
+    </div>
+
+    <div class="item" data-name="Kofta Sabji" data-price="160">
+      <div class="name">Kofta Sabji</div><div class="price">₹160</div>
+    </div>
+
+    <div class="item" data-name="Gatte Ki Sabji" data-price="150">
+      <div class="name">Gatte Ki Sabji</div><div class="price">₹150</div>
+    </div>
+
+    <div class="item" data-name="Bhujia Sabji" data-price="120">
+      <div class="name">Bhujia Sabji</div><div class="price">₹120</div>
+    </div>
+
+    <div class="item" data-name="Chole bhature" data-price="150">
+      <div class="name">Chole bhature</div><div class="price">₹150</div>
+    </div>
+
+  </div>
+
+
+  <h2 class="sectionTitle">Dal</h2>
+
+  <div class="card">
+
+    <div class="header">
+      <div>Item</div><div style="text-align:right">Price</div>
+    </div>
+
+    <div class="item" data-name="Chana Dal" data-price="120">
+      <div class="name">Chana Dal</div><div class="price">₹120</div>
+    </div>
+
+    <div class="item" data-name="Dal Fry" data-price="100">
+      <div class="name">Dal Fry</div><div class="price">₹100</div>
+    </div>
+
+    <div class="item" data-name="Dal Tadka" data-price="100">
+      <div class="name">Dal Tadka</div><div class="price">₹100</div>
+    </div>
+
+  </div>
+
+
+  <h2 class="sectionTitle">Halwa</h2>
+
+  <div class="card">
+
+    <div class="header">
+      <div>Item</div><div style="text-align:right">Price</div>
+    </div>
+
+    <div class="item" data-name="Mango Halwa" data-price="140">
+      <div class="name">Mango Halwa</div><div class="price">₹140</div>
+    </div>
+
+    <div class="item" data-name="Loki Halwa" data-price="120">
+      <div class="name">Loki Halwa</div><div class="price">₹120</div>
+    </div>
+
+    <div class="item" data-name="Suji Halwa" data-price="100">
+      <div class="name">Suji Halwa</div><div class="price">₹100</div>
+    </div>
+
+    <div class="item" data-name="Sada Halwa" data-price="90">
+      <div class="name">Sada Halwa</div><div class="price">₹90</div>
+    </div>
+
+  </div>
+
 </div>
 
-<div class="item"><div class="name">Roti</div><div class="price">₹10</div></div>
-<div class="item"><div class="name">Roti with Ghee</div><div class="price">₹15</div></div>
-<div class="item"><div class="name">Paratha</div><div class="price">₹20</div></div>
-<div class="item"><div class="name">Lachha Paratha</div><div class="price">₹25</div></div>
-<div class="item"><div class="name">Aaloo Paratha</div><div class="price">₹30</div></div>
-<div class="item"><div class="name">Sattu Paratha</div><div class="price">₹30</div></div>
 
-</div>
+<footer class="footer">
 
-<h2 class="sectionTitle">Rice</h2>
+  <h3>Prachi Cloud Kitchen</h3>
 
-<div class="card">
+  <p>CONTACT: 8318604464</p>
 
-<div class="header">
-<div>Item</div>
-<div style="text-align:right;">Price</div>
-</div>
+  <br>
 
-<div class="item"><div class="name">Fried Rice</div><div class="price">₹120</div></div>
-<div class="item"><div class="name">Jeera Rice</div><div class="price">₹100</div></div>
-<div class="item"><div class="name">Poha</div><div class="price">₹125</div></div>
+  <h3>A website by mpoxel.in</h3>
 
-</div>
-
-<h2 class="sectionTitle">Paneer & Special Curries</h2>
-
-<div class="card">
-
-<div class="header">
-<div>Item</div>
-<div style="text-align:right;">Price</div>
-</div>
-
-<div class="item"><div class="name">Kadhai Paneer</div><div class="price">₹200</div></div>
-<div class="item"><div class="name">Matar Paneer</div><div class="price">₹180</div></div>
-<div class="item"><div class="name">Palak Paneer</div><div class="price">₹180</div></div>
-<div class="item"><div class="name">Litti chokha 2pcs.</div><div class="price">₹30</div></div>
-
-</div>
-
-<h2 class="sectionTitle">Vegetable Curries</h2>
-
-<div class="card">
-
-<div class="header">
-<div>Item</div>
-<div style="text-align:right;">Price</div>
-</div>
-<div class="item"><div class="name">Bhindi Bhujia</div><div class="price">₹100</div></div>
-<div class="item"><div class="name">Bharwa Karela</div><div class="price">₹170</div></div>
-<div class="item"><div class="name">Baigan Bharta</div><div class="price">₹150</div></div>
-<div class="item"><div class="name">Lauki Sabji</div><div class="price">₹100</div></div>
-<div class="item"><div class="name">Aaloo Sabji</div><div class="price">₹120</div></div>
-<div class="item"><div class="name">Aaloo Baigan</div><div class="price">₹120</div></div>
-<div class="item"><div class="name">Kofta Sabji</div><div class="price">₹160</div></div>
-<div class="item"><div class="name">Gatte Ki Sabji</div><div class="price">₹150</div></div>
-<div class="item"><div class="name">Bhujia Sabji</div><div class="price">₹120</div></div>
-<div class="item"><div class="name">Chole bhature</div><div class="price">₹150</div></div>
-
-</div>
-
-<h2 class="sectionTitle">Dal</h2>
-
-<div class="card">
-
-<div class="header">
-<div>Item</div>
-<div style="text-align:right;">Price</div>
-</div>
-
-<div class="item"><div class="name">Chana Dal</div><div class="price">₹120</div></div>
-<div class="item"><div class="name">Dal Fry</div><div class="price">₹100</div></div>
-<div class="item"><div class="name">Dal Tadka</div><div class="price">₹100</div></div>
-
-</div>
-
-</div>
-
-<h2 class="sectionTitle">Halwa</h2>
-
-<div class="card">
-
-<div class="header">
-<div>Item</div>
-<div style="text-align:right;">Price</div>
-</div>
-
-<div class="item"><div class="name">Mango Halwa</div><div class="price">₹140</div></div>
-<div class="item"><div class="name">Loki Halwa</div><div class="price">₹120</div></div>
-<div class="item"><div class="name">Suji Halwa</div><div class="price">₹100</div></div>
-<div class="item"><div class="name">Sada Halwa</div><div class="price">₹90</div></div>
+</footer>
 
 
-</div>
-
-</div>
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-<div class="footer">
-<h3> Cloud kitchen </h3>
-<p> . </p>
-<p>CONTACT: 8318604464</p>
-<p> . </p>
-<h3> A website by mpoxel.in</h3>
-</div>
 <script>
-const btn=document.getElementById("themeBtn");
+/* ---------- THEME ---------- */
 
-btn.onclick=()=>{
+const themeBtn=document.getElementById("themeBtn");
 
-    document.body.classList.toggle("dark");
+themeBtn.onclick=()=>{
+  document.body.classList.toggle("dark");
+  themeBtn.textContent=
+    document.body.classList.contains("dark")?"☀️":"🌙";
+};
 
-    if(document.body.classList.contains("dark")){
-        btn.textContent="☀️";
+
+/* ---------- CART ---------- */
+
+const cart={};
+
+const cartBtn=document.getElementById("cartBtn");
+const cartOverlay=document.getElementById("cartOverlay");
+const cartPopup=document.getElementById("cartPopup");
+const cartItems=document.getElementById("cartItems");
+const cartTotal=document.getElementById("cartTotal");
+const cartCount=document.getElementById("cartCount");
+
+
+/* Add food item */
+
+document.querySelectorAll(".item").forEach(item=>{
+
+  item.onclick=()=>{
+
+    const name=item.dataset.name;
+    const price=Number(item.dataset.price);
+
+    if(cart[name]){
+      cart[name].quantity++;
     }else{
-        btn.textContent="🌙";
+      cart[name]={
+        price:price,
+        quantity:1
+      };
     }
 
+    updateCart();
+  };
+
+});
+
+
+/* Open cart */
+
+cartBtn.onclick=e=>{
+  e.stopPropagation();
+  cartOverlay.classList.add("show");
 };
+
+
+/* Close when clicking outside */
+
+cartOverlay.onclick=e=>{
+  if(e.target===cartOverlay){
+    cartOverlay.classList.remove("show");
+  }
+};
+
+
+/* Prevent popup itself from closing */
+
+cartPopup.onclick=e=>{
+  e.stopPropagation();
+};
+
+
+/* Update cart */
+
+function updateCart(){
+
+  cartItems.innerHTML="";
+
+  let total=0;
+  let count=0;
+
+  const names=Object.keys(cart);
+
+  if(!names.length){
+
+    cartItems.innerHTML=
+      '<div class="cart-empty">Your cart is empty 🛒</div>';
+
+  }else{
+
+    names.forEach(name=>{
+
+      const item=cart[name];
+
+      total+=item.price*item.quantity;
+      count+=item.quantity;
+
+      const row=document.createElement("div");
+
+      row.className="cart-item";
+
+      row.innerHTML=`
+        <div>
+          <div class="cart-name">${name}</div>
+          <div class="cart-price">
+            ₹${item.price} × ${item.quantity}
+          </div>
+        </div>
+
+        <div class="cart-controls">
+
+          <button onclick="changeQty('${name}',-1)">−</button>
+
+          <span>${item.quantity}</span>
+
+          <button onclick="changeQty('${name}',1)">+</button>
+
+          <button class="delete"
+            onclick="removeItem('${name}')">🗑️</button>
+
+        </div>
+      `;
+
+      cartItems.appendChild(row);
+
+    });
+
+  }
+
+  cartTotal.textContent="₹"+total;
+
+  cartCount.textContent=count;
+  cartCount.style.display=count?"block":"none";
+}
+
+
+/* Change quantity */
+
+function changeQty(name,amount){
+
+  if(!cart[name]) return;
+
+  cart[name].quantity+=amount;
+
+  if(cart[name].quantity<=0){
+    delete cart[name];
+  }
+
+  updateCart();
+}
+
+
+/* Delete item */
+
+function removeItem(name){
+
+  delete cart[name];
+
+  updateCart();
+}
 </script>
+
 </body>
 </html>
