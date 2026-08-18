@@ -25,11 +25,13 @@
 body{
   font-family:Inter,sans-serif;
   color:#000;
-  background:#fff;
+  background:
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
+    url("img.png") center center / cover no-repeat fixed;
   transition:.3s;
 }
 
-/* ---------- HERO ---------- */
+/* ================= HERO ================= */
 
 .hero{
   min-height:100vh;
@@ -38,19 +40,25 @@ body{
   justify-content:center;
   align-items:center;
   text-align:center;
-  padding:70px 20px;
+  padding:80px 20px;
+  background:transparent;
 }
 
 .hero h1{
   font-family:FoodDelight,Anton,sans-serif;
   font-size:clamp(55px,8vw,110px);
   letter-spacing:7px;
+  color:#fff;
+  text-shadow:
+    0 4px 10px rgba(0,0,0,.7),
+    0 10px 30px rgba(0,0,0,.8);
 }
 
 .hero p{
-  margin-top:15px;
+  margin-top:18px;
   font-size:22px;
-  color:#6e6e73;
+  color:#fff;
+  text-shadow:0 2px 8px #000;
 }
 
 .hero-image{
@@ -58,7 +66,7 @@ body{
   margin-top:55px;
   border-radius:28px;
   object-fit:cover;
-  box-shadow:0 30px 70px #0002;
+  box-shadow:0 30px 70px rgba(0,0,0,.35);
   transition:.3s;
 }
 
@@ -66,10 +74,10 @@ body{
   transform:scale(1.015);
 }
 
-/* ---------- TOP BUTTONS ---------- */
+/* ================= TOP BUTTONS ================= */
 
-#themeBtn,
-#cartBtn{
+#cartBtn,
+#themeBtn{
   position:fixed;
   top:20px;
   width:55px;
@@ -81,7 +89,7 @@ body{
   font-size:23px;
   cursor:pointer;
   z-index:10001;
-  box-shadow:0 8px 25px #0003;
+  box-shadow:0 8px 25px rgba(0,0,0,.3);
 }
 
 #cartBtn{
@@ -101,13 +109,13 @@ body{
   padding:2px 5px;
   border-radius:20px;
   background:#e53935;
-  color:white;
+  color:#fff;
   font-size:12px;
   font-weight:700;
   display:none;
 }
 
-/* ---------- MENU ---------- */
+/* ================= MENU ================= */
 
 .menu{
   max-width:1000px;
@@ -121,13 +129,15 @@ body{
   font-size:45px;
   letter-spacing:4px;
   margin:90px 0 35px;
+  color:#fff;
+  text-shadow:0 3px 12px #000;
 }
 
 .card{
   background:#fff;
   border-radius:25px;
   overflow:hidden;
-  box-shadow:0 15px 45px #00000012;
+  box-shadow:0 15px 45px rgba(0,0,0,.18);
 }
 
 .header,
@@ -172,12 +182,12 @@ body{
   font-weight:700;
 }
 
-/* ---------- CART ---------- */
+/* ================= CART ================= */
 
 .cart-overlay{
   position:fixed;
   inset:0;
-  background:#0006;
+  background:rgba(0,0,0,.6);
   z-index:10002;
   display:none;
 }
@@ -190,14 +200,14 @@ body{
   position:absolute;
   top:85px;
   left:20px;
-  width:min(420px,calc(100% - 40px));
+  width:min(430px,calc(100% - 40px));
   max-height:75vh;
   overflow:auto;
   background:#fff;
   color:#111;
   border-radius:22px;
   padding:22px;
-  box-shadow:0 20px 70px #0006;
+  box-shadow:0 20px 70px rgba(0,0,0,.5);
 }
 
 .cart h2{
@@ -234,7 +244,7 @@ body{
 .cart-controls{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:7px;
 }
 
 .cart-controls button{
@@ -261,20 +271,20 @@ body{
   font-weight:700;
 }
 
-/* ---------- FOOTER ---------- */
+/* ================= FOOTER ================= */
 
 .footer{
   text-align:center;
   padding:90px 20px 30px;
-  color:#777;
+  color:#fff;
+  text-shadow:0 2px 8px #000;
 }
 
 .footer h3{
-  color:#111;
   margin-bottom:10px;
 }
 
-/* ---------- GLASS DOOR ---------- */
+/* ================= GLASS DOOR ================= */
 
 .glass-door{
   position:fixed;
@@ -289,11 +299,14 @@ body{
   top:0;
   width:50%;
   height:100%;
-  background:#87ceeb2e;
+  background:rgba(135,206,235,.18);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   border:8px solid #8c8c8c;
-  box-shadow:inset 0 0 25px #fff6,0 0 30px #0006;
+  box-shadow:
+    inset 0 0 25px rgba(255,255,255,.35),
+    inset 0 0 80px rgba(255,255,255,.15),
+    0 0 30px rgba(0,0,0,.35);
 }
 
 .left-door{
@@ -309,6 +322,9 @@ body{
 }
 
 @keyframes openLeft{
+  0%{
+    transform:translateX(0);
+  }
   80%,100%{
     transform:translateX(-100%);
     opacity:0;
@@ -317,6 +333,9 @@ body{
 }
 
 @keyframes openRight{
+  0%{
+    transform:translateX(0);
+  }
   80%,100%{
     transform:translateX(100%);
     opacity:0;
@@ -324,19 +343,22 @@ body{
   }
 }
 
-/* ---------- DARK MODE ---------- */
+/* ================= DARK MODE ================= */
 
 body.dark{
-  background:#111;
+  background:
+    linear-gradient(rgba(0,0,0,.82),rgba(0,0,0,.82)),
+    url("img.png") center center / cover no-repeat fixed;
   color:#fff;
 }
 
 body.dark .hero{
-  background:#111;
+  background:transparent;
 }
 
 body.dark .hero h1{
   color:#fff;
+  text-shadow:0 0 25px rgba(255,255,255,.3);
 }
 
 body.dark .hero p{
@@ -368,11 +390,7 @@ body.dark .sectionTitle{
 }
 
 body.dark .footer{
-  background:#111;
-  color:#aaa;
-}
-
-body.dark .footer h3{
+  background:transparent;
   color:#fff;
 }
 
@@ -404,17 +422,27 @@ body.dark .cart-total{
   border-color:#fff;
 }
 
-/* ---------- MOBILE ---------- */
+/* ================= MOBILE ================= */
 
 @media(max-width:700px){
 
   .hero{
     min-height:70vh;
-    padding:80px 15px 40px;
+    padding:90px 15px 40px;
+  }
+
+  .hero h1{
+    font-size:clamp(42px,11vw,70px);
+    letter-spacing:4px;
   }
 
   .hero p{
     font-size:18px;
+  }
+
+  .hero-image{
+    width:95%;
+    margin-top:40px;
   }
 
   .sectionTitle{
@@ -436,9 +464,24 @@ body.dark .cart-total{
     font-size:19px;
   }
 
-  .hero-image{
-    width:95%;
-    margin-top:40px;
+  #cartBtn,
+  #themeBtn{
+    width:50px;
+    height:50px;
+  }
+
+  #cartBtn{
+    left:12px;
+  }
+
+  #themeBtn{
+    right:12px;
+  }
+
+  .cart{
+    top:75px;
+    left:10px;
+    width:calc(100% - 20px);
   }
 }
 </style>
@@ -447,15 +490,15 @@ body.dark .cart-total{
 <body>
 
 <!-- CART BUTTON -->
-<button id="cartBtn">
+<button id="cartBtn" aria-label="Open cart">
   🛒
   <span id="cartCount">0</span>
 </button>
 
-<!-- THEME BUTTON -->
-<button id="themeBtn">🌙</button>
+<!-- DARK MODE -->
+<button id="themeBtn" aria-label="Toggle dark mode">🌙</button>
 
-<!-- GLASS DOORS -->
+<!-- GLASS DOOR -->
 <div class="glass-door">
   <div class="door left-door"></div>
   <div class="door right-door"></div>
@@ -483,7 +526,8 @@ body.dark .cart-total{
 
 </div>
 
-<!-- HERO -->
+
+<!-- ================= HERO ================= -->
 
 <section class="hero">
 
@@ -491,6 +535,7 @@ body.dark .cart-total{
 
   <p>Fresh • Homemade • Delicious</p>
 
+  <!-- YOUR FOOD IMAGE RESTORED -->
   <img
     class="hero-image"
     src="image.png"
@@ -498,198 +543,248 @@ body.dark .cart-total{
 
 </section>
 
-<!-- MENU -->
+
+<!-- ================= MENU ================= -->
 
 <div class="menu">
 
-  <h2 class="sectionTitle">Indian Breads</h2>
+<!-- INDIAN BREADS -->
 
-  <div class="card">
+<h2 class="sectionTitle">Indian Breads</h2>
 
-    <div class="header">
-      <div>Item</div>
-      <div style="text-align:right">Price</div>
-    </div>
+<div class="card">
 
-    <div class="item" data-name="Roti" data-price="10">
-      <div class="name">Roti</div><div class="price">₹10</div>
-    </div>
-
-    <div class="item" data-name="Roti with Ghee" data-price="15">
-      <div class="name">Roti with Ghee</div><div class="price">₹15</div>
-    </div>
-
-    <div class="item" data-name="Paratha" data-price="20">
-      <div class="name">Paratha</div><div class="price">₹20</div>
-    </div>
-
-    <div class="item" data-name="Lachha Paratha" data-price="25">
-      <div class="name">Lachha Paratha</div><div class="price">₹25</div>
-    </div>
-
-    <div class="item" data-name="Aaloo Paratha" data-price="30">
-      <div class="name">Aaloo Paratha</div><div class="price">₹30</div>
-    </div>
-
-    <div class="item" data-name="Sattu Paratha" data-price="30">
-      <div class="name">Sattu Paratha</div><div class="price">₹30</div>
-    </div>
-
+  <div class="header">
+    <div>Item</div>
+    <div style="text-align:right">Price</div>
   </div>
 
-
-  <h2 class="sectionTitle">Rice</h2>
-
-  <div class="card">
-
-    <div class="header">
-      <div>Item</div><div style="text-align:right">Price</div>
-    </div>
-
-    <div class="item" data-name="Fried Rice" data-price="120">
-      <div class="name">Fried Rice</div><div class="price">₹120</div>
-    </div>
-
-    <div class="item" data-name="Jeera Rice" data-price="100">
-      <div class="name">Jeera Rice</div><div class="price">₹100</div>
-    </div>
-
-    <div class="item" data-name="Poha" data-price="125">
-      <div class="name">Poha</div><div class="price">₹125</div>
-    </div>
-
+  <div class="item" data-name="Roti" data-price="10">
+    <div class="name">Roti</div>
+    <div class="price">₹10</div>
   </div>
 
-
-  <h2 class="sectionTitle">Paneer & Special Curries</h2>
-
-  <div class="card">
-
-    <div class="header">
-      <div>Item</div><div style="text-align:right">Price</div>
-    </div>
-
-    <div class="item" data-name="Kadhai Paneer" data-price="200">
-      <div class="name">Kadhai Paneer</div><div class="price">₹200</div>
-    </div>
-
-    <div class="item" data-name="Matar Paneer" data-price="180">
-      <div class="name">Matar Paneer</div><div class="price">₹180</div>
-    </div>
-
-    <div class="item" data-name="Palak Paneer" data-price="180">
-      <div class="name">Palak Paneer</div><div class="price">₹180</div>
-    </div>
-
-    <div class="item" data-name="Litti chokha 2pcs." data-price="30">
-      <div class="name">Litti chokha 2pcs.</div><div class="price">₹30</div>
-    </div>
-
+  <div class="item" data-name="Roti with Ghee" data-price="15">
+    <div class="name">Roti with Ghee</div>
+    <div class="price">₹15</div>
   </div>
 
-
-  <h2 class="sectionTitle">Vegetable Curries</h2>
-
-  <div class="card">
-
-    <div class="header">
-      <div>Item</div><div style="text-align:right">Price</div>
-    </div>
-
-    <div class="item" data-name="Bhindi Bhujia" data-price="100">
-      <div class="name">Bhindi Bhujia</div><div class="price">₹100</div>
-    </div>
-
-    <div class="item" data-name="Bharwa Karela" data-price="170">
-      <div class="name">Bharwa Karela</div><div class="price">₹170</div>
-    </div>
-
-    <div class="item" data-name="Baigan Bharta" data-price="150">
-      <div class="name">Baigan Bharta</div><div class="price">₹150</div>
-    </div>
-
-    <div class="item" data-name="Lauki Sabji" data-price="100">
-      <div class="name">Lauki Sabji</div><div class="price">₹100</div>
-    </div>
-
-    <div class="item" data-name="Aaloo Sabji" data-price="120">
-      <div class="name">Aaloo Sabji</div><div class="price">₹120</div>
-    </div>
-
-    <div class="item" data-name="Aaloo Baigan" data-price="120">
-      <div class="name">Aaloo Baigan</div><div class="price">₹120</div>
-    </div>
-
-    <div class="item" data-name="Kofta Sabji" data-price="160">
-      <div class="name">Kofta Sabji</div><div class="price">₹160</div>
-    </div>
-
-    <div class="item" data-name="Gatte Ki Sabji" data-price="150">
-      <div class="name">Gatte Ki Sabji</div><div class="price">₹150</div>
-    </div>
-
-    <div class="item" data-name="Bhujia Sabji" data-price="120">
-      <div class="name">Bhujia Sabji</div><div class="price">₹120</div>
-    </div>
-
-    <div class="item" data-name="Chole bhature" data-price="150">
-      <div class="name">Chole bhature</div><div class="price">₹150</div>
-    </div>
-
+  <div class="item" data-name="Paratha" data-price="20">
+    <div class="name">Paratha</div>
+    <div class="price">₹20</div>
   </div>
 
-
-  <h2 class="sectionTitle">Dal</h2>
-
-  <div class="card">
-
-    <div class="header">
-      <div>Item</div><div style="text-align:right">Price</div>
-    </div>
-
-    <div class="item" data-name="Chana Dal" data-price="120">
-      <div class="name">Chana Dal</div><div class="price">₹120</div>
-    </div>
-
-    <div class="item" data-name="Dal Fry" data-price="100">
-      <div class="name">Dal Fry</div><div class="price">₹100</div>
-    </div>
-
-    <div class="item" data-name="Dal Tadka" data-price="100">
-      <div class="name">Dal Tadka</div><div class="price">₹100</div>
-    </div>
-
+  <div class="item" data-name="Lachha Paratha" data-price="25">
+    <div class="name">Lachha Paratha</div>
+    <div class="price">₹25</div>
   </div>
 
+  <div class="item" data-name="Aaloo Paratha" data-price="30">
+    <div class="name">Aaloo Paratha</div>
+    <div class="price">₹30</div>
+  </div>
 
-  <h2 class="sectionTitle">Halwa</h2>
-
-  <div class="card">
-
-    <div class="header">
-      <div>Item</div><div style="text-align:right">Price</div>
-    </div>
-
-    <div class="item" data-name="Mango Halwa" data-price="140">
-      <div class="name">Mango Halwa</div><div class="price">₹140</div>
-    </div>
-
-    <div class="item" data-name="Loki Halwa" data-price="120">
-      <div class="name">Loki Halwa</div><div class="price">₹120</div>
-    </div>
-
-    <div class="item" data-name="Suji Halwa" data-price="100">
-      <div class="name">Suji Halwa</div><div class="price">₹100</div>
-    </div>
-
-    <div class="item" data-name="Sada Halwa" data-price="90">
-      <div class="name">Sada Halwa</div><div class="price">₹90</div>
-    </div>
-
+  <div class="item" data-name="Sattu Paratha" data-price="30">
+    <div class="name">Sattu Paratha</div>
+    <div class="price">₹30</div>
   </div>
 
 </div>
 
+
+<!-- RICE -->
+
+<h2 class="sectionTitle">Rice</h2>
+
+<div class="card">
+
+  <div class="header">
+    <div>Item</div>
+    <div style="text-align:right">Price</div>
+  </div>
+
+  <div class="item" data-name="Fried Rice" data-price="120">
+    <div class="name">Fried Rice</div>
+    <div class="price">₹120</div>
+  </div>
+
+  <div class="item" data-name="Jeera Rice" data-price="100">
+    <div class="name">Jeera Rice</div>
+    <div class="price">₹100</div>
+  </div>
+
+  <div class="item" data-name="Poha" data-price="125">
+    <div class="name">Poha</div>
+    <div class="price">₹125</div>
+  </div>
+
+</div>
+
+
+<!-- PANEER -->
+
+<h2 class="sectionTitle">Paneer & Special Curries</h2>
+
+<div class="card">
+
+  <div class="header">
+    <div>Item</div>
+    <div style="text-align:right">Price</div>
+  </div>
+
+  <div class="item" data-name="Kadhai Paneer" data-price="200">
+    <div class="name">Kadhai Paneer</div>
+    <div class="price">₹200</div>
+  </div>
+
+  <div class="item" data-name="Matar Paneer" data-price="180">
+    <div class="name">Matar Paneer</div>
+    <div class="price">₹180</div>
+  </div>
+
+  <div class="item" data-name="Palak Paneer" data-price="180">
+    <div class="name">Palak Paneer</div>
+    <div class="price">₹180</div>
+  </div>
+
+  <div class="item" data-name="Litti chokha 2pcs." data-price="30">
+    <div class="name">Litti chokha 2pcs.</div>
+    <div class="price">₹30</div>
+  </div>
+
+</div>
+
+
+<!-- VEGETABLE CURRIES -->
+
+<h2 class="sectionTitle">Vegetable Curries</h2>
+
+<div class="card">
+
+  <div class="header">
+    <div>Item</div>
+    <div style="text-align:right">Price</div>
+  </div>
+
+  <div class="item" data-name="Bhindi Bhujia" data-price="100">
+    <div class="name">Bhindi Bhujia</div>
+    <div class="price">₹100</div>
+  </div>
+
+  <div class="item" data-name="Bharwa Karela" data-price="170">
+    <div class="name">Bharwa Karela</div>
+    <div class="price">₹170</div>
+  </div>
+
+  <div class="item" data-name="Baigan Bharta" data-price="150">
+    <div class="name">Baigan Bharta</div>
+    <div class="price">₹150</div>
+  </div>
+
+  <div class="item" data-name="Lauki Sabji" data-price="100">
+    <div class="name">Lauki Sabji</div>
+    <div class="price">₹100</div>
+  </div>
+
+  <div class="item" data-name="Aaloo Sabji" data-price="120">
+    <div class="name">Aaloo Sabji</div>
+    <div class="price">₹120</div>
+  </div>
+
+  <div class="item" data-name="Aaloo Baigan" data-price="120">
+    <div class="name">Aaloo Baigan</div>
+    <div class="price">₹120</div>
+  </div>
+
+  <div class="item" data-name="Kofta Sabji" data-price="160">
+    <div class="name">Kofta Sabji</div>
+    <div class="price">₹160</div>
+  </div>
+
+  <div class="item" data-name="Gatte Ki Sabji" data-price="150">
+    <div class="name">Gatte Ki Sabji</div>
+    <div class="price">₹150</div>
+  </div>
+
+  <div class="item" data-name="Bhujia Sabji" data-price="120">
+    <div class="name">Bhujia Sabji</div>
+    <div class="price">₹120</div>
+  </div>
+
+  <div class="item" data-name="Chole bhature" data-price="150">
+    <div class="name">Chole bhature</div>
+    <div class="price">₹150</div>
+  </div>
+
+</div>
+
+
+<!-- DAL -->
+
+<h2 class="sectionTitle">Dal</h2>
+
+<div class="card">
+
+  <div class="header">
+    <div>Item</div>
+    <div style="text-align:right">Price</div>
+  </div>
+
+  <div class="item" data-name="Chana Dal" data-price="120">
+    <div class="name">Chana Dal</div>
+    <div class="price">₹120</div>
+  </div>
+
+  <div class="item" data-name="Dal Fry" data-price="100">
+    <div class="name">Dal Fry</div>
+    <div class="price">₹100</div>
+  </div>
+
+  <div class="item" data-name="Dal Tadka" data-price="100">
+    <div class="name">Dal Tadka</div>
+    <div class="price">₹100</div>
+  </div>
+
+</div>
+
+
+<!-- HALWA -->
+
+<h2 class="sectionTitle">Halwa</h2>
+
+<div class="card">
+
+  <div class="header">
+    <div>Item</div>
+    <div style="text-align:right">Price</div>
+  </div>
+
+  <div class="item" data-name="Mango Halwa" data-price="140">
+    <div class="name">Mango Halwa</div>
+    <div class="price">₹140</div>
+  </div>
+
+  <div class="item" data-name="Loki Halwa" data-price="120">
+    <div class="name">Loki Halwa</div>
+    <div class="price">₹120</div>
+  </div>
+
+  <div class="item" data-name="Suji Halwa" data-price="100">
+    <div class="name">Suji Halwa</div>
+    <div class="price">₹100</div>
+  </div>
+
+  <div class="item" data-name="Sada Halwa" data-price="90">
+    <div class="name">Sada Halwa</div>
+    <div class="price">₹90</div>
+  </div>
+
+</div>
+
+</div>
+
+
+<!-- ================= FOOTER ================= -->
 
 <footer class="footer">
 
@@ -705,18 +800,22 @@ body.dark .cart-total{
 
 
 <script>
-/* ---------- THEME ---------- */
+
+/* ================= DARK MODE ================= */
 
 const themeBtn=document.getElementById("themeBtn");
 
 themeBtn.onclick=()=>{
   document.body.classList.toggle("dark");
+
   themeBtn.textContent=
-    document.body.classList.contains("dark")?"☀️":"🌙";
+    document.body.classList.contains("dark")
+    ? "☀️"
+    : "🌙";
 };
 
 
-/* ---------- CART ---------- */
+/* ================= CART ================= */
 
 const cart={};
 
@@ -728,7 +827,7 @@ const cartTotal=document.getElementById("cartTotal");
 const cartCount=document.getElementById("cartCount");
 
 
-/* Add food item */
+/* Add food to cart */
 
 document.querySelectorAll(".item").forEach(item=>{
 
@@ -760,16 +859,18 @@ cartBtn.onclick=e=>{
 };
 
 
-/* Close when clicking outside */
+/* Close cart when clicking outside */
 
 cartOverlay.onclick=e=>{
+
   if(e.target===cartOverlay){
     cartOverlay.classList.remove("show");
   }
+
 };
 
 
-/* Prevent popup itself from closing */
+/* Keep clicks inside popup from closing it */
 
 cartPopup.onclick=e=>{
   e.stopPropagation();
@@ -787,7 +888,7 @@ function updateCart(){
 
   const names=Object.keys(cart);
 
-  if(!names.length){
+  if(names.length===0){
 
     cartItems.innerHTML=
       '<div class="cart-empty">Your cart is empty 🛒</div>';
@@ -806,25 +907,39 @@ function updateCart(){
       row.className="cart-item";
 
       row.innerHTML=`
+
         <div>
-          <div class="cart-name">${name}</div>
+
+          <div class="cart-name">
+            ${name}
+          </div>
+
           <div class="cart-price">
             ₹${item.price} × ${item.quantity}
           </div>
+
         </div>
 
         <div class="cart-controls">
 
-          <button onclick="changeQty('${name}',-1)">−</button>
+          <button onclick="changeQty('${name}',-1)">
+            −
+          </button>
 
           <span>${item.quantity}</span>
 
-          <button onclick="changeQty('${name}',1)">+</button>
+          <button onclick="changeQty('${name}',1)">
+            +
+          </button>
 
-          <button class="delete"
-            onclick="removeItem('${name}')">🗑️</button>
+          <button
+            class="delete"
+            onclick="removeItem('${name}')">
+            🗑️
+          </button>
 
         </div>
+
       `;
 
       cartItems.appendChild(row);
@@ -836,7 +951,9 @@ function updateCart(){
   cartTotal.textContent="₹"+total;
 
   cartCount.textContent=count;
-  cartCount.style.display=count?"block":"none";
+
+  cartCount.style.display=
+    count ? "block" : "none";
 }
 
 
@@ -864,6 +981,7 @@ function removeItem(name){
 
   updateCart();
 }
+
 </script>
 
 </body>
