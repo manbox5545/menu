@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prachi Cloud Kitchen — Admin Login</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Arial,sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+    url("img.png") center/cover fixed;
+  padding:20px;
+}
+
+.login{
+  width:min(420px,100%);
+  background:rgba(255,255,255,.96);
+  padding:30px;
+  border-radius:24px;
+  box-shadow:0 25px 80px rgba(0,0,0,.45);
+}
+
+h1{
+  margin-bottom:8px;
+}
+
+p{
+  color:#777;
+  margin-bottom:25px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  margin-bottom:12px;
+  border:2px solid #ddd;
+  border-radius:12px;
+  font-size:15px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:12px;
+  background:#111;
+  color:white;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.5;
+}
+
+#error{
+  color:#c0392b;
+  margin-top:15px;
+  font-size:13px;
+  line-height:1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login">
+
+  <h1>Admin Login</h1>
+
+  <p>Prachi Cloud Kitchen</p>
+
+  <form id="loginForm">
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Admin email"
+      required
+    >
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+      required
+    >
+
+    <button id="loginButton" type="submit">
+      LOGIN
+    </button>
+
+  </form>
+
+  <div id="error"></div>
+
+</div>
+
+
+<script type="module">
+
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+const firebaseConfig = {
+  apiKey:"AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
+  authDomain:"ticktok-7fb30.firebaseapp.com",
+  databaseURL:"https://ticktok-7fb30-default-rtdb.firebaseio.com",
+  projectId:"ticktok-7fb30",
+  storageBucket:"ticktok-7fb30.firebasestorage.app",
+  messagingSenderId:"493782050714",
+  appId:"1:493782050714:web:5f6bd9eae6af68b250fc23",
+  measurementId:"G-3KH8Y1SVDG"
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const form = document.getElementById("loginForm");
+
+const email = document.getElementById("email");
+
+const password = document.getElementById("password");
+
+const button = document.getElementById("loginButton");
+
+const error = document.getElementById("error");
+
+
+/*
+  If already logged in,
+  skip the login screen.
+*/
+
+onAuthStateChanged(auth, async user => {
+
+  if(!user) return;
+
+  try{
+
+    const token =
+      await user.getIdTokenResult(true);
+
+    if(token.claims.admin === true){
+
+      location.href = "secret-controller.html";
+
+    }else{
+
+      error.textContent =
+        "This account is not an administrator.";
+
+    }
+
+  }catch(err){
+
+    console.error(err);
+
+  }
+
+});
+
+
+form.addEventListener("submit", async event => {
+
+  event.preventDefault();
+
+  error.textContent = "";
+
+  button.disabled = true;
+
+  button.textContent = "LOGGING IN...";
+
+
+  try{
+
+    const credential =
+      await signInWithEmailAndPassword(
+        auth,
+        email.value.trim(),
+        password.value
+      );
+
+
+    /*
+      Verify that this account actually has
+      the Firebase custom admin claim.
+    */
+
+    const token =
+      await credential.user.getIdTokenResult(true);
+
+
+    if(token.claims.admin !== true){
+
+      error.textContent =
+        "Login succeeded, but this account is not an admin.";
+
+      button.disabled = false;
+      button.textContent = "LOGIN";
+
+      return;
+    }
+
+
+    location.href = "secret-controller.html";
+
+
+  }catch(err){
+
+    console.error(err);
+
+    error.textContent =
+      "Login failed: " + err.message;
+
+    button.disabled = false;
+
+    button.textContent = "LOGIN";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
