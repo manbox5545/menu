@@ -654,13 +654,22 @@ input:focus{
 }
 
 @media(max-width:600px){
+  html,
   body{
-    padding:15px;
+    width:100%;
+    min-height:100%;
+    overflow-x:hidden;
+  }
+
+  body{
+    padding:15px 15px 30px;
     align-items:flex-start;
   }
 
   .checkout{
-    margin-top:10px;
+    width:100%;
+    max-width:680px;
+    margin:10px auto 25px;
     max-height:none;
     padding:22px 17px;
     border-radius:24px;
@@ -676,6 +685,38 @@ input:focus{
 
   .buildings{
     grid-template-columns:repeat(2,1fr);
+  }
+
+  .building{
+    min-width:0;
+  }
+
+  .warning{
+    font-size:13px;
+  }
+
+  .payment-option{
+    grid-template-columns:38px minmax(0,1fr) 24px;
+    gap:9px;
+    padding:13px;
+  }
+
+  .payment-option strong,
+  .payment-option small{
+    overflow-wrap:anywhere;
+  }
+
+  .checkout-final-total{
+    font-size:18px;
+  }
+
+  .order-success-card{
+    max-height:calc(100vh - 30px);
+    padding:22px 16px;
+  }
+
+  .order-status-board{
+    padding:17px;
   }
 
   .invoice-box{
@@ -848,7 +889,7 @@ import { getDatabase, ref, push, serverTimestamp, onValue } from "https://www.gs
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBq7UEsIwoudC2g8DRrG7EwqblX9SIDCF8",
+  apiKey: "AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
   authDomain: "ticktok-7fb30.firebaseapp.com",
   databaseURL: "https://ticktok-7fb30-default-rtdb.firebaseio.com",
   projectId: "ticktok-7fb30",
