@@ -1015,6 +1015,10 @@ cartItems.addEventListener("click",e=>{
 
 /* Non-functional Buy Now button */
 document.getElementById("buyNowBtn").onclick=()=>{
+  localStorage.setItem("prachiOrderCart",JSON.stringify(cart));
+  localStorage.setItem("prachiOrderTotal",String(
+    Object.values(cart).reduce((sum,item)=>sum+(item.price*item.quantity),0)
+  ));
   window.location.href="final.html";
 };
 
