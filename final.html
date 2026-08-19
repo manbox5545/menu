@@ -319,6 +319,145 @@ input:focus{
   80%{transform:translateX(5px)}
 }
 
+.payment-options{
+  display:grid;
+  gap:13px;
+  margin-bottom:18px;
+}
+
+.payment-option{
+  width:100%;
+  display:grid;
+  grid-template-columns:42px 1fr 28px;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  border:2px solid #ddd;
+  border-radius:17px;
+  padding:15px;
+  background:#fff;
+  color:#111;
+  cursor:pointer;
+  transition:transform .18s,border-color .18s,box-shadow .18s;
+}
+
+.payment-option:hover:not(.unavailable){
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,.1);
+}
+
+.payment-option.selected{
+  border-color:#111;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.payment-option.unavailable{
+  cursor:not-allowed;
+  opacity:.55;
+  background:#f5f5f5;
+}
+
+.payment-icon{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f0f0f0;
+  font-size:22px;
+}
+
+.payment-option strong{
+  display:block;
+  font-size:15px;
+}
+
+.payment-option small{
+  display:block;
+  margin-top:4px;
+  color:#777;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.4px;
+}
+
+.payment-check{
+  font-weight:900;
+  text-align:center;
+}
+
+.payment-note{
+  padding:14px 16px;
+  border-radius:14px;
+  background:#f4f4f4;
+  color:#555;
+  font-size:13px;
+  line-height:1.45;
+  margin-bottom:4px;
+}
+
+.payment-note strong{
+  display:block;
+  color:#111;
+  margin-bottom:4px;
+  letter-spacing:.6px;
+}
+
+.phone-label{
+  margin-top:18px;
+}
+
+.phone-input{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  align-items:center;
+  border:2px solid #ddd;
+  border-radius:13px;
+  overflow:hidden;
+  background:#fff;
+  transition:border-color .18s,box-shadow .18s;
+}
+
+.phone-input:focus-within{
+  border-color:#111;
+  box-shadow:0 0 0 4px rgba(0,0,0,.08);
+}
+
+.country-code{
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  background:#f2f2f2;
+  color:#111;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.phone-input input{
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+
+.phone-input input:focus{
+  border:0;
+  box-shadow:none;
+}
+
+.phone-error{
+  display:none;
+  color:#c62828;
+  font-size:12px;
+  font-weight:700;
+  margin-top:7px;
+}
+
+.phone-error.show{
+  display:block;
+}
+
 .order-summary{
   margin-top:20px;
   padding:16px;
@@ -347,6 +486,34 @@ input:focus{
   font-weight:800;
 }
 
+.order-success-overlay{
+  position:fixed;
+  inset:0;
+  z-index:30;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.62);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+
+.order-success-overlay.active{
+  display:flex;
+  animation:fadeUp .3s ease;
+}
+
+.order-success-card{
+  width:min(560px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:26px;
+  padding:28px;
+  box-shadow:0 25px 80px rgba(0,0,0,.5);
+}
+
 .success{
   text-align:center;
 }
@@ -364,38 +531,109 @@ input:focus{
   font-size:35px;
 }
 
-.invoice-box{
-  margin-top:24px;
-  min-height:250px;
-  background:#fff;
-  border-radius:22px;
-  padding:28px;
-  box-shadow:0 8px 30px rgba(0,0,0,.1);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
-
-.invoice-box h2{
-  font-family:Anton,sans-serif;
-  letter-spacing:1.5px;
-  margin-bottom:10px;
-}
-
-.invoice-box p{
-  color:#666;
-  margin-bottom:20px;
-}
-
-.download{
+.notification-btn{
   width:100%;
-  padding:15px;
+  margin-top:18px;
+  padding:13px 16px;
   border:0;
   border-radius:13px;
   background:#111;
   color:#fff;
-  font:800 16px Inter,sans-serif;
+  font:800 13px Inter,sans-serif;
+  letter-spacing:.5px;
   cursor:pointer;
+}
+
+.notification-btn:hover{
+  opacity:.9;
+}
+
+.status-live{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:10px 0 17px;
+  color:#111;
+  font-size:13px;
+}
+
+.live-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:#27ae60;
+  box-shadow:0 0 0 5px rgba(39,174,96,.12);
+}
+
+.order-status-board{
+  margin-top:24px;
+  background:#fff;
+  border-radius:20px;
+  padding:22px;
+  text-align:left;
+  box-shadow:0 8px 30px rgba(0,0,0,.08);
+}
+
+.status-heading{
+  font:800 15px Inter,sans-serif;
+  letter-spacing:.7px;
+  margin-bottom:18px;
+  color:#111;
+}
+
+.status-line{
+  display:grid;
+  grid-template-columns:34px 1fr;
+  gap:12px;
+  align-items:start;
+  padding:13px 0;
+  border-bottom:1px solid #eee;
+}
+
+.status-line:last-child{
+  border-bottom:0;
+  padding-bottom:0;
+}
+
+.status-dot{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:#eee;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:800;
+  color:#666;
+}
+
+.status-line.active .status-dot{
+  background:#27ae60;
+  color:#fff;
+}
+
+.status-line strong{
+  display:block;
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+.status-line small{
+  display:block;
+  color:#777;
+  line-height:1.4;
+  font-size:12px;
+}
+
+.order-info-board{
+  margin-top:14px;
+  padding:15px;
+  border-radius:15px;
+  background:#f7f7f7;
+  text-align:left;
+  font-size:13px;
+  line-height:1.6;
 }
 
 .small-note{
@@ -461,7 +699,7 @@ input:focus{
     <div class="buildings">
       <button class="building" data-block="A" type="button">
         <div class="building-art"><div class="tower"></div></div>
-        <div class="building-name">ABLOCK</div>
+        <div class="building-name">A</div>
       </button>
 
       <button class="building" data-block="B" type="button">
@@ -488,6 +726,21 @@ input:focus{
     <label for="customerName">Enter your name</label>
     <input id="customerName" type="text" maxlength="60" autocomplete="name" placeholder="Your name">
 
+    <label for="customerPhone" class="phone-label">📱 Enter your phone number</label>
+    <div class="phone-input">
+      <span class="country-code">🇮🇳 +91</span>
+      <input
+        id="customerPhone"
+        type="tel"
+        inputmode="numeric"
+        autocomplete="tel-national"
+        maxlength="10"
+        pattern="[0-9]{10}"
+        placeholder="10-digit mobile number"
+        aria-label="10 digit Indian phone number">
+    </div>
+    <div class="phone-error" id="phoneError">Please enter exactly 10 digits.</div>
+
     <div class="order-summary" id="orderSummary"></div>
 
     <button class="place-order" id="placeOrderBtn" type="button">
@@ -497,18 +750,61 @@ input:focus{
     <p class="small-note">Your order details will be securely sent for order processing.</p>
   </section>
 
-  <!-- STEP 3 -->
-  <section class="step success" id="step3">
-    <div class="success-icon">✓</div>
-    <h1 class="question">ORDER PLACED</h1>
-    <p id="successText">Your order has been received.</p>
+  <!-- PAYMENT STEP -->
+  <section class="step" id="paymentStep">
+    <h1 class="question">How would you like to pay?</h1>
 
-    <div class="invoice-box">
-      <h2>DOWNLOAD INVOICE</h2>
-      <p>Your invoice is ready.</p>
-      <button class="download" id="downloadInvoiceBtn" type="button">
-        DOWNLOAD PDF
+    <div class="payment-options">
+      <button class="payment-option selected" data-payment="Cash on Delivery" type="button">
+        <span class="payment-icon">💵</span>
+        <span><strong>Cash on Delivery</strong><small>Pay when your food arrives</small></span>
+        <span class="payment-check">✓</span>
       </button>
+
+      <button class="payment-option unavailable" data-payment="QR" type="button">
+        <span class="payment-icon">▦</span>
+        <span><strong>QR Payment</strong><small>CURRENTLY UNAVAILABLE</small></span>
+        <span class="payment-check">—</span>
+      </button>
+    </div>
+
+    <div class="payment-note">
+      <strong>PAYMENT</strong>
+      Cash on Delivery is currently available. QR payment will be enabled later.
+    </div>
+
+    <button class="place-order" id="confirmOrderBtn" type="button">PLACE ORDER</button>
+  </section>
+
+  <!-- ORDER PLACED OVERLAY -->
+  <section class="order-success-overlay" id="step3">
+    <div class="order-success-card">
+      <div class="success-icon">✓</div>
+      <h1 class="question">ORDER PLACED</h1>
+      <p id="successText">Your order has been received.</p>
+
+      <button class="notification-btn" id="notificationBtn" type="button">
+        🔔 ENABLE ORDER NOTIFICATIONS
+      </button>
+
+      <div class="order-status-board">
+        <div class="status-heading">WHAT'S GOING ON WITH YOUR ORDER?</div>
+
+        <div class="status-live">
+          <span class="live-dot"></span>
+          <strong id="liveOrderStatus">Our admin is receiving your order</strong>
+        </div>
+
+        <div class="status-line active">
+          <span class="status-dot">1</span>
+          <div>
+            <strong>Order received</strong>
+            <small id="statusDetail">Our admin is receiving your order.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-info-board" id="finalOrderInfo"></div>
     </div>
   </section>
 
@@ -527,7 +823,7 @@ input:focus{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { getDatabase, ref, push, serverTimestamp, onValue } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
@@ -548,11 +844,13 @@ const step2 = document.getElementById("step2");
 const step3 = document.getElementById("step3");
 const outsidePopup = document.getElementById("outsidePopup");
 const customerName = document.getElementById("customerName");
+const customerPhone = document.getElementById("customerPhone");
+const phoneError = document.getElementById("phoneError");
 const orderSummary = document.getElementById("orderSummary");
 const placeOrderBtn = document.getElementById("placeOrderBtn");
-const downloadInvoiceBtn = document.getElementById("downloadInvoiceBtn");
 
 let selectedBlock = "";
+let paymentMethod = "Cash on Delivery";
 let currentOrder = null;
 
 const rawCart = localStorage.getItem("prachiOrderCart");
@@ -560,7 +858,12 @@ const cart = rawCart ? JSON.parse(rawCart) : {};
 const total = Number(localStorage.getItem("prachiOrderTotal") || 0);
 
 function showStep(step){
-  [step1,step2,step3].forEach(el=>el.classList.remove("active"));
+  if(step===step3){
+    step3.classList.add("active");
+    return;
+  }
+
+  [step1,step2].forEach(el=>el.classList.remove("active"));
   step.classList.add("active");
 }
 
@@ -606,6 +909,123 @@ function escapeHtml(value){
   }[char]));
 }
 
+const STATUS_MESSAGES={
+  "Order taken":{
+    detail:"Our admin has taken your order.",
+    index:1
+  },
+  "Preparing your food":{
+    detail:"The kitchen is preparing your food.",
+    index:2
+  },
+  "Packaging it":{
+    detail:"Your food is being packaged.",
+    index:3
+  },
+  "Billing it":{
+    detail:"Your order is being billed.",
+    index:4
+  },
+  "Order has been canceled":{
+    detail:"Your order has been canceled.",
+    index:5
+  },
+  "Out for delivery":{
+    detail:"Your order is out for delivery.",
+    index:6
+  }
+};
+
+let lastKnownStatus="";
+let notificationEnabled=false;
+
+function showOrderStatus(status){
+  const data=STATUS_MESSAGES[status];
+  const live=document.getElementById("liveOrderStatus");
+  const detail=document.getElementById("statusDetail");
+
+  if(!data){
+    live.textContent="Our admin is receiving your order";
+    detail.textContent="Our admin is receiving your order.";
+    return;
+  }
+
+  live.textContent=status;
+  detail.textContent=data.detail;
+
+  if(status!==lastKnownStatus && lastKnownStatus){
+    notifyOrderStatus(status,data.detail);
+  }
+
+  lastKnownStatus=status;
+}
+
+function notifyOrderStatus(title,message){
+  if(!notificationEnabled || Notification.permission!=="granted") return;
+
+  const notification=new Notification("Prachi Cloud Kitchen",{
+    body:message,
+    icon:"img.png",
+    tag:"prachi-order-status"
+  });
+
+  try{
+    const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+    if(AudioContextClass){
+      const audio=new AudioContextClass();
+      const oscillator=audio.createOscillator();
+      const gain=audio.createGain();
+      oscillator.frequency.value=880;
+      gain.gain.value=.04;
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start();
+      oscillator.stop(audio.currentTime+.18);
+    }
+  }catch(error){
+    console.log("Notification sound unavailable.",error);
+  }
+
+  setTimeout(()=>notification.close(),5000);
+}
+
+const notificationBtn=document.getElementById("notificationBtn");
+
+notificationBtn.onclick=async()=>{
+  if(!("Notification" in window)){
+    alert("This browser does not support notifications.");
+    return;
+  }
+
+  const permission=await Notification.requestPermission();
+
+  if(permission==="granted"){
+    notificationEnabled=true;
+    notificationBtn.textContent="✓ ORDER NOTIFICATIONS ENABLED";
+  }else{
+    notificationBtn.textContent="🔔 NOTIFICATIONS BLOCKED";
+  }
+};
+
+function listenForOrderStatus(orderId){
+  if(!orderId) return;
+
+  onValue(ref(db,`orders/${orderId}/status`),snapshot=>{
+    const status=snapshot.val();
+    if(status){
+      showOrderStatus(status);
+    }else{
+      showOrderStatus("");
+    }
+  });
+}
+
+
+customerPhone.addEventListener("input",()=>{
+  customerPhone.value=customerPhone.value.replace(/\D/g,"").slice(0,10);
+  phoneError.classList.remove("show");
+});
+
 document.getElementById("yesBtn").onclick=()=>{
   renderSummary();
   showStep(step2);
@@ -627,7 +1047,7 @@ document.querySelectorAll(".building").forEach(button=>{
   };
 });
 
-placeOrderBtn.onclick=async()=>{
+placeOrderBtn.onclick=()=>{
   placeOrderBtn.classList.remove("shake");
   void placeOrderBtn.offsetWidth;
   placeOrderBtn.classList.add("shake");
@@ -645,14 +1065,48 @@ placeOrderBtn.onclick=async()=>{
     return;
   }
 
+  const phone=customerPhone.value.trim();
+
+  if(!/^\d{10}$/.test(phone)){
+    customerPhone.focus();
+    phoneError.classList.add("show");
+    return;
+  }
+
   if(!Object.keys(cart).length){
     alert("Your cart is empty.");
     return;
   }
 
+  showStep(document.getElementById("paymentStep"));
+};
+
+document.querySelectorAll(".payment-option").forEach(button=>{
+  button.onclick=()=>{
+    if(button.classList.contains("unavailable")){
+      alert("QR payment is currently unavailable.");
+      return;
+    }
+
+    document.querySelectorAll(".payment-option").forEach(b=>{
+      b.classList.remove("selected");
+      b.querySelector(".payment-check").textContent="—";
+    });
+
+    button.classList.add("selected");
+    button.querySelector(".payment-check").textContent="✓";
+    paymentMethod=button.dataset.payment;
+  };
+});
+
+document.getElementById("confirmOrderBtn").onclick=async()=>{
+  const name=customerName.value.trim();
+
   currentOrder={
     customerName:name,
+    phone:"+91"+customerPhone.value,
     block:selectedBlock,
+    paymentMethod,
     bill:total,
     food:Object.entries(cart).map(([foodName,item])=>({
       name:foodName,
@@ -663,8 +1117,9 @@ placeOrderBtn.onclick=async()=>{
     createdAt:Date.now()
   };
 
-  placeOrderBtn.disabled=true;
-  placeOrderBtn.textContent="PLACING ORDER...";
+  const confirmBtn=document.getElementById("confirmOrderBtn");
+  confirmBtn.disabled=true;
+  confirmBtn.textContent="PLACING ORDER...";
 
   try{
     const orderRef=await push(ref(db,"orders"),{
@@ -673,83 +1128,34 @@ placeOrderBtn.onclick=async()=>{
     });
 
     currentOrder.orderId=orderRef.key;
-
     localStorage.setItem("prachiLastOrder",JSON.stringify(currentOrder));
+    showOrderStatus("");
+    listenForOrderStatus(currentOrder.orderId);
 
     document.getElementById("successText").textContent=
       `Thank you ${name}. Your order for Block ${selectedBlock} has been received.`;
+
+    document.getElementById("finalOrderInfo").innerHTML=`
+      <strong>Order details</strong><br>
+      👤 ${escapeHtml(name)}<br>
+      📱 ${escapeHtml(currentOrder.phone)}<br>
+      🏢 Block ${escapeHtml(selectedBlock)}<br>
+      💵 ${escapeHtml(currentOrder.paymentMethod)}<br>
+      🧾 Total: ₹${currentOrder.bill}
+    `;
 
     showStep(step3);
   }catch(error){
     console.error(error);
     alert("The order could not be sent. Please check your Firebase Realtime Database rules and try again.");
-    placeOrderBtn.disabled=false;
-    placeOrderBtn.textContent="PLACE ORDER";
+    confirmBtn.disabled=false;
+    confirmBtn.textContent="PLACE ORDER";
   }
 };
 
-downloadInvoiceBtn.onclick=async()=>{
-  if(!currentOrder){
-    currentOrder=JSON.parse(localStorage.getItem("prachiLastOrder") || "null");
-  }
 
-  if(!currentOrder) return;
 
-  const { jsPDF } = window.jspdf;
-  const pdf=new jsPDF();
 
-  pdf.setFont("helvetica","bold");
-  pdf.setFontSize(22);
-  pdf.text("PRACHI CLOUD KITCHEN",20,25);
-
-  pdf.setFont("helvetica","normal");
-  pdf.setFontSize(12);
-  pdf.text("ORDER INVOICE",20,36);
-
-  pdf.text(`Order ID: ${currentOrder.orderId || "N/A"}`,20,50);
-  pdf.text(`Name: ${currentOrder.customerName}`,20,59);
-  pdf.text(`Block: ${currentOrder.block}`,20,68);
-
-  let y=84;
-
-  pdf.setFont("helvetica","bold");
-  pdf.text("Food",20,y);
-  pdf.text("Qty",125,y);
-  pdf.text("Amount",155,y);
-
-  y+=10;
-  pdf.setFont("helvetica","normal");
-
-  currentOrder.food.forEach(item=>{
-    pdf.text(String(item.name).slice(0,35),20,y);
-    pdf.text(String(item.quantity),125,y);
-    pdf.text(`Rs. ${item.subtotal}`,155,y);
-    y+=9;
-
-    if(y>270){
-      pdf.addPage();
-      y=25;
-    }
-  });
-
-  y+=8;
-  pdf.setFont("helvetica","bold");
-  pdf.line(20,y,190,y);
-  y+=10;
-  pdf.text(`TOTAL: Rs. ${currentOrder.bill}`,20,y);
-
-  pdf.setFont("helvetica","normal");
-  pdf.setFontSize(9);
-  pdf.text("Delivery: Star Galaxy Apartments receptionist",20,y+15);
-
-  pdf.save(`Prachi-Invoice-${currentOrder.orderId || "order"}.pdf`);
-};
-
-// Load jsPDF only when needed.
-const pdfScript=document.createElement("script");
-pdfScript.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js";
-pdfScript.async=true;
-document.head.appendChild(pdfScript);
 </script>
 
 </body>
