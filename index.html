@@ -92,10 +92,6 @@ body{
   box-shadow:0 8px 25px rgba(0,0,0,.3);
 }
 
-#cartBtn{
-  left:20px;
-}
-
 #themeBtn{
   right:20px;
 }
@@ -462,6 +458,404 @@ body.dark .cart-total{
   border-color:#fff;
 }
 
+/* ================= BOTTOM NAVIGATION ================= */
+
+.bottom-nav{
+  position:fixed;
+  left:50%;
+  bottom:15px;
+  transform:translateX(-50%);
+  z-index:10005;
+  width:min(560px,calc(100% - 24px));
+  min-height:67px;
+  padding:7px;
+  display:flex;
+  align-items:stretch;
+  justify-content:space-around;
+  gap:5px;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;
+  background:rgba(15,15,15,.9);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 15px 45px rgba(0,0,0,.35);
+}
+
+.nav-item{
+  flex:1;
+  min-width:0;
+  border:0;
+  border-radius:14px;
+  background:transparent;
+  color:#fff;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  font-family:Inter,sans-serif;
+}
+
+.nav-item span{
+  position:relative;
+  font-size:20px;
+  line-height:22px;
+}
+
+.nav-item small{
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.5px;
+}
+
+.nav-item:hover,
+.nav-item.active{
+  background:rgba(255,255,255,.14);
+}
+
+#navCartCount{
+  display:none;
+  position:absolute;
+  right:-9px;
+  top:-8px;
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  border-radius:10px;
+  background:#e74c3c;
+  color:#fff;
+  font:800 9px/16px Inter,sans-serif;
+}
+
+.settings-overlay{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:10004;
+  display:none;
+  align-items:stretch;
+  justify-content:stretch;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(5px);
+}
+
+.settings-overlay.show{display:flex}
+
+.settings-panel{
+  width:100vw;
+  height:100vh;
+  background:#fff;
+  color:#111;
+  border-radius:0;
+  padding:clamp(25px,5vw,55px);
+  box-shadow:none;
+}
+
+.settings-panel h2{
+  font-family:Anton,sans-serif;
+  letter-spacing:1.5px;
+  margin-bottom:18px;
+}
+
+.theme-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:15px;
+  border-radius:15px;
+  background:#f4f4f4;
+}
+
+.theme-toggle{
+  border:0;
+  border-radius:12px;
+  padding:11px 17px;
+  background:#111;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+
+body.dark .settings-panel{
+  background:#1b1b1b;
+  color:#fff;
+}
+
+body.dark .theme-row{
+  background:#292929;
+}
+
+body.dark .theme-toggle{
+  background:#fff;
+  color:#111;
+}
+
+@media(max-width:600px){
+  .bottom-nav{
+    bottom:8px;
+    width:calc(100% - 16px);
+    min-height:62px;
+  }
+
+  body{
+    padding-bottom:90px;
+  }
+}
+
+/* ================= ORDERS + REPEAT CHECKOUT ================= */
+
+.orders-overlay,.repeat-overlay{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  background:rgba(0,0,0,.62);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+  z-index:10003;
+  display:none;
+  align-items:stretch;
+  justify-content:stretch;
+  padding:0;
+}
+
+.orders-overlay.show,.repeat-overlay.show{display:flex}
+
+.orders-panel,.repeat-panel{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  max-height:none;
+  overflow:auto;
+  background:#fff;
+  color:#111;
+  border-radius:0;
+  padding:clamp(25px,5vw,55px);
+  box-shadow:none;
+}
+
+.orders-panel h2,.repeat-panel h2{
+  font-family:Anton,sans-serif;
+  letter-spacing:2px;
+  margin-bottom:18px;
+}
+
+.close-panel{
+  position:absolute;
+  right:15px;
+  top:12px;
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:50%;
+  background:#eee;
+  font-size:25px;
+  cursor:pointer;
+}
+
+.account-box{
+  padding:13px;
+  border-radius:14px;
+  background:#f5f5f5;
+  margin-bottom:15px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.order-card{
+  padding:16px;
+  border:1px solid #e5e5e5;
+  border-radius:16px;
+  margin-bottom:12px;
+}
+
+.order-card-status{
+  display:inline-block;
+  margin:8px 0;
+  padding:6px 9px;
+  border-radius:9px;
+  background:#eef8f1;
+  color:#1c743c;
+  font-size:12px;
+  font-weight:800;
+}
+
+.orders-empty{
+  text-align:center;
+  padding:35px 10px;
+  color:#777;
+}
+
+.repeat-details{
+  background:#f6f6f6;
+  border-radius:14px;
+  padding:13px;
+  margin-bottom:17px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.repeat-panel label{
+  display:block;
+  font-weight:700;
+  margin:13px 0 7px;
+}
+
+.repeat-panel input{
+  width:100%;
+  border:2px solid #ddd;
+  border-radius:12px;
+  padding:13px;
+  font:500 16px Inter,sans-serif;
+}
+
+.phone-input-index{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  border:2px solid #ddd;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.phone-input-index span{
+  display:flex;
+  align-items:center;
+  padding:0 11px;
+  background:#f1f1f1;
+  font-weight:800;
+}
+
+.phone-input-index input{
+  border:0;
+  border-radius:0;
+}
+
+.repeat-blocks{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+}
+
+.repeat-blocks button{
+  padding:14px;
+  border:2px solid #ddd;
+  border-radius:12px;
+  background:#f5f5f5;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.repeat-blocks button.selected{
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+
+.delivery-note{
+  margin-top:17px;
+  padding:13px;
+  border-radius:12px;
+  background:#fff4d6;
+  color:#604b00;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.repeat-next{
+  width:100%;
+  margin-top:17px;
+  padding:14px;
+  border:0;
+  border-radius:13px;
+  background:#111;
+  color:#fff;
+  font:800 15px Inter,sans-serif;
+  cursor:pointer;
+}
+
+.repeat-payment-option{
+  display:grid;
+  grid-template-columns:42px 1fr 25px;
+  gap:12px;
+  align-items:center;
+  padding:16px;
+  border:2px solid #111;
+  border-radius:15px;
+}
+
+.repeat-payment-option>span{
+  font-size:23px;
+}
+
+.repeat-payment-option small{
+  display:block;
+  color:#777;
+  margin-top:3px;
+}
+
+.qr-unavailable{
+  margin-top:10px;
+  padding:13px;
+  border-radius:12px;
+  background:#eee;
+  color:#777;
+  font-size:13px;
+  font-weight:700;
+}
+
+.repeat-total{
+  margin-top:18px;
+  padding-top:15px;
+  border-top:2px solid #111;
+  display:flex;
+  justify-content:space-between;
+  font-weight:800;
+  font-size:20px;
+}
+
+body.dark .orders-panel,
+body.dark .repeat-panel{
+  background:#1b1b1b;
+  color:#fff;
+}
+
+body.dark .account-box,
+body.dark .order-card,
+body.dark .repeat-details{
+  background:#292929;
+  border-color:#444;
+}
+
+body.dark .close-panel,
+body.dark .repeat-blocks button{
+  background:#333;
+  color:#fff;
+}
+
+body.dark .phone-input-index,
+body.dark .phone-input-index span{
+  background:#333;
+  color:#fff;
+  border-color:#555;
+}
+
+body.dark .repeat-panel input{
+  background:#222;
+  color:#fff;
+  border-color:#555;
+}
+
+body.dark .repeat-payment-option{
+  border-color:#fff;
+}
+
+body.dark .repeat-total{
+  border-color:#fff;
+}
+
 /* ================= MOBILE ================= */
 
 @media(max-width:700px){
@@ -510,10 +904,6 @@ body.dark .cart-total{
     height:50px;
   }
 
-  #cartBtn{
-    left:12px;
-  }
-
   #themeBtn{
     right:12px;
   }
@@ -529,11 +919,21 @@ body.dark .cart-total{
 
 <body>
 
-<!-- CART BUTTON -->
-<button id="cartBtn" aria-label="Open cart">
-  🛒
-  <span id="cartCount">0</span>
-</button>
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="nav-item" id="homeNavBtn" data-page="home" type="button">
+    <span>⌂</span><small>HOME</small>
+  </button>
+  <button class="nav-item" id="ordersBtn" data-page="orders" type="button">
+    <span>📦</span><small>ORDERS</small>
+  </button>
+  <button class="nav-item" id="cartNavBtn" data-page="cart" type="button">
+    <span>🛒<b id="navCartCount">0</b></span><small>CART</small>
+  </button>
+  <button class="nav-item" id="settingsNavBtn" data-page="settings" type="button">
+    <span>⚙️</span><small>SETTINGS</small>
+  </button>
+</nav>
 
 <!-- DARK MODE -->
 <button id="themeBtn" aria-label="Toggle dark mode">🌙</button>
@@ -570,8 +970,97 @@ body.dark .cart-total{
 
 </div>
 
+<!-- ORDERS / ACCOUNT -->
+<div class="orders-overlay" id="ordersOverlay">
+  <div class="orders-panel">
+    <button class="close-panel" id="closeOrdersBtn" type="button">×</button>
+    <h2>YOUR ORDERS</h2>
+    <div class="account-box" id="accountBox"></div>
+    <div id="ordersList">
+      <div class="orders-empty">Sign in with your delivery details to see orders.</div>
+    </div>
+  </div>
+</div>
 
-<!-- ================= HERO ================= -->
+<!-- REPEAT ORDER -->
+<div class="repeat-overlay" id="repeatOverlay">
+  <div class="repeat-panel">
+    <button class="close-panel" id="closeRepeatBtn" type="button">×</button>
+    <h2>CONFIRM DELIVERY DETAILS</h2>
+
+    <div class="repeat-details" id="repeatDetails"></div>
+
+    <label for="repeatName">Name</label>
+    <input id="repeatName" type="text" maxlength="60">
+
+    <label for="repeatPhone">Phone</label>
+    <div class="phone-input-index">
+      <span>🇮🇳 +91</span>
+      <input id="repeatPhone" type="tel" inputmode="numeric" maxlength="10">
+    </div>
+
+    <label>Building / Block</label>
+    <div class="repeat-blocks" id="repeatBlocks">
+      <button data-block="A" type="button">A</button>
+      <button data-block="B" type="button">B</button>
+      <button data-block="C" type="button">C</button>
+      <button data-block="D" type="button">D</button>
+    </div>
+
+    <div class="delivery-note">
+      Delivery charge is free for the orrders more than 300.<br>
+      Orders under ₹300 with Cash on Delivery have a ₹20 delivery charge.
+    </div>
+
+    <button class="repeat-next" id="repeatNextBtn" type="button">NEXT</button>
+  </div>
+</div>
+
+<!-- REPEAT PAYMENT -->
+<div class="repeat-overlay" id="repeatPaymentOverlay">
+  <div class="repeat-panel">
+    <button class="close-panel" id="closeRepeatPaymentBtn" type="button">×</button>
+    <h2>PAYMENT</h2>
+
+    <div class="repeat-payment-option">
+      <span>💵</span>
+      <div>
+        <strong>Cash on Delivery</strong>
+        <small>Available</small>
+      </div>
+      <b>✓</b>
+    </div>
+
+    <div class="qr-unavailable">
+      ▦ QR Payment — CURRENTLY UNAVAILABLE
+    </div>
+
+    <div class="repeat-total" id="repeatTotal"></div>
+
+    <button class="repeat-next" id="repeatOrderBtn" type="button">
+      PAY ON DELIVERY & ORDER
+    </button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-panel">
+    <button class="close-panel" id="closeSettingsBtn" type="button">×</button>
+    <h2>SETTINGS</h2>
+    <div class="theme-row">
+      <div>
+        <strong>THEME</strong>
+        <div style="font-size:12px;color:#777;margin-top:4px">
+          Switch between light and dark mode.
+        </div>
+      </div>
+      <button class="theme-toggle" id="settingsThemeBtn" type="button">🌙 THEME</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= HERO ================= --><!-- ================= HERO ================= -->
 
 <section class="hero">
 
@@ -843,6 +1332,25 @@ body.dark .cart-total{
 </footer>
 
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
+  authDomain:"ticktok-7fb30.firebaseapp.com",
+  databaseURL:"https://ticktok-7fb30-default-rtdb.firebaseio.com",
+  projectId:"ticktok-7fb30",
+  storageBucket:"ticktok-7fb30.firebasestorage.app",
+  messagingSenderId:"493782050714",
+  appId:"1:493782050714:web:5f6bd9eae6af68b250fc23",
+  measurementId:"G-3KH8Y1SVDG"
+};
+const firebaseApp=initializeApp(firebaseConfig);
+window.prachiDb=getDatabase(firebaseApp);
+window.prachiFirebase={ref,onValue,push,serverTimestamp};
+</script>
+
 <script>
 
 /* ================= DARK MODE ================= */
@@ -863,12 +1371,11 @@ themeBtn.onclick=()=>{
 
 const cart={};
 
-const cartBtn=document.getElementById("cartBtn");
 const cartOverlay=document.getElementById("cartOverlay");
 const cartPopup=document.getElementById("cartPopup");
 const cartItems=document.getElementById("cartItems");
 const cartTotal=document.getElementById("cartTotal");
-const cartCount=document.getElementById("cartCount");
+const cartCount=document.getElementById("navCartCount");
 
 
 /* Add food to cart */
@@ -890,26 +1397,15 @@ document.querySelector(".menu").addEventListener("click",e=>{
 });
 
 
-/* Open cart */
-
-cartBtn.onclick=e=>{
-  e.stopPropagation();
-  cartOverlay.classList.add("show");
-};
-
-
-/* Close cart when clicking outside */
+/* Cart is opened only through the bottom navigation.
+   It behaves as a full-screen page, just like Orders and Settings. */
 
 cartOverlay.onclick=e=>{
-
   if(e.target===cartOverlay){
-    cartOverlay.classList.remove("show");
+    closeAllScreens();
+    showNavPage("home");
   }
-
 };
-
-
-/* Keep clicks inside popup from closing it */
 
 cartPopup.onclick=e=>{
   e.stopPropagation();
@@ -991,9 +1487,7 @@ function updateCart(){
   cartTotal.textContent="₹"+total;
 
   cartCount.textContent=count;
-
-  cartCount.style.display=
-    count ? "block" : "none";
+  cartCount.style.display=count ? "flex" : "none";
 }
 
 
@@ -1015,11 +1509,21 @@ cartItems.addEventListener("click",e=>{
 
 /* Non-functional Buy Now button */
 document.getElementById("buyNowBtn").onclick=()=>{
+  if(!Object.keys(cart).length){
+    alert("Your cart is empty.");
+    return;
+  }
+
   localStorage.setItem("prachiOrderCart",JSON.stringify(cart));
   localStorage.setItem("prachiOrderTotal",String(
     Object.values(cart).reduce((sum,item)=>sum+(item.price*item.quantity),0)
   ));
-  window.location.href="final.html";
+
+  if(localStorage.getItem("prachiProfile")){
+    openRepeatCheckout();
+  }else{
+    window.location.href="final.html";
+  }
 };
 
 /* Change quantity */
@@ -1046,6 +1550,287 @@ function removeItem(name){
 
   updateCart();
 }
+
+
+/* ================= ACCOUNT + ORDER TRACKING ================= */
+
+const ordersBtn=document.getElementById("ordersBtn");
+const ordersOverlay=document.getElementById("ordersOverlay");
+const ordersList=document.getElementById("ordersList");
+const accountBox=document.getElementById("accountBox");
+const repeatOverlay=document.getElementById("repeatOverlay");
+const repeatPaymentOverlay=document.getElementById("repeatPaymentOverlay");
+
+let profile=null;
+let repeatBlock="";
+let repeatCart={};
+let repeatSubtotal=0;
+let repeatDelivery=0;
+
+function escapeHtmlIndex(value){
+  return String(value??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function getProfile(){
+  try{return JSON.parse(localStorage.getItem("prachiProfile")||"null")}catch{return null}
+}
+
+function saveProfile(p){
+  profile=p;
+  localStorage.setItem("prachiProfile",JSON.stringify(p));
+}
+
+function deliveryFor(subtotal){
+  return subtotal<300?20:0;
+}
+
+function openOrders(){
+  ordersOverlay.classList.add("show");
+  profile=getProfile();
+
+  if(!profile){
+    accountBox.innerHTML="<strong>Not signed in yet.</strong><br>Place your first order to create your password-free account.";
+    ordersList.innerHTML='<div class="orders-empty">No account orders available yet.</div>';
+    return;
+  }
+
+  accountBox.innerHTML=`
+    <strong>👤 ${escapeHtmlIndex(profile.name)}</strong><br>
+    📱 ${escapeHtmlIndex(profile.phone)}<br>
+    🏢 Block ${escapeHtmlIndex(profile.block)}
+  `;
+
+  ordersList.innerHTML='<div class="orders-empty">Loading your orders...</div>';
+
+  window.prachiFirebase.onValue(
+    window.prachiFirebase.ref(window.prachiDb,"orders"),
+    snapshot=>{
+    const data=snapshot.val()||{};
+    const mine=Object.entries(data)
+      .filter(([id,o])=>{
+        const orderPhone=String(o.phone||"").replace(/\D/g,"");
+        const profilePhone=String(profile.phone||"").replace(/\D/g,"");
+        return orderPhone===profilePhone;
+      })
+      .sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+
+    if(!mine.length){
+      ordersList.innerHTML='<div class="orders-empty">You have no orders yet.</div>';
+      return;
+    }
+
+    ordersList.innerHTML=mine.map(([id,o])=>{
+      const status=o.status||"Our admin is receiving your order";
+      const delivery=o.deliveryCharge||0;
+      const finalBill=o.finalBill??(Number(o.bill||0)+delivery);
+      return `
+        <div class="order-card">
+          <strong>ORDER #${escapeHtmlIndex(id.slice(-7))}</strong>
+          <span class="order-card-status">${escapeHtmlIndex(status)}</span>
+          <div style="font-size:13px;line-height:1.6">
+            🏢 Block ${escapeHtmlIndex(o.block)}<br>
+            🍽️ ${(o.food||[]).map(x=>`${escapeHtmlIndex(x.name)} × ${escapeHtmlIndex(x.quantity)}`).join(", ")}<br>
+            💵 Subtotal: ₹${escapeHtmlIndex(o.bill)}<br>
+            🚚 Delivery: ₹${escapeHtmlIndex(delivery)}<br>
+            <strong>Final bill: ₹${escapeHtmlIndex(finalBill)}</strong>
+          </div>
+        </div>`;
+    }).join("");
+    });}
+
+const homeNavBtn=document.getElementById("homeNavBtn");
+const cartNavBtn=document.getElementById("cartNavBtn");
+const settingsNavBtn=document.getElementById("settingsNavBtn");
+const settingsOverlay=document.getElementById("settingsOverlay");
+const settingsThemeBtn=document.getElementById("settingsThemeBtn");
+const navCartCount=document.getElementById("navCartCount");
+
+function refreshNav(){
+  if(navCartCount && cartCount){
+    navCartCount.textContent=cartCount.textContent||"0";
+  }
+}
+
+const navCartObserver=new MutationObserver(refreshNav);
+navCartObserver.observe(cartCount,{childList:true,characterData:true,subtree:true});
+
+function showNavPage(page){
+  document.querySelectorAll(".nav-item").forEach(btn=>{
+    btn.style.display=btn.dataset.page===page?"none":"flex";
+  });
+}
+
+function closeAllScreens(){
+  ordersOverlay.classList.remove("show");
+  cartOverlay.classList.remove("show");
+  settingsOverlay.classList.remove("show");
+  repeatOverlay.classList.remove("show");
+  repeatPaymentOverlay.classList.remove("show");
+}
+
+function openPage(page){
+  closeAllScreens();
+
+  if(page==="orders"){
+    openOrders();
+  }else if(page==="cart"){
+    cartOverlay.classList.add("show");
+  }else if(page==="settings"){
+    settingsOverlay.classList.add("show");
+  }
+
+  showNavPage(page);
+}
+
+ordersBtn.onclick=()=>openPage("orders");
+
+homeNavBtn.onclick=()=>{
+  closeAllScreens();
+  window.scrollTo({top:0,behavior:"smooth"});
+  showNavPage("home");
+};
+
+cartNavBtn.onclick=()=>openPage("cart");
+
+settingsNavBtn.onclick=()=>openPage("settings");
+
+document.getElementById("closeSettingsBtn").onclick=()=>{
+  closeAllScreens();
+  showNavPage("home");
+};
+
+settingsOverlay.onclick=e=>{
+  if(e.target===settingsOverlay){
+    closeAllScreens();
+    showNavPage("home");
+  }
+};
+
+settingsThemeBtn.onclick=()=>{
+  themeBtn.click();
+  settingsThemeBtn.textContent=document.body.classList.contains("dark")
+    ?"☀️ LIGHT MODE"
+    :"🌙 DARK MODE";
+};
+
+document.getElementById("closeOrdersBtn").onclick=()=>{
+  closeAllScreens();
+  showNavPage("home");
+};
+
+document.getElementById("closeRepeatBtn").onclick=()=>{
+  closeAllScreens();
+  showNavPage("home");
+};
+
+document.getElementById("closeRepeatPaymentBtn").onclick=()=>{
+  closeAllScreens();
+  showNavPage("home");
+};
+
+function openRepeatCheckout(){
+  profile=getProfile();
+  if(!profile){window.location.href="final.html";return}
+
+  repeatCart=JSON.parse(localStorage.getItem("prachiOrderCart")||"{}");
+  repeatSubtotal=Object.values(repeatCart).reduce((s,i)=>s+i.price*i.quantity,0);
+  repeatDelivery=deliveryFor(repeatSubtotal);
+
+  document.getElementById("repeatName").value=profile.name||"";
+  document.getElementById("repeatPhone").value=(profile.phone||"").replace(/^\+91/,"");
+  repeatBlock=profile.block||"";
+  document.querySelectorAll("#repeatBlocks button").forEach(b=>{
+    b.classList.toggle("selected",b.dataset.block===repeatBlock);
+  });
+
+  document.getElementById("repeatDetails").innerHTML=`
+    Current delivery details: <strong>Block ${escapeHtmlIndex(repeatBlock)}</strong>.
+    You can confirm or update them before ordering.
+  `;
+
+  closeAllScreens();
+  repeatOverlay.classList.add("show");
+}
+
+document.querySelectorAll("#repeatBlocks button").forEach(button=>{
+  button.onclick=()=>{
+    repeatBlock=button.dataset.block;
+    document.querySelectorAll("#repeatBlocks button").forEach(b=>b.classList.remove("selected"));
+    button.classList.add("selected");
+  };
+});
+
+document.getElementById("repeatPhone").addEventListener("input",e=>{
+  e.target.value=e.target.value.replace(/\D/g,"").slice(0,10);
+});
+
+document.getElementById("repeatNextBtn").onclick=()=>{
+  const name=document.getElementById("repeatName").value.trim();
+  const phone=document.getElementById("repeatPhone").value.trim();
+
+  if(!name){alert("Please enter your name.");return}
+  if(!/^\d{10}$/.test(phone)){alert("Please enter exactly 10 digits.");return}
+  if(!repeatBlock){alert("Please select your building / block.");return}
+
+  saveProfile({name,phone:"+91"+phone,block:repeatBlock});
+
+  const finalBill=repeatSubtotal+repeatDelivery;
+
+  document.getElementById("repeatTotal").innerHTML=`
+    <span>Total</span>
+    <span>₹${finalBill}</span>
+  `;
+
+  repeatOverlay.classList.remove("show");
+  repeatPaymentOverlay.classList.add("show");
+};
+
+document.getElementById("repeatOrderBtn").onclick=async()=>{
+  const name=document.getElementById("repeatName").value.trim();
+  const phone="+91"+document.getElementById("repeatPhone").value.trim();
+  const finalBill=repeatSubtotal+repeatDelivery;
+
+  const order={
+    customerName:name,
+    phone,
+    block:repeatBlock,
+    paymentMethod:"Cash on Delivery",
+    bill:repeatSubtotal,
+    deliveryCharge:repeatDelivery,
+    finalBill,
+    food:Object.entries(repeatCart).map(([name,item])=>({
+      name,price:item.price,quantity:item.quantity,subtotal:item.price*item.quantity
+    })),
+    status:null,
+    createdAt:Date.now(),
+    serverCreatedAt:window.prachiFirebase.serverTimestamp()
+  };
+
+  const btn=document.getElementById("repeatOrderBtn");
+  btn.disabled=true;
+  btn.textContent="PLACING ORDER...";
+
+  try{
+    const orderRef=await window.prachiFirebase.push(
+      window.prachiFirebase.ref(window.prachiDb,"orders"),
+      order
+    );
+    localStorage.setItem("prachiLastOrderId",orderRef.key);
+    repeatPaymentOverlay.classList.remove("show");
+    Object.keys(cart).forEach(k=>delete cart[k]);
+    updateCart();
+    alert("Order placed successfully!");
+    openOrders();
+  }catch(error){
+    console.error(error);
+    alert("Could not place the order. Please check Firebase rules.");
+  }finally{
+    btn.disabled=false;
+    btn.textContent="PAY ON DELIVERY & ORDER";
+  }
+};
 
 </script>
 
