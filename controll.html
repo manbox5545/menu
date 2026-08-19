@@ -151,18 +151,61 @@ select:focus{
   border-color:#111;
 }
 
+select:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
 .empty{
   text-align:center;
   padding:70px 20px;
   color:#777;
 }
 
+.error{
+  text-align:center;
+  padding:50px 20px;
+  color:#c0392b;
+  font-weight:700;
+}
+
+.user-info{
+  margin-top:5px;
+  color:#777;
+  font-size:11px;
+}
+
+.admin-badge{
+  display:inline-block;
+  margin-top:7px;
+  padding:4px 8px;
+  border-radius:7px;
+  background:#111;
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+}
+
 @media(max-width:600px){
   body{padding:12px}
-  .panel{padding:17px;border-radius:21px}
-  .header{align-items:flex-start;flex-direction:column}
-  h1{font-size:30px}
-  .orders{grid-template-columns:1fr}
+
+  .panel{
+    padding:17px;
+    border-radius:21px;
+  }
+
+  .header{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  h1{
+    font-size:30px;
+  }
+
+  .orders{
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
@@ -170,27 +213,67 @@ select:focus{
 <body>
 
 <main class="panel">
+
   <div class="header">
+
     <div>
       <h1>ORDER CONTROLLER</h1>
-      <p style="color:#777;margin-top:5px">Prachi Cloud Kitchen</p>
+
+      <p style="color:#777;margin-top:5px">
+        Prachi Cloud Kitchen
+      </p>
+
+      <div id="userInfo" class="user-info">
+        Checking authentication...
+      </div>
     </div>
+
     <div class="connection">
       <span class="connection-dot"></span>
       REALTIME FIREBASE
     </div>
+
   </div>
 
   <div class="orders" id="orders">
-    <div class="empty">Loading orders...</div>
+    <div class="empty">
+      Checking login...
+    </div>
   </div>
+
 </main>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
-const firebaseConfig={
+/* =========================
+   FIREBASE IMPORTS
+========================= */
+
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  onValue,
+  update,
+  query,
+  orderByChild,
+  equalTo
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+/* =========================
+   FIREBASE CONFIG
+========================= */
+
+const firebaseConfig = {
   apiKey:"AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
   authDomain:"ticktok-7fb30.firebaseapp.com",
   databaseURL:"https://ticktok-7fb30-default-rtdb.firebaseio.com",
@@ -201,12 +284,27 @@ const firebaseConfig={
   measurementId:"G-3KH8Y1SVDG"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
-const ordersRef=ref(db,"orders");
-const ordersEl=document.getElementById("orders");
 
-const statuses=[
+/* =========================
+   INITIALIZE FIREBASE
+========================= */
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+const auth = getAuth(app);
+
+const ordersEl = document.getElementById("orders");
+
+const userInfo = document.getElementById("userInfo");
+
+
+/* =========================
+   STATUS OPTIONS
+========================= */
+
+const statuses = [
   "Order taken",
   "Preparing your food",
   "Packaging it",
@@ -215,95 +313,409 @@ const statuses=[
   "Out for delivery"
 ];
 
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
 function escapeHtml(value){
-  return String(value ?? "").replace(/[&<>"']/g,char=>({
+
+  return String(value ?? "").replace(/[&<>"']/g,char => ({
     "&":"&amp;",
     "<":"&lt;",
     ">":"&gt;",
     '"':"&quot;",
     "'":"&#039;"
   }[char]));
+
 }
 
-function renderOrders(data){
-  const entries=Object.entries(data||{}).reverse();
+
+/* =========================
+   RENDER ORDERS
+========================= */
+
+function renderOrders(data,isAdmin){
+
+  const entries = Object.entries(data || {}).reverse();
 
   if(!entries.length){
-    ordersEl.innerHTML='<div class="empty">No orders yet.</div>';
+
+    ordersEl.innerHTML =
+      '<div class="empty">No orders yet.</div>';
+
     return;
   }
 
-  ordersEl.innerHTML=entries.map(([id,order])=>{
-    const status=order.status||"Admin is receiving your order";
-    const isPending=!order.status;
 
-    const food=(order.food||[]).map(item=>`
-      <div class="food-row">
-        <span>${escapeHtml(item.name)} × ${escapeHtml(item.quantity)}</span>
-        <strong>₹${escapeHtml(item.subtotal)}</strong>
-      </div>
-    `).join("");
+  ordersEl.innerHTML = entries.map(([id,order]) => {
 
-    const selected=statuses.includes(status)?status:"";
+    const status =
+      order.status ||
+      "Admin is receiving your order";
+
+    const isPending = !order.status;
+
+
+    const food = Array.isArray(order.food)
+      ? order.food.map(item => `
+
+        <div class="food-row">
+
+          <span>
+            ${escapeHtml(item.name)}
+            ×
+            ${escapeHtml(item.quantity)}
+          </span>
+
+          <strong>
+            ₹${escapeHtml(item.subtotal)}
+          </strong>
+
+        </div>
+
+      `).join("")
+      : "";
+
+
+    const selected =
+      statuses.includes(status)
+        ? status
+        : "";
+
 
     return `
-      <article class="order ${isPending?"new":""}">
+
+      <article class="order ${isPending ? "new" : ""}">
+
         <div class="order-top">
+
           <div>
+
             <strong>ORDER</strong>
-            <div class="order-id">${escapeHtml(id)}</div>
+
+            <div class="order-id">
+              ${escapeHtml(id)}
+            </div>
+
           </div>
-          <div class="order-total">₹${escapeHtml(order.bill)}</div>
+
+          <div class="order-total">
+            ₹${escapeHtml(order.bill)}
+          </div>
+
         </div>
+
 
         <div class="customer">
-          <strong>${escapeHtml(order.customerName)}</strong><br>
-          📱 ${escapeHtml(order.phone)}<br>
-          🏢 Block ${escapeHtml(order.block)}<br>
+
+          <strong>
+            ${escapeHtml(order.customerName)}
+          </strong>
+
+          <br>
+
+          📱 ${escapeHtml(order.phone)}
+
+          <br>
+
+          🏢 Block ${escapeHtml(order.block)}
+
+          <br>
+
           💵 ${escapeHtml(order.paymentMethod)}
+
         </div>
 
-        <div class="food">${food}</div>
 
-        <div class="status ${isPending?"pending":""}">
+        <div class="food">
+
+          ${food}
+
+        </div>
+
+
+        <div class="status ${isPending ? "pending" : ""}">
+
           ${escapeHtml(status)}
+
         </div>
 
-        <select data-order-id="${escapeHtml(id)}">
-          <option value="" disabled ${!selected?"selected":""}>
+
+        <select
+          data-order-id="${escapeHtml(id)}"
+          ${isAdmin ? "" : "disabled"}
+        >
+
+          <option
+            value=""
+            disabled
+            ${!selected ? "selected" : ""}
+          >
             Select order message...
           </option>
-          ${statuses.map(option=>`
-            <option value="${escapeHtml(option)}" ${selected===option?"selected":""}>
-              ${escapeHtml(option)}
-            </option>
-          `).join("")}
+
+          ${
+            statuses.map(option => `
+
+              <option
+                value="${escapeHtml(option)}"
+                ${selected === option ? "selected" : ""}
+              >
+                ${escapeHtml(option)}
+              </option>
+
+            `).join("")
+          }
+
         </select>
+
       </article>
+
     `;
+
   }).join("");
+
 }
 
-onValue(ordersRef,snapshot=>{
-  renderOrders(snapshot.val());
-});
 
-ordersEl.addEventListener("change",async event=>{
-  const select=event.target.closest("select[data-order-id]");
-  if(!select || !select.value) return;
+/* =========================
+   AUTHENTICATION
+========================= */
 
-  const orderId=select.dataset.orderId;
+onAuthStateChanged(auth, async user => {
+
+  if(!user){
+
+    userInfo.textContent =
+      "You must be logged in.";
+
+    ordersEl.innerHTML = `
+      <div class="error">
+        Login required to view orders.
+      </div>
+    `;
+
+    return;
+  }
+
 
   try{
-    await update(ref(db,`orders/${orderId}`),{
-      status:select.value,
-      statusUpdatedAt:Date.now()
-    });
+
+    /*
+      Get Firebase ID token claims.
+
+      Your rules use:
+
+      auth.token.admin === true
+    */
+
+    const tokenResult =
+      await user.getIdTokenResult(true);
+
+    const isAdmin =
+      tokenResult.claims.admin === true;
+
+
+    userInfo.innerHTML = `
+      Logged in as:
+      ${escapeHtml(user.email || user.uid)}
+
+      ${
+        isAdmin
+          ? '<span class="admin-badge">ADMIN</span>'
+          : ''
+      }
+    `;
+
+
+    /* =========================
+       ADMIN QUERY
+    =========================
+
+       Admin:
+
+       auth.token.admin === true
+
+       Therefore the admin can read:
+
+       /orders
+
+    */
+
+    let ordersQuery;
+
+
+    if(isAdmin){
+
+      ordersQuery = ref(db,"orders");
+
+    }else{
+
+      /* =========================
+         NORMAL USER QUERY
+      =========================
+
+         Your rule requires:
+
+         query.orderByChild == "ownerUid"
+
+         AND
+
+         query.equalTo == auth.uid
+      */
+
+      ordersQuery = query(
+        ref(db,"orders"),
+        orderByChild("ownerUid"),
+        equalTo(user.uid)
+      );
+
+    }
+
+
+    /* =========================
+       REALTIME LISTENER
+    ========================= */
+
+    onValue(
+      ordersQuery,
+
+      snapshot => {
+
+        renderOrders(
+          snapshot.val(),
+          isAdmin
+        );
+
+      },
+
+      error => {
+
+        console.error(
+          "Firebase read error:",
+          error
+        );
+
+        ordersEl.innerHTML = `
+          <div class="error">
+            Could not read orders.
+            <br><br>
+            ${escapeHtml(error.message)}
+          </div>
+        `;
+
+      }
+
+    );
+
+
+    /* =========================
+       STATUS UPDATE
+    =========================
+
+       IMPORTANT:
+
+       Your Firebase rule says:
+
+       .write:
+       auth != null &&
+       (
+         auth.token.admin === true ||
+         (
+           !data.exists() &&
+           newData.child('ownerUid').val() == auth.uid
+         )
+       )
+
+       Therefore:
+
+       ADMIN:
+       Can update existing orders.
+
+       NORMAL USER:
+       Cannot update existing orders.
+
+       So the dropdown is disabled for normal users.
+    */
+
+    ordersEl.addEventListener(
+      "change",
+      async event => {
+
+        const select =
+          event.target.closest(
+            "select[data-order-id]"
+          );
+
+
+        if(!select || !select.value)
+          return;
+
+
+        if(!isAdmin){
+
+          alert(
+            "Only an administrator can change order status."
+          );
+
+          return;
+        }
+
+
+        const orderId =
+          select.dataset.orderId;
+
+
+        try{
+
+          await update(
+            ref(
+              db,
+              `orders/${orderId}`
+            ),
+            {
+              status:select.value,
+              statusUpdatedAt:Date.now()
+            }
+          );
+
+        }catch(error){
+
+          console.error(error);
+
+          alert(
+            "Could not update the order status."
+          );
+
+        }
+
+      }
+    );
+
+
   }catch(error){
-    console.error(error);
-    alert("Could not update the order status. Check Firebase Database rules.");
+
+    console.error(
+      "Authentication error:",
+      error
+    );
+
+    userInfo.textContent =
+      "Authentication error.";
+
+    ordersEl.innerHTML = `
+      <div class="error">
+        Could not verify your account.
+        <br><br>
+        ${escapeHtml(error.message)}
+      </div>
+    `;
+
   }
+
 });
+
 </script>
 
 </body>
