@@ -387,6 +387,16 @@ input:focus{
   text-align:center;
 }
 
+.checkout-final-total{
+  margin:15px 0 0;
+  padding:15px;
+  border-top:2px solid #111;
+  display:flex;
+  justify-content:space-between;
+  font-size:19px;
+  font-weight:800;
+}
+
 .payment-note{
   padding:14px 16px;
   border-radius:14px;
@@ -771,6 +781,14 @@ input:focus{
     <div class="payment-note">
       <strong>PAYMENT</strong>
       Cash on Delivery is currently available. QR payment will be enabled later.
+      <br><br>
+      Delivery charge is free for the orrders more than 300.
+      Orders under ₹300 with Cash on Delivery have a ₹20 delivery charge.
+    </div>
+
+    <div class="checkout-final-total" id="checkoutFinalTotal">
+      <span>Total</span>
+      <span>₹0</span>
     </div>
 
     <button class="place-order" id="confirmOrderBtn" type="button">PLACE ORDER</button>
@@ -805,6 +823,9 @@ input:focus{
       </div>
 
       <div class="order-info-board" id="finalOrderInfo"></div>
+      <button class="notification-btn" id="backHomeBtn" type="button">
+        BACK TO HOME
+      </button>
     </div>
   </section>
 
@@ -851,6 +872,7 @@ const placeOrderBtn = document.getElementById("placeOrderBtn");
 
 let selectedBlock = "";
 let paymentMethod = "Cash on Delivery";
+let deliveryCharge = 0;
 let currentOrder = null;
 
 const rawCart = localStorage.getItem("prachiOrderCart");
@@ -858,12 +880,10 @@ const cart = rawCart ? JSON.parse(rawCart) : {};
 const total = Number(localStorage.getItem("prachiOrderTotal") || 0);
 
 function showStep(step){
-  if(step===step3){
-    step3.classList.add("active");
-    return;
-  }
+  document.querySelectorAll(".step").forEach(el=>{
+    el.classList.remove("active");
+  });
 
-  [step1,step2].forEach(el=>el.classList.remove("active"));
   step.classList.add("active");
 }
 
@@ -1007,6 +1027,10 @@ notificationBtn.onclick=async()=>{
   }
 };
 
+document.getElementById("backHomeBtn").onclick=()=>{
+  window.location.href="index.html";
+};
+
 function listenForOrderStatus(orderId){
   if(!orderId) return;
 
@@ -1078,6 +1102,16 @@ placeOrderBtn.onclick=()=>{
     return;
   }
 
+  const subtotal=Object.values(cart).reduce((sum,item)=>sum+(item.price*item.quantity),0);
+  deliveryCharge=subtotal<300?20:0;
+  const finalTotalBox=document.getElementById("checkoutFinalTotal");
+  if(finalTotalBox){
+    finalTotalBox.innerHTML=`
+      <span>Total</span>
+      <span>₹${subtotal+deliveryCharge}</span>
+    `;
+  }
+
   showStep(document.getElementById("paymentStep"));
 };
 
@@ -1100,6 +1134,12 @@ document.querySelectorAll(".payment-option").forEach(button=>{
 });
 
 document.getElementById("confirmOrderBtn").onclick=async()=>{
+  const confirmBtn=document.getElementById("confirmOrderBtn");
+
+  confirmBtn.classList.remove("shake");
+  void confirmBtn.offsetWidth;
+  confirmBtn.classList.add("shake");
+
   const name=customerName.value.trim();
 
   currentOrder={
@@ -1108,6 +1148,8 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
     block:selectedBlock,
     paymentMethod,
     bill:total,
+    deliveryCharge:paymentMethod==="Cash on Delivery" && total<300 ? 20 : 0,
+    finalBill:total+(paymentMethod==="Cash on Delivery" && total<300 ? 20 : 0),
     food:Object.entries(cart).map(([foodName,item])=>({
       name:foodName,
       price:item.price,
@@ -1117,7 +1159,6 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
     createdAt:Date.now()
   };
 
-  const confirmBtn=document.getElementById("confirmOrderBtn");
   confirmBtn.disabled=true;
   confirmBtn.textContent="PLACING ORDER...";
 
@@ -1128,7 +1169,14 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
     });
 
     currentOrder.orderId=orderRef.key;
+
     localStorage.setItem("prachiLastOrder",JSON.stringify(currentOrder));
+    localStorage.setItem("prachiLastOrderId",orderRef.key);
+    localStorage.setItem("prachiProfile",JSON.stringify({
+      name:currentOrder.customerName,
+      phone:currentOrder.phone,
+      block:currentOrder.block
+    }));
     showOrderStatus("");
     listenForOrderStatus(currentOrder.orderId);
 
@@ -1141,7 +1189,8 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
       📱 ${escapeHtml(currentOrder.phone)}<br>
       🏢 Block ${escapeHtml(selectedBlock)}<br>
       💵 ${escapeHtml(currentOrder.paymentMethod)}<br>
-      🧾 Total: ₹${currentOrder.bill}
+      🚚 Delivery: ₹${currentOrder.deliveryCharge}<br>
+      🧾 Final bill: ₹${currentOrder.finalBill}
     `;
 
     showStep(step3);
