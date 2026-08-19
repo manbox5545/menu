@@ -1333,504 +1333,1243 @@ body.dark .repeat-total{
 
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
-const firebaseConfig={
-  apiKey:"AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
-  authDomain:"ticktok-7fb30.firebaseapp.com",
-  databaseURL:"https://ticktok-7fb30-default-rtdb.firebaseio.com",
-  projectId:"ticktok-7fb30",
-  storageBucket:"ticktok-7fb30.firebasestorage.app",
-  messagingSenderId:"493782050714",
-  appId:"1:493782050714:web:5f6bd9eae6af68b250fc23",
-  measurementId:"G-3KH8Y1SVDG"
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
+  authDomain: "ticktok-7fb30.firebaseapp.com",
+  databaseURL: "https://ticktok-7fb30-default-rtdb.firebaseio.com",
+  projectId: "ticktok-7fb30",
+  storageBucket: "ticktok-7fb30.firebasestorage.app",
+  messagingSenderId: "493782050714",
+  appId: "1:493782050714:web:5f6bd9eae6af68b250fc23",
+  measurementId: "G-3KH8Y1SVDG"
 };
-const firebaseApp=initializeApp(firebaseConfig);
-window.prachiDb=getDatabase(firebaseApp);
-window.prachiFirebase={ref,onValue,push,serverTimestamp};
-</script>
 
-<script>
+const firebaseApp = initializeApp(firebaseConfig);
+const prachiDb = getDatabase(firebaseApp);
 
-/* ================= DARK MODE ================= */
 
-const themeBtn=document.getElementById("themeBtn");
+/* =========================================================
+   DARK MODE
+========================================================= */
 
-themeBtn.onclick=()=>{
+const themeBtn = document.getElementById("themeBtn");
+const settingsThemeBtn = document.getElementById("settingsThemeBtn");
+
+themeBtn.onclick = () => {
+
   document.body.classList.toggle("dark");
 
-  themeBtn.textContent=
-    document.body.classList.contains("dark")
-    ? "☀️"
-    : "🌙";
+  const isDark = document.body.classList.contains("dark");
+
+  themeBtn.textContent = isDark ? "☀️" : "🌙";
+
+  if (settingsThemeBtn) {
+    settingsThemeBtn.textContent =
+      isDark ? "☀️ LIGHT MODE" : "🌙 DARK MODE";
+  }
 };
 
 
-/* ================= CART ================= */
+/* =========================================================
+   CART
+========================================================= */
 
-const cart={};
+const cart = {};
 
-const cartOverlay=document.getElementById("cartOverlay");
-const cartPopup=document.getElementById("cartPopup");
-const cartItems=document.getElementById("cartItems");
-const cartTotal=document.getElementById("cartTotal");
-const cartCount=document.getElementById("navCartCount");
+const cartOverlay = document.getElementById("cartOverlay");
+const cartPopup = document.getElementById("cartPopup");
+const cartItems = document.getElementById("cartItems");
+const cartTotal = document.getElementById("cartTotal");
+
+const navCartCount = document.getElementById("navCartCount");
 
 
-/* Add food to cart */
+/* =========================================================
+   ADD FOOD TO CART
+========================================================= */
 
-document.querySelector(".menu").addEventListener("click",e=>{
-  const item=e.target.closest(".item");
-  if(!item) return;
+document.querySelector(".menu").addEventListener("click", (e) => {
 
-  const name=item.dataset.name;
-  const price=Number(item.dataset.price);
+  const item = e.target.closest(".item");
 
-  if(cart[name]){
+  if (!item) return;
+
+  const name = item.dataset.name;
+  const price = Number(item.dataset.price);
+
+  if (!name || !Number.isFinite(price)) return;
+
+  if (cart[name]) {
+
     cart[name].quantity++;
-  }else{
-    cart[name]={price,quantity:1};
+
+  } else {
+
+    cart[name] = {
+      price: price,
+      quantity: 1
+    };
+
   }
 
   updateCart();
 });
 
 
-/* Cart is opened only through the bottom navigation.
-   It behaves as a full-screen page, just like Orders and Settings. */
+/* =========================================================
+   UPDATE CART UI
+========================================================= */
 
-cartOverlay.onclick=e=>{
-  if(e.target===cartOverlay){
-    closeAllScreens();
-    showNavPage("home");
-  }
-};
+function updateCart() {
 
-cartPopup.onclick=e=>{
-  e.stopPropagation();
-};
+  let total = 0;
+  let count = 0;
+
+  const names = Object.keys(cart);
+
+  /* Clear old cart UI */
+  cartItems.replaceChildren();
+
+  /* Empty cart */
+
+  if (names.length === 0) {
+
+    const empty = document.createElement("div");
+
+    empty.className = "cart-empty";
+    empty.textContent = "Your cart is empty 🛒";
+
+    cartItems.appendChild(empty);
+
+  } else {
+
+    /* Build cart */
+
+    const fragment = document.createDocumentFragment();
+
+    names.forEach((name) => {
+
+      const item = cart[name];
+
+      total += item.price * item.quantity;
+      count += item.quantity;
+
+      const row = document.createElement("div");
+
+      row.className = "cart-item";
+
+      /* Left side */
+
+      const info = document.createElement("div");
+
+      const nameEl = document.createElement("div");
+
+      nameEl.className = "cart-name";
+      nameEl.textContent = name;
+
+      const priceEl = document.createElement("div");
+
+      priceEl.className = "cart-price";
+      priceEl.textContent =
+        `₹${item.price} × ${item.quantity}`;
+
+      info.appendChild(nameEl);
+      info.appendChild(priceEl);
 
 
-/* Update cart */
+      /* Right side */
 
-function updateCart(){
+      const controls = document.createElement("div");
 
-  cartItems.innerHTML="";
+      controls.className = "cart-controls";
 
-  let total=0;
-  let count=0;
 
-  const names=Object.keys(cart);
+      /* Minus */
 
-  if(names.length===0){
+      const minus = document.createElement("button");
 
-    cartItems.innerHTML=
-      '<div class="cart-empty">Your cart is empty 🛒</div>';
+      minus.type = "button";
+      minus.dataset.action = "qty";
+      minus.dataset.name = name;
+      minus.dataset.amount = "-1";
+      minus.textContent = "−";
 
-  }else{
 
-    names.forEach(name=>{
+      /* Quantity */
 
-      const item=cart[name];
+      const quantity = document.createElement("span");
 
-      total+=item.price*item.quantity;
-      count+=item.quantity;
+      quantity.textContent = item.quantity;
 
-      const row=document.createElement("div");
 
-      row.className="cart-item";
+      /* Plus */
 
-      row.innerHTML=`
+      const plus = document.createElement("button");
 
-        <div>
+      plus.type = "button";
+      plus.dataset.action = "qty";
+      plus.dataset.name = name;
+      plus.dataset.amount = "1";
+      plus.textContent = "+";
 
-          <div class="cart-name">
-            ${name}
-          </div>
 
-          <div class="cart-price">
-            ₹${item.price} × ${item.quantity}
-          </div>
+      /* Delete */
 
-        </div>
+      const remove = document.createElement("button");
 
-        <div class="cart-controls">
+      remove.type = "button";
+      remove.className = "delete";
+      remove.dataset.action = "remove";
+      remove.dataset.name = name;
+      remove.textContent = "🗑️";
 
-          <button data-action="qty" data-name="${name}" data-amount="-1">
-            −
-          </button>
 
-          <span>${item.quantity}</span>
+      controls.appendChild(minus);
+      controls.appendChild(quantity);
+      controls.appendChild(plus);
+      controls.appendChild(remove);
 
-          <button data-action="qty" data-name="${name}" data-amount="1">
-            +
-          </button>
+      row.appendChild(info);
+      row.appendChild(controls);
 
-          <button
-            class="delete"
-            data-action="remove"
-            data-name="${name}">
-            🗑️
-          </button>
-
-        </div>
-
-      `;
-
-      cartItems.appendChild(row);
+      fragment.appendChild(row);
 
     });
 
+    cartItems.appendChild(fragment);
   }
 
-  cartTotal.textContent="₹"+total;
 
-  cartCount.textContent=count;
-  cartCount.style.display=count ? "flex" : "none";
+  /* Update total */
+
+  cartTotal.textContent = "₹" + total;
+
+
+  /* =======================================================
+     IMPORTANT:
+     Update the cart badge DIRECTLY.
+     
+     NO MutationObserver here.
+     This prevents the infinite update loop that was
+     freezing the website.
+  ======================================================= */
+
+  if (navCartCount) {
+
+    navCartCount.textContent = String(count);
+
+    navCartCount.style.display =
+      count > 0 ? "flex" : "none";
+
+  }
+
 }
 
 
-/* Cart controls — one listener instead of many inline handlers */
+/* =========================================================
+   CART CONTROLS
+========================================================= */
 
-cartItems.addEventListener("click",e=>{
-  const button=e.target.closest("button[data-action]");
-  if(!button) return;
+cartItems.addEventListener("click", (e) => {
 
-  const name=button.dataset.name;
-  const action=button.dataset.action;
+  const button = e.target.closest("button[data-action]");
 
-  if(action==="qty"){
-    changeQty(name,Number(button.dataset.amount));
-  }else if(action==="remove"){
-    removeItem(name);
+  if (!button) return;
+
+  const name = button.dataset.name;
+  const action = button.dataset.action;
+
+  if (!name) return;
+
+
+  if (action === "qty") {
+
+    const amount = Number(button.dataset.amount);
+
+    if (!Number.isFinite(amount)) return;
+
+    changeQty(name, amount);
+
   }
+
+
+  else if (action === "remove") {
+
+    removeItem(name);
+
+  }
+
 });
 
-/* Non-functional Buy Now button */
-document.getElementById("buyNowBtn").onclick=()=>{
-  if(!Object.keys(cart).length){
-    alert("Your cart is empty.");
-    return;
+
+/* =========================================================
+   CART OVERLAY
+========================================================= */
+
+cartOverlay.onclick = (e) => {
+
+  if (e.target === cartOverlay) {
+
+    closeAllScreens();
+
+    showNavPage("home");
+
   }
 
-  localStorage.setItem("prachiOrderCart",JSON.stringify(cart));
-  localStorage.setItem("prachiOrderTotal",String(
-    Object.values(cart).reduce((sum,item)=>sum+(item.price*item.quantity),0)
-  ));
-
-  if(localStorage.getItem("prachiProfile")){
-    openRepeatCheckout();
-  }else{
-    window.location.href="final.html";
-  }
 };
 
-/* Change quantity */
 
-function changeQty(name,amount){
+cartPopup.onclick = (e) => {
 
-  if(!cart[name]) return;
+  e.stopPropagation();
 
-  cart[name].quantity+=amount;
+};
 
-  if(cart[name].quantity<=0){
+
+/* =========================================================
+   CHANGE QUANTITY
+========================================================= */
+
+function changeQty(name, amount) {
+
+  if (!cart[name]) return;
+
+  cart[name].quantity += amount;
+
+
+  if (cart[name].quantity <= 0) {
+
     delete cart[name];
+
   }
 
+
   updateCart();
+
 }
 
 
-/* Delete item */
+/* =========================================================
+   REMOVE ITEM
+========================================================= */
 
-function removeItem(name){
+function removeItem(name) {
+
+  if (!cart[name]) return;
 
   delete cart[name];
 
   updateCart();
+
 }
 
 
-/* ================= ACCOUNT + ORDER TRACKING ================= */
+/* =========================================================
+   BUY NOW
+========================================================= */
 
-const ordersBtn=document.getElementById("ordersBtn");
-const ordersOverlay=document.getElementById("ordersOverlay");
-const ordersList=document.getElementById("ordersList");
-const accountBox=document.getElementById("accountBox");
-const repeatOverlay=document.getElementById("repeatOverlay");
-const repeatPaymentOverlay=document.getElementById("repeatPaymentOverlay");
+const buyNowBtn = document.getElementById("buyNowBtn");
 
-let profile=null;
-let repeatBlock="";
-let repeatCart={};
-let repeatSubtotal=0;
-let repeatDelivery=0;
+buyNowBtn.onclick = () => {
 
-function escapeHtmlIndex(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
-}
+  const cartKeys = Object.keys(cart);
 
-function getProfile(){
-  try{return JSON.parse(localStorage.getItem("prachiProfile")||"null")}catch{return null}
-}
 
-function saveProfile(p){
-  profile=p;
-  localStorage.setItem("prachiProfile",JSON.stringify(p));
-}
+  if (!cartKeys.length) {
 
-function deliveryFor(subtotal){
-  return subtotal<300?20:0;
-}
+    alert("Your cart is empty.");
 
-function openOrders(){
-  ordersOverlay.classList.add("show");
-  profile=getProfile();
-
-  if(!profile){
-    accountBox.innerHTML="<strong>Not signed in yet.</strong><br>Place your first order to create your password-free account.";
-    ordersList.innerHTML='<div class="orders-empty">No account orders available yet.</div>';
     return;
+
   }
 
-  accountBox.innerHTML=`
+
+  /* Save cart for checkout */
+
+  localStorage.setItem(
+    "prachiOrderCart",
+    JSON.stringify(cart)
+  );
+
+
+  /* Calculate subtotal */
+
+  const subtotal = Object.values(cart).reduce(
+    (sum, item) =>
+      sum + (item.price * item.quantity),
+    0
+  );
+
+
+  localStorage.setItem(
+    "prachiOrderTotal",
+    String(subtotal)
+  );
+
+
+  /* Existing profile */
+
+  if (localStorage.getItem("prachiProfile")) {
+
+    openRepeatCheckout();
+
+  } else {
+
+    window.location.href = "final.html";
+
+  }
+
+};
+
+
+/* =========================================================
+   ACCOUNT + ORDER TRACKING
+========================================================= */
+
+const ordersBtn =
+  document.getElementById("ordersBtn");
+
+const ordersOverlay =
+  document.getElementById("ordersOverlay");
+
+const ordersList =
+  document.getElementById("ordersList");
+
+const accountBox =
+  document.getElementById("accountBox");
+
+const repeatOverlay =
+  document.getElementById("repeatOverlay");
+
+const repeatPaymentOverlay =
+  document.getElementById("repeatPaymentOverlay");
+
+
+let profile = null;
+let repeatBlock = "";
+let repeatCart = {};
+let repeatSubtotal = 0;
+let repeatDelivery = 0;
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtmlIndex(value) {
+
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    (c) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[c])
+  );
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function getProfile() {
+
+  try {
+
+    return JSON.parse(
+      localStorage.getItem("prachiProfile") || "null"
+    );
+
+  } catch {
+
+    return null;
+
+  }
+
+}
+
+
+function saveProfile(p) {
+
+  profile = p;
+
+  localStorage.setItem(
+    "prachiProfile",
+    JSON.stringify(p)
+  );
+
+}
+
+
+/* =========================================================
+   DELIVERY
+========================================================= */
+
+function deliveryFor(subtotal) {
+
+  return subtotal < 300 ? 20 : 0;
+
+}
+
+
+/* =========================================================
+   OPEN ORDERS
+========================================================= */
+
+function openOrders() {
+
+  ordersOverlay.classList.add("show");
+
+  profile = getProfile();
+
+
+  if (!profile) {
+
+    accountBox.innerHTML =
+      "<strong>Not signed in yet.</strong><br>" +
+      "Place your first order to create your " +
+      "password-free account.";
+
+    ordersList.innerHTML =
+      '<div class="orders-empty">' +
+      'No account orders available yet.' +
+      '</div>';
+
+    return;
+
+  }
+
+
+  accountBox.innerHTML = `
     <strong>👤 ${escapeHtmlIndex(profile.name)}</strong><br>
     📱 ${escapeHtmlIndex(profile.phone)}<br>
     🏢 Block ${escapeHtmlIndex(profile.block)}
   `;
 
-  ordersList.innerHTML='<div class="orders-empty">Loading your orders...</div>';
 
-  window.prachiFirebase.onValue(
-    window.prachiFirebase.ref(window.prachiDb,"orders"),
-    snapshot=>{
-    const data=snapshot.val()||{};
-    const mine=Object.entries(data)
-      .filter(([id,o])=>{
-        const orderPhone=String(o.phone||"").replace(/\D/g,"");
-        const profilePhone=String(profile.phone||"").replace(/\D/g,"");
-        return orderPhone===profilePhone;
-      })
-      .sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+  ordersList.innerHTML =
+    '<div class="orders-empty">' +
+    'Loading your orders...' +
+    '</div>';
 
-    if(!mine.length){
-      ordersList.innerHTML='<div class="orders-empty">You have no orders yet.</div>';
-      return;
+
+  /* Firebase order listener */
+
+  onValue(
+    ref(prachiDb, "orders"),
+    (snapshot) => {
+
+      const data = snapshot.val() || {};
+
+
+      const profilePhone =
+        String(profile.phone || "")
+          .replace(/\D/g, "");
+
+
+      const mine = Object.entries(data)
+
+        .filter(([id, order]) => {
+
+          const orderPhone =
+            String(order.phone || "")
+              .replace(/\D/g, "");
+
+          return orderPhone === profilePhone;
+
+        })
+
+
+        .sort(
+          (a, b) =>
+            (b[1].createdAt || 0) -
+            (a[1].createdAt || 0)
+        );
+
+
+      if (!mine.length) {
+
+        ordersList.innerHTML =
+          '<div class="orders-empty">' +
+          'You have no orders yet.' +
+          '</div>';
+
+        return;
+
+      }
+
+
+      ordersList.innerHTML = mine.map(
+        ([id, order]) => {
+
+          const status =
+            order.status ||
+            "Our admin is receiving your order";
+
+          const delivery =
+            order.deliveryCharge || 0;
+
+          const finalBill =
+            order.finalBill ??
+            (Number(order.bill || 0) + delivery);
+
+
+          return `
+            <div class="order-card">
+
+              <strong>
+                ORDER #${escapeHtmlIndex(id.slice(-7))}
+              </strong>
+
+              <span class="order-card-status">
+                ${escapeHtmlIndex(status)}
+              </span>
+
+              <div style="font-size:13px;line-height:1.6">
+
+                🏢 Block
+                ${escapeHtmlIndex(order.block)}
+                <br>
+
+                🍽️ ${
+                  (order.food || [])
+                    .map(
+                      x =>
+                        `${escapeHtmlIndex(x.name)} × ${escapeHtmlIndex(x.quantity)}`
+                    )
+                    .join(", ")
+                }
+
+                <br>
+
+                💵 Subtotal:
+                ₹${escapeHtmlIndex(order.bill)}
+
+                <br>
+
+                🚚 Delivery:
+                ₹${escapeHtmlIndex(delivery)}
+
+                <br>
+
+                <strong>
+                  Final bill:
+                  ₹${escapeHtmlIndex(finalBill)}
+                </strong>
+
+              </div>
+
+            </div>
+          `;
+
+        }
+      ).join("");
+
     }
+  );
 
-    ordersList.innerHTML=mine.map(([id,o])=>{
-      const status=o.status||"Our admin is receiving your order";
-      const delivery=o.deliveryCharge||0;
-      const finalBill=o.finalBill??(Number(o.bill||0)+delivery);
-      return `
-        <div class="order-card">
-          <strong>ORDER #${escapeHtmlIndex(id.slice(-7))}</strong>
-          <span class="order-card-status">${escapeHtmlIndex(status)}</span>
-          <div style="font-size:13px;line-height:1.6">
-            🏢 Block ${escapeHtmlIndex(o.block)}<br>
-            🍽️ ${(o.food||[]).map(x=>`${escapeHtmlIndex(x.name)} × ${escapeHtmlIndex(x.quantity)}`).join(", ")}<br>
-            💵 Subtotal: ₹${escapeHtmlIndex(o.bill)}<br>
-            🚚 Delivery: ₹${escapeHtmlIndex(delivery)}<br>
-            <strong>Final bill: ₹${escapeHtmlIndex(finalBill)}</strong>
-          </div>
-        </div>`;
-    }).join("");
-    });}
-
-const homeNavBtn=document.getElementById("homeNavBtn");
-const cartNavBtn=document.getElementById("cartNavBtn");
-const settingsNavBtn=document.getElementById("settingsNavBtn");
-const settingsOverlay=document.getElementById("settingsOverlay");
-const settingsThemeBtn=document.getElementById("settingsThemeBtn");
-const navCartCount=document.getElementById("navCartCount");
-
-function refreshNav(){
-  if(navCartCount && cartCount){
-    navCartCount.textContent=cartCount.textContent||"0";
-  }
 }
 
-const navCartObserver=new MutationObserver(refreshNav);
-navCartObserver.observe(cartCount,{childList:true,characterData:true,subtree:true});
 
-function showNavPage(page){
-  document.querySelectorAll(".nav-item").forEach(btn=>{
-    btn.style.display=btn.dataset.page===page?"none":"flex";
-  });
-}
+/* =========================================================
+   NAVIGATION ELEMENTS
+========================================================= */
 
-function closeAllScreens(){
+const homeNavBtn =
+  document.getElementById("homeNavBtn");
+
+const cartNavBtn =
+  document.getElementById("cartNavBtn");
+
+const settingsNavBtn =
+  document.getElementById("settingsNavBtn");
+
+const settingsOverlay =
+  document.getElementById("settingsOverlay");
+
+
+/* =========================================================
+   CLOSE ALL SCREENS
+========================================================= */
+
+function closeAllScreens() {
+
   ordersOverlay.classList.remove("show");
+
   cartOverlay.classList.remove("show");
+
   settingsOverlay.classList.remove("show");
+
   repeatOverlay.classList.remove("show");
+
   repeatPaymentOverlay.classList.remove("show");
+
 }
 
-function openPage(page){
+
+/* =========================================================
+   NAVIGATION DISPLAY
+========================================================= */
+
+function showNavPage(page) {
+
+  document.querySelectorAll(".nav-item")
+    .forEach((btn) => {
+
+      btn.style.display =
+        btn.dataset.page === page
+          ? "none"
+          : "flex";
+
+    });
+
+}
+
+
+/* =========================================================
+   OPEN PAGE
+========================================================= */
+
+function openPage(page) {
+
   closeAllScreens();
 
-  if(page==="orders"){
+
+  if (page === "orders") {
+
     openOrders();
-  }else if(page==="cart"){
-    cartOverlay.classList.add("show");
-  }else if(page==="settings"){
-    settingsOverlay.classList.add("show");
+
   }
+
+
+  else if (page === "cart") {
+
+    cartOverlay.classList.add("show");
+
+  }
+
+
+  else if (page === "settings") {
+
+    settingsOverlay.classList.add("show");
+
+  }
+
 
   showNavPage(page);
+
 }
 
-ordersBtn.onclick=()=>openPage("orders");
 
-homeNavBtn.onclick=()=>{
+/* =========================================================
+   NAV BUTTONS
+========================================================= */
+
+ordersBtn.onclick = () => {
+
+  openPage("orders");
+
+};
+
+
+homeNavBtn.onclick = () => {
+
   closeAllScreens();
-  window.scrollTo({top:0,behavior:"smooth"});
-  showNavPage("home");
-};
 
-cartNavBtn.onclick=()=>openPage("cart");
-
-settingsNavBtn.onclick=()=>openPage("settings");
-
-document.getElementById("closeSettingsBtn").onclick=()=>{
-  closeAllScreens();
-  showNavPage("home");
-};
-
-settingsOverlay.onclick=e=>{
-  if(e.target===settingsOverlay){
-    closeAllScreens();
-    showNavPage("home");
-  }
-};
-
-settingsThemeBtn.onclick=()=>{
-  themeBtn.click();
-  settingsThemeBtn.textContent=document.body.classList.contains("dark")
-    ?"☀️ LIGHT MODE"
-    :"🌙 DARK MODE";
-};
-
-document.getElementById("closeOrdersBtn").onclick=()=>{
-  closeAllScreens();
-  showNavPage("home");
-};
-
-document.getElementById("closeRepeatBtn").onclick=()=>{
-  closeAllScreens();
-  showNavPage("home");
-};
-
-document.getElementById("closeRepeatPaymentBtn").onclick=()=>{
-  closeAllScreens();
-  showNavPage("home");
-};
-
-function openRepeatCheckout(){
-  profile=getProfile();
-  if(!profile){window.location.href="final.html";return}
-
-  repeatCart=JSON.parse(localStorage.getItem("prachiOrderCart")||"{}");
-  repeatSubtotal=Object.values(repeatCart).reduce((s,i)=>s+i.price*i.quantity,0);
-  repeatDelivery=deliveryFor(repeatSubtotal);
-
-  document.getElementById("repeatName").value=profile.name||"";
-  document.getElementById("repeatPhone").value=(profile.phone||"").replace(/^\+91/,"");
-  repeatBlock=profile.block||"";
-  document.querySelectorAll("#repeatBlocks button").forEach(b=>{
-    b.classList.toggle("selected",b.dataset.block===repeatBlock);
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
   });
 
-  document.getElementById("repeatDetails").innerHTML=`
-    Current delivery details: <strong>Block ${escapeHtmlIndex(repeatBlock)}</strong>.
+  showNavPage("home");
+
+};
+
+
+cartNavBtn.onclick = () => {
+
+  openPage("cart");
+
+};
+
+
+settingsNavBtn.onclick = () => {
+
+  openPage("settings");
+
+};
+
+
+/* =========================================================
+   CLOSE SETTINGS
+========================================================= */
+
+document.getElementById(
+  "closeSettingsBtn"
+).onclick = () => {
+
+  closeAllScreens();
+
+  showNavPage("home");
+
+};
+
+
+/* =========================================================
+   SETTINGS OVERLAY
+========================================================= */
+
+settingsOverlay.onclick = (e) => {
+
+  if (e.target === settingsOverlay) {
+
+    closeAllScreens();
+
+    showNavPage("home");
+
+  }
+
+};
+
+
+/* =========================================================
+   SETTINGS THEME BUTTON
+========================================================= */
+
+settingsThemeBtn.onclick = () => {
+
+  themeBtn.click();
+
+};
+
+
+/* =========================================================
+   CLOSE ORDERS
+========================================================= */
+
+document.getElementById(
+  "closeOrdersBtn"
+).onclick = () => {
+
+  closeAllScreens();
+
+  showNavPage("home");
+
+};
+
+
+/* =========================================================
+   CLOSE REPEAT CHECKOUT
+========================================================= */
+
+document.getElementById(
+  "closeRepeatBtn"
+).onclick = () => {
+
+  closeAllScreens();
+
+  showNavPage("home");
+
+};
+
+
+/* =========================================================
+   CLOSE REPEAT PAYMENT
+========================================================= */
+
+document.getElementById(
+  "closeRepeatPaymentBtn"
+).onclick = () => {
+
+  closeAllScreens();
+
+  showNavPage("home");
+
+};
+
+
+/* =========================================================
+   OPEN REPEAT CHECKOUT
+========================================================= */
+
+function openRepeatCheckout() {
+
+  profile = getProfile();
+
+
+  if (!profile) {
+
+    window.location.href = "final.html";
+
+    return;
+
+  }
+
+
+  try {
+
+    repeatCart = JSON.parse(
+      localStorage.getItem("prachiOrderCart") || "{}"
+    );
+
+  } catch {
+
+    repeatCart = {};
+
+  }
+
+
+  repeatSubtotal =
+    Object.values(repeatCart).reduce(
+      (s, i) =>
+        s + (Number(i.price) * Number(i.quantity)),
+      0
+    );
+
+
+  repeatDelivery =
+    deliveryFor(repeatSubtotal);
+
+
+  document.getElementById(
+    "repeatName"
+  ).value = profile.name || "";
+
+
+  document.getElementById(
+    "repeatPhone"
+  ).value =
+    (profile.phone || "")
+      .replace(/^\+91/, "");
+
+
+  repeatBlock = profile.block || "";
+
+
+  document.querySelectorAll(
+    "#repeatBlocks button"
+  ).forEach((button) => {
+
+    button.classList.toggle(
+      "selected",
+      button.dataset.block === repeatBlock
+    );
+
+  });
+
+
+  document.getElementById(
+    "repeatDetails"
+  ).innerHTML = `
+    Current delivery details:
+    <strong>
+      Block ${escapeHtmlIndex(repeatBlock)}
+    </strong>.
     You can confirm or update them before ordering.
   `;
 
+
   closeAllScreens();
+
   repeatOverlay.classList.add("show");
+
 }
 
-document.querySelectorAll("#repeatBlocks button").forEach(button=>{
-  button.onclick=()=>{
-    repeatBlock=button.dataset.block;
-    document.querySelectorAll("#repeatBlocks button").forEach(b=>b.classList.remove("selected"));
+
+/* =========================================================
+   REPEAT BLOCK BUTTONS
+========================================================= */
+
+document.querySelectorAll(
+  "#repeatBlocks button"
+).forEach((button) => {
+
+  button.onclick = () => {
+
+    repeatBlock =
+      button.dataset.block;
+
+
+    document.querySelectorAll(
+      "#repeatBlocks button"
+    ).forEach((b) => {
+
+      b.classList.remove("selected");
+
+    });
+
+
     button.classList.add("selected");
+
   };
+
 });
 
-document.getElementById("repeatPhone").addEventListener("input",e=>{
-  e.target.value=e.target.value.replace(/\D/g,"").slice(0,10);
+
+/* =========================================================
+   PHONE INPUT
+========================================================= */
+
+document.getElementById(
+  "repeatPhone"
+).addEventListener("input", (e) => {
+
+  e.target.value =
+    e.target.value
+      .replace(/\D/g, "")
+      .slice(0, 10);
+
 });
 
-document.getElementById("repeatNextBtn").onclick=()=>{
-  const name=document.getElementById("repeatName").value.trim();
-  const phone=document.getElementById("repeatPhone").value.trim();
 
-  if(!name){alert("Please enter your name.");return}
-  if(!/^\d{10}$/.test(phone)){alert("Please enter exactly 10 digits.");return}
-  if(!repeatBlock){alert("Please select your building / block.");return}
+/* =========================================================
+   REPEAT CHECKOUT NEXT
+========================================================= */
 
-  saveProfile({name,phone:"+91"+phone,block:repeatBlock});
+document.getElementById(
+  "repeatNextBtn"
+).onclick = () => {
 
-  const finalBill=repeatSubtotal+repeatDelivery;
+  const name =
+    document.getElementById(
+      "repeatName"
+    ).value.trim();
 
-  document.getElementById("repeatTotal").innerHTML=`
+
+  const phone =
+    document.getElementById(
+      "repeatPhone"
+    ).value.trim();
+
+
+  if (!name) {
+
+    alert("Please enter your name.");
+
+    return;
+
+  }
+
+
+  if (!/^\d{10}$/.test(phone)) {
+
+    alert("Please enter exactly 10 digits.");
+
+    return;
+
+  }
+
+
+  if (!repeatBlock) {
+
+    alert(
+      "Please select your building / block."
+    );
+
+    return;
+
+  }
+
+
+  saveProfile({
+    name: name,
+    phone: "+91" + phone,
+    block: repeatBlock
+  });
+
+
+  const finalBill =
+    repeatSubtotal + repeatDelivery;
+
+
+  document.getElementById(
+    "repeatTotal"
+  ).innerHTML = `
     <span>Total</span>
     <span>₹${finalBill}</span>
   `;
 
+
   repeatOverlay.classList.remove("show");
+
   repeatPaymentOverlay.classList.add("show");
+
 };
 
-document.getElementById("repeatOrderBtn").onclick=async()=>{
-  const name=document.getElementById("repeatName").value.trim();
-  const phone="+91"+document.getElementById("repeatPhone").value.trim();
-  const finalBill=repeatSubtotal+repeatDelivery;
 
-  const order={
-    customerName:name,
-    phone,
-    block:repeatBlock,
-    paymentMethod:"Cash on Delivery",
-    bill:repeatSubtotal,
-    deliveryCharge:repeatDelivery,
-    finalBill,
-    food:Object.entries(repeatCart).map(([name,item])=>({
-      name,price:item.price,quantity:item.quantity,subtotal:item.price*item.quantity
-    })),
-    status:null,
-    createdAt:Date.now(),
-    serverCreatedAt:window.prachiFirebase.serverTimestamp()
+/* =========================================================
+   PLACE REPEAT ORDER
+========================================================= */
+
+document.getElementById(
+  "repeatOrderBtn"
+).onclick = async () => {
+
+  const name =
+    document.getElementById(
+      "repeatName"
+    ).value.trim();
+
+
+  const phone =
+    "+91" +
+    document.getElementById(
+      "repeatPhone"
+    ).value.trim();
+
+
+  const finalBill =
+    repeatSubtotal + repeatDelivery;
+
+
+  const order = {
+
+    customerName: name,
+
+    phone: phone,
+
+    block: repeatBlock,
+
+    paymentMethod: "Cash on Delivery",
+
+    bill: repeatSubtotal,
+
+    deliveryCharge: repeatDelivery,
+
+    finalBill: finalBill,
+
+    food: Object.entries(repeatCart)
+      .map(([name, item]) => ({
+
+        name: name,
+
+        price: item.price,
+
+        quantity: item.quantity,
+
+        subtotal:
+          item.price * item.quantity
+
+      })),
+
+    status: null,
+
+    createdAt: Date.now(),
+
+    serverCreatedAt: serverTimestamp()
+
   };
 
-  const btn=document.getElementById("repeatOrderBtn");
-  btn.disabled=true;
-  btn.textContent="PLACING ORDER...";
 
-  try{
-    const orderRef=await window.prachiFirebase.push(
-      window.prachiFirebase.ref(window.prachiDb,"orders"),
+  const btn =
+    document.getElementById(
+      "repeatOrderBtn"
+    );
+
+
+  btn.disabled = true;
+
+  btn.textContent =
+    "PLACING ORDER...";
+
+
+  try {
+
+    const orderRef = await push(
+      ref(prachiDb, "orders"),
       order
     );
-    localStorage.setItem("prachiLastOrderId",orderRef.key);
-    repeatPaymentOverlay.classList.remove("show");
-    Object.keys(cart).forEach(k=>delete cart[k]);
+
+
+    localStorage.setItem(
+      "prachiLastOrderId",
+      orderRef.key
+    );
+
+
+    repeatPaymentOverlay.classList.remove(
+      "show"
+    );
+
+
+    /* Empty cart safely */
+
+    Object.keys(cart).forEach((key) => {
+
+      delete cart[key];
+
+    });
+
+
+    /* Update UI once */
+
     updateCart();
-    alert("Order placed successfully!");
+
+
+    alert(
+      "Order placed successfully!"
+    );
+
+
     openOrders();
-  }catch(error){
-    console.error(error);
-    alert("Could not place the order. Please check Firebase rules.");
-  }finally{
-    btn.disabled=false;
-    btn.textContent="PAY ON DELIVERY & ORDER";
+
+
+  } catch (error) {
+
+    console.error(
+      "Order placement error:",
+      error
+    );
+
+
+    alert(
+      "Could not place the order. " +
+      "Please check Firebase rules."
+    );
+
+
+  } finally {
+
+    btn.disabled = false;
+
+    btn.textContent =
+      "PAY ON DELIVERY & ORDER";
+
   }
+
 };
+
+
+/* =========================================================
+   INITIAL CART UI
+========================================================= */
+
+updateCart();
+
+/* Start on HOME */
+
+showNavPage("home");
 
 </script>
 
