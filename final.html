@@ -845,6 +845,7 @@ input:focus{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import { getDatabase, ref, push, serverTimestamp, onValue } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
@@ -859,6 +860,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
+let currentUser = null;
+const authReady = (async () => {
+  if (!auth.currentUser) await signInAnonymously(auth);
+  currentUser = auth.currentUser;
+  if (!currentUser) throw new Error("Firebase user was not created.");
+  return currentUser;
+})();
 
 const step1 = document.getElementById("step1");
 const step2 = document.getElementById("step2");
@@ -1032,7 +1041,7 @@ document.getElementById("backHomeBtn").onclick=()=>{
 };
 
 function listenForOrderStatus(orderId){
-  if(!orderId) return;
+  if(!orderId || !currentUser) return;
 
   onValue(ref(db,`orders/${orderId}/status`),snapshot=>{
     const status=snapshot.val();
@@ -1136,6 +1145,19 @@ document.querySelectorAll(".payment-option").forEach(button=>{
 document.getElementById("confirmOrderBtn").onclick=async()=>{
   const confirmBtn=document.getElementById("confirmOrderBtn");
 
+  try {
+    await authReady;
+  } catch(error) {
+    console.error("Firebase authentication failed:",error);
+    alert("Could not authenticate your account. Please refresh and try again.");
+    return;
+  }
+
+  if(!currentUser){
+    alert("No customer account is available. Please refresh and try again.");
+    return;
+  }
+
   confirmBtn.classList.remove("shake");
   void confirmBtn.offsetWidth;
   confirmBtn.classList.add("shake");
@@ -1143,6 +1165,7 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
   const name=customerName.value.trim();
 
   currentOrder={
+    ownerUid:currentUser.uid,
     customerName:name,
     phone:"+91"+customerPhone.value,
     block:selectedBlock,
@@ -1173,6 +1196,7 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
     localStorage.setItem("prachiLastOrder",JSON.stringify(currentOrder));
     localStorage.setItem("prachiLastOrderId",orderRef.key);
     localStorage.setItem("prachiProfile",JSON.stringify({
+      ownerUid:currentUser.uid,
       name:currentOrder.customerName,
       phone:currentOrder.phone,
       block:currentOrder.block
