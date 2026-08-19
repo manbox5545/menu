@@ -28,7 +28,7 @@ body{
   background:
     linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
     url("img.png") center center / cover no-repeat fixed;
-  transition:.3s;
+  transition:background-color .3s,color .3s;
 }
 
 /* ================= HERO ================= */
@@ -67,7 +67,7 @@ body{
   border-radius:28px;
   object-fit:cover;
   box-shadow:0 30px 70px rgba(0,0,0,.35);
-  transition:.3s;
+  transition:transform .3s;
 }
 
 .hero-image:hover{
@@ -269,6 +269,46 @@ body{
   border-top:2px solid #111;
   font-size:20px;
   font-weight:700;
+}
+
+
+/* ================= BUY NOW ================= */
+
+.buy-now{
+  width:100%;
+  margin-top:18px;
+  padding:15px 20px;
+  border:0;
+  border-radius:14px;
+  background:#111;
+  color:#fff;
+  font:800 16px Inter,sans-serif;
+  letter-spacing:.8px;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+  transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;
+}
+
+.buy-now:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(0,0,0,.25);
+  opacity:.95;
+}
+
+.buy-now:active{
+  transform:translateY(0);
+  box-shadow:0 5px 12px rgba(0,0,0,.18);
+}
+
+.buy-now:focus-visible{
+  outline:3px solid rgba(0,0,0,.25);
+  outline-offset:3px;
+}
+
+body.dark .buy-now{
+  background:#fff;
+  color:#111;
+  box-shadow:0 8px 20px rgba(255,255,255,.08);
 }
 
 /* ================= FOOTER ================= */
@@ -521,6 +561,10 @@ body.dark .cart-total{
       <span>Total</span>
       <span id="cartTotal">₹0</span>
     </div>
+
+    <button class="buy-now" id="buyNowBtn" type="button">
+      BUY NOW
+    </button>
 
   </div>
 
@@ -829,25 +873,20 @@ const cartCount=document.getElementById("cartCount");
 
 /* Add food to cart */
 
-document.querySelectorAll(".item").forEach(item=>{
+document.querySelector(".menu").addEventListener("click",e=>{
+  const item=e.target.closest(".item");
+  if(!item) return;
 
-  item.onclick=()=>{
+  const name=item.dataset.name;
+  const price=Number(item.dataset.price);
 
-    const name=item.dataset.name;
-    const price=Number(item.dataset.price);
+  if(cart[name]){
+    cart[name].quantity++;
+  }else{
+    cart[name]={price,quantity:1};
+  }
 
-    if(cart[name]){
-      cart[name].quantity++;
-    }else{
-      cart[name]={
-        price:price,
-        quantity:1
-      };
-    }
-
-    updateCart();
-  };
-
+  updateCart();
 });
 
 
@@ -922,19 +961,20 @@ function updateCart(){
 
         <div class="cart-controls">
 
-          <button onclick="changeQty('${name}',-1)">
+          <button data-action="qty" data-name="${name}" data-amount="-1">
             −
           </button>
 
           <span>${item.quantity}</span>
 
-          <button onclick="changeQty('${name}',1)">
+          <button data-action="qty" data-name="${name}" data-amount="1">
             +
           </button>
 
           <button
             class="delete"
-            onclick="removeItem('${name}')">
+            data-action="remove"
+            data-name="${name}">
             🗑️
           </button>
 
@@ -956,6 +996,27 @@ function updateCart(){
     count ? "block" : "none";
 }
 
+
+/* Cart controls — one listener instead of many inline handlers */
+
+cartItems.addEventListener("click",e=>{
+  const button=e.target.closest("button[data-action]");
+  if(!button) return;
+
+  const name=button.dataset.name;
+  const action=button.dataset.action;
+
+  if(action==="qty"){
+    changeQty(name,Number(button.dataset.amount));
+  }else if(action==="remove"){
+    removeItem(name);
+  }
+});
+
+/* Non-functional Buy Now button */
+document.getElementById("buyNowBtn").onclick=()=>{
+  window.location.href="final.html";
+};
 
 /* Change quantity */
 
