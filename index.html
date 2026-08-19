@@ -594,14 +594,67 @@ body.dark .theme-toggle{
 }
 
 @media(max-width:600px){
-  .bottom-nav{
-    bottom:8px;
-    width:calc(100% - 16px);
-    min-height:62px;
+  html,
+  body{
+    width:100%;
+    min-height:100%;
+    overflow-x:hidden;
   }
 
   body{
-    padding-bottom:90px;
+    padding-bottom:110px;
+  }
+
+  .bottom-nav{
+    left:0;
+    right:0;
+    bottom:0;
+    transform:none;
+    width:100%;
+    min-height:72px;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom));
+    border-radius:18px 18px 0 0;
+    box-sizing:border-box;
+  }
+
+  .nav-item{
+    min-width:0;
+    padding:4px 2px;
+  }
+
+  .nav-item span{
+    font-size:20px;
+  }
+
+  .nav-item small{
+    font-size:9px;
+  }
+
+  /* Keep full-screen panels above the bottom navigation. */
+  .settings-overlay,
+  .orders-overlay,
+  .repeat-overlay{
+    z-index:10006;
+  }
+
+  .cart-overlay{
+    z-index:10007;
+  }
+
+  /* Do not allow the fixed navigation to sit over an open panel. */
+  body:has(.settings-overlay.show) .bottom-nav,
+  body:has(.orders-overlay.show) .bottom-nav,
+  body:has(.repeat-overlay.show) .bottom-nav,
+  body:has(.cart-overlay.show) .bottom-nav{
+    visibility:hidden;
+    pointer-events:none;
+  }
+
+  .orders-panel,
+  .repeat-panel,
+  .settings-panel{
+    padding:24px 16px;
+    padding-bottom:calc(30px + env(safe-area-inset-bottom));
   }
 }
 
