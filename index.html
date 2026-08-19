@@ -1342,12 +1342,10 @@ import { initializeApp }
   from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
-  getDatabase,
-  ref,
-  onValue,
-  push,
-  serverTimestamp
+  getDatabase, ref, onValue, push, serverTimestamp,
+  query, orderByChild, equalTo
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
 const firebaseConfig = {
@@ -1363,6 +1361,14 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const prachiDb = getDatabase(firebaseApp);
+const prachiAuth = getAuth(firebaseApp);
+let currentUser = null;
+const authReady = (async () => {
+  if (!prachiAuth.currentUser) await signInAnonymously(prachiAuth);
+  currentUser = prachiAuth.currentUser;
+  if (!currentUser) throw new Error("Firebase user was not created.");
+  return currentUser;
+})();
 
 
 /* =========================================================
@@ -1837,160 +1843,75 @@ function deliveryFor(subtotal) {
    OPEN ORDERS
 ========================================================= */
 
-function openOrders() {
+let stopOrdersListener = null;
 
+async function openOrders() {
   ordersOverlay.classList.add("show");
-
   profile = getProfile();
 
-
   if (!profile) {
-
-    accountBox.innerHTML =
-      "<strong>Not signed in yet.</strong><br>" +
-      "Place your first order to create your " +
-      "password-free account.";
-
-    ordersList.innerHTML =
-      '<div class="orders-empty">' +
-      'No account orders available yet.' +
-      '</div>';
-
+    accountBox.innerHTML = "<strong>Not signed in yet.</strong><br>Place your first order to create your password-free account.";
+    ordersList.innerHTML = '<div class="orders-empty">No account orders available yet.</div>';
     return;
-
   }
-
 
   accountBox.innerHTML = `
     <strong>👤 ${escapeHtmlIndex(profile.name)}</strong><br>
     📱 ${escapeHtmlIndex(profile.phone)}<br>
     🏢 Block ${escapeHtmlIndex(profile.block)}
   `;
+  ordersList.innerHTML = '<div class="orders-empty">Loading your orders...</div>';
 
+  try { await authReady; }
+  catch (error) {
+    console.error("Authentication failed:", error);
+    ordersList.innerHTML = '<div class="orders-empty">Could not authenticate this device. Please refresh.</div>';
+    return;
+  }
 
-  ordersList.innerHTML =
-    '<div class="orders-empty">' +
-    'Loading your orders...' +
-    '</div>';
+  if (!currentUser) return;
 
-
-  /* Firebase order listener */
-
-  onValue(
+  const myOrdersQuery = query(
     ref(prachiDb, "orders"),
-    (snapshot) => {
-
-      const data = snapshot.val() || {};
-
-
-      const profilePhone =
-        String(profile.phone || "")
-          .replace(/\D/g, "");
-
-
-      const mine = Object.entries(data)
-
-        .filter(([id, order]) => {
-
-          const orderPhone =
-            String(order.phone || "")
-              .replace(/\D/g, "");
-
-          return orderPhone === profilePhone;
-
-        })
-
-
-        .sort(
-          (a, b) =>
-            (b[1].createdAt || 0) -
-            (a[1].createdAt || 0)
-        );
-
-
-      if (!mine.length) {
-
-        ordersList.innerHTML =
-          '<div class="orders-empty">' +
-          'You have no orders yet.' +
-          '</div>';
-
-        return;
-
-      }
-
-
-      ordersList.innerHTML = mine.map(
-        ([id, order]) => {
-
-          const status =
-            order.status ||
-            "Our admin is receiving your order";
-
-          const delivery =
-            order.deliveryCharge || 0;
-
-          const finalBill =
-            order.finalBill ??
-            (Number(order.bill || 0) + delivery);
-
-
-          return `
-            <div class="order-card">
-
-              <strong>
-                ORDER #${escapeHtmlIndex(id.slice(-7))}
-              </strong>
-
-              <span class="order-card-status">
-                ${escapeHtmlIndex(status)}
-              </span>
-
-              <div style="font-size:13px;line-height:1.6">
-
-                🏢 Block
-                ${escapeHtmlIndex(order.block)}
-                <br>
-
-                🍽️ ${
-                  (order.food || [])
-                    .map(
-                      x =>
-                        `${escapeHtmlIndex(x.name)} × ${escapeHtmlIndex(x.quantity)}`
-                    )
-                    .join(", ")
-                }
-
-                <br>
-
-                💵 Subtotal:
-                ₹${escapeHtmlIndex(order.bill)}
-
-                <br>
-
-                🚚 Delivery:
-                ₹${escapeHtmlIndex(delivery)}
-
-                <br>
-
-                <strong>
-                  Final bill:
-                  ₹${escapeHtmlIndex(finalBill)}
-                </strong>
-
-              </div>
-
-            </div>
-          `;
-
-        }
-      ).join("");
-
-    }
+    orderByChild("ownerUid"),
+    equalTo(currentUser.uid)
   );
 
-}
+  if (stopOrdersListener) stopOrdersListener();
 
+  stopOrdersListener = onValue(myOrdersQuery, (snapshot) => {
+    const data = snapshot.val() || {};
+    const mine = Object.entries(data).sort(
+      (a,b) => (b[1].createdAt || 0) - (a[1].createdAt || 0)
+    );
+
+    if (!mine.length) {
+      ordersList.innerHTML = '<div class="orders-empty">You have no orders yet.</div>';
+      return;
+    }
+
+    ordersList.innerHTML = mine.map(([id, order]) => {
+      const status = order.status || "Our admin is receiving your order";
+      const delivery = order.deliveryCharge || 0;
+      const finalBill = order.finalBill ?? (Number(order.bill || 0) + delivery);
+      return `
+        <div class="order-card">
+          <strong>ORDER #${escapeHtmlIndex(id.slice(-7))}</strong>
+          <span class="order-card-status">${escapeHtmlIndex(status)}</span>
+          <div style="font-size:13px;line-height:1.6">
+            🏢 Block ${escapeHtmlIndex(order.block)}<br>
+            🍽️ ${(order.food || []).map(x => `${escapeHtmlIndex(x.name)} × ${escapeHtmlIndex(x.quantity)}`).join(", ")}<br>
+            💵 Subtotal: ₹${escapeHtmlIndex(order.bill)}<br>
+            🚚 Delivery: ₹${escapeHtmlIndex(delivery)}<br>
+            <strong>Final bill: ₹${escapeHtmlIndex(finalBill)}</strong>
+          </div>
+        </div>`;
+    }).join("");
+  }, (error) => {
+    console.error("Orders read failed:", error);
+    ordersList.innerHTML = '<div class="orders-empty">Unable to load your orders.</div>';
+  });
+}
 
 /* =========================================================
    NAVIGATION ELEMENTS
@@ -2443,7 +2364,12 @@ document.getElementById(
     repeatSubtotal + repeatDelivery;
 
 
+  await authReady;
+  if (!currentUser) throw new Error("No authenticated customer.");
+
   const order = {
+
+    ownerUid: currentUser.uid,
 
     customerName: name,
 
