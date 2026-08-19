@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Prachi Cloud Kitchen — Checkout</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+@font-face{
+  font-family:FoodDelight;
+  src:url("FoodDelight.ttf") format("truetype");
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  min-height:100vh;
+  font-family:Inter,sans-serif;
+  color:#111;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+    url("img.png") center center / cover no-repeat fixed;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:30px 15px;
+}
+
+.checkout{
+  width:min(680px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:rgba(255,255,255,.96);
+  border-radius:28px;
+  padding:30px;
+  box-shadow:0 25px 80px rgba(0,0,0,.45);
+}
+
+.logo{
+  text-align:center;
+  font-family:FoodDelight,Anton,sans-serif;
+  font-size:clamp(35px,7vw,60px);
+  letter-spacing:3px;
+  line-height:1;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#666;
+  margin-bottom:28px;
+}
+
+.step{
+  display:none;
+}
+
+.step.active{
+  display:block;
+  animation:fadeUp .3s ease;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.question{
+  font-family:Anton,sans-serif;
+  letter-spacing:1.5px;
+  font-size:clamp(28px,6vw,42px);
+  text-align:center;
+  margin-bottom:24px;
+}
+
+.yes-no{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.choice{
+  min-height:125px;
+  border:0;
+  border-radius:20px;
+  cursor:pointer;
+  font:800 25px Inter,sans-serif;
+  transition:transform .18s,box-shadow .18s;
+  box-shadow:0 10px 25px rgba(0,0,0,.12);
+}
+
+.choice:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 35px rgba(0,0,0,.18);
+}
+
+.yes{
+  background:#111;
+  color:#fff;
+}
+
+.no{
+  background:#eee;
+  color:#111;
+}
+
+.popup-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:20;
+}
+
+.popup-backdrop.show{
+  display:flex;
+}
+
+.popup{
+  width:min(430px,100%);
+  background:#fff;
+  border-radius:25px;
+  padding:28px;
+  text-align:center;
+  box-shadow:0 25px 70px rgba(0,0,0,.45);
+  animation:pop .22s ease;
+}
+
+@keyframes pop{
+  from{opacity:0;transform:scale(.94)}
+  to{opacity:1;transform:scale(1)}
+}
+
+.popup h2{
+  font-family:Anton,sans-serif;
+  letter-spacing:1px;
+  font-size:28px;
+  margin-bottom:12px;
+}
+
+.popup p{
+  color:#555;
+  line-height:1.5;
+  margin-bottom:20px;
+}
+
+.understand{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:13px;
+  background:#27ae60;
+  color:#fff;
+  font:800 16px Inter,sans-serif;
+  cursor:pointer;
+}
+
+.buildings{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.building{
+  border:2px solid transparent;
+  border-radius:18px;
+  background:#f2f2f2;
+  padding:15px 8px 12px;
+  cursor:pointer;
+  transition:transform .18s,border-color .18s,background .18s;
+}
+
+.building:hover{
+  transform:translateY(-4px);
+}
+
+.building.selected{
+  border-color:#111;
+  background:#e8e8e8;
+}
+
+.building-art{
+  height:100px;
+  display:flex;
+  align-items:end;
+  justify-content:center;
+  margin-bottom:10px;
+}
+
+.tower{
+  width:52px;
+  height:82px;
+  background:linear-gradient(90deg,#555,#999 45%,#444);
+  border-radius:5px 5px 2px 2px;
+  position:relative;
+  box-shadow:5px 0 0 rgba(0,0,0,.08);
+}
+
+.tower:before{
+  content:"";
+  position:absolute;
+  left:7px;
+  right:7px;
+  top:9px;
+  height:8px;
+  background:repeating-linear-gradient(
+    90deg,#d9d9d9 0 7px,transparent 7px 12px
+  );
+  box-shadow:0 17px 0 rgba(255,255,255,.65),
+             0 34px 0 rgba(255,255,255,.65),
+             0 51px 0 rgba(255,255,255,.65);
+}
+
+.building:nth-child(2) .tower{
+  height:94px;
+  width:58px;
+}
+
+.building:nth-child(3) .tower{
+  height:72px;
+  width:64px;
+  border-radius:14px 14px 2px 2px;
+}
+
+.building:nth-child(4) .tower{
+  height:88px;
+  width:48px;
+  transform:skewY(-3deg);
+}
+
+.building-name{
+  font:800 18px Inter,sans-serif;
+}
+
+.warning{
+  padding:14px 16px;
+  border-radius:14px;
+  background:#fff4d6;
+  border:1px solid #f0d27b;
+  color:#5d4800;
+  font-size:13px;
+  line-height:1.45;
+  margin-bottom:22px;
+}
+
+.warning strong{
+  display:block;
+  margin-bottom:4px;
+  letter-spacing:.5px;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+input{
+  width:100%;
+  border:2px solid #ddd;
+  border-radius:13px;
+  padding:14px 15px;
+  font:500 16px Inter,sans-serif;
+  outline:0;
+  transition:border-color .18s,box-shadow .18s;
+}
+
+input:focus{
+  border-color:#111;
+  box-shadow:0 0 0 4px rgba(0,0,0,.08);
+}
+
+.next,
+.place-order{
+  width:100%;
+  margin-top:18px;
+  padding:15px 18px;
+  border:0;
+  border-radius:14px;
+  background:#111;
+  color:#fff;
+  font:800 16px Inter,sans-serif;
+  letter-spacing:.7px;
+  cursor:pointer;
+}
+
+.next:hover{
+  opacity:.9;
+}
+
+.place-order{
+  margin-top:22px;
+  background:#111;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+
+.place-order.shake{
+  animation:shake .45s ease;
+}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-7px)}
+  40%{transform:translateX(7px)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(5px)}
+}
+
+.order-summary{
+  margin-top:20px;
+  padding:16px;
+  border-radius:16px;
+  background:#f6f6f6;
+}
+
+.order-summary h3{
+  font-family:Anton,sans-serif;
+  letter-spacing:1px;
+  margin-bottom:10px;
+}
+
+.summary-row{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:6px 0;
+  font-size:14px;
+}
+
+.summary-total{
+  border-top:2px solid #111;
+  margin-top:8px;
+  padding-top:10px;
+  font-weight:800;
+}
+
+.success{
+  text-align:center;
+}
+
+.success-icon{
+  width:70px;
+  height:70px;
+  margin:0 auto 15px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#27ae60;
+  color:#fff;
+  font-size:35px;
+}
+
+.invoice-box{
+  margin-top:24px;
+  min-height:250px;
+  background:#fff;
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 8px 30px rgba(0,0,0,.1);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.invoice-box h2{
+  font-family:Anton,sans-serif;
+  letter-spacing:1.5px;
+  margin-bottom:10px;
+}
+
+.invoice-box p{
+  color:#666;
+  margin-bottom:20px;
+}
+
+.download{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:13px;
+  background:#111;
+  color:#fff;
+  font:800 16px Inter,sans-serif;
+  cursor:pointer;
+}
+
+.small-note{
+  text-align:center;
+  color:#777;
+  font-size:12px;
+  margin-top:15px;
+}
+
+@media(max-width:600px){
+  body{
+    padding:15px;
+    align-items:flex-start;
+  }
+
+  .checkout{
+    margin-top:10px;
+    max-height:none;
+    padding:22px 17px;
+    border-radius:24px;
+  }
+
+  .yes-no{
+    grid-template-columns:1fr;
+  }
+
+  .choice{
+    min-height:95px;
+  }
+
+  .buildings{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .invoice-box{
+    min-height:300px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="checkout">
+
+  <div class="logo">PRACHI</div>
+  <p class="subtitle">Cloud Kitchen • Checkout</p>
+
+  <!-- STEP 1 -->
+  <section class="step active" id="step1">
+    <h1 class="question">Do you live in Star Galaxy Apartments?</h1>
+
+    <div class="yes-no">
+      <button class="choice yes" id="yesBtn" type="button">YES</button>
+      <button class="choice no" id="noBtn" type="button">NO</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step" id="step2">
+    <h1 class="question">Select your building / block</h1>
+
+    <div class="buildings">
+      <button class="building" data-block="A" type="button">
+        <div class="building-art"><div class="tower"></div></div>
+        <div class="building-name">ABLOCK</div>
+      </button>
+
+      <button class="building" data-block="B" type="button">
+        <div class="building-art"><div class="tower"></div></div>
+        <div class="building-name">B</div>
+      </button>
+
+      <button class="building" data-block="C" type="button">
+        <div class="building-art"><div class="tower"></div></div>
+        <div class="building-name">C</div>
+      </button>
+
+      <button class="building" data-block="D" type="button">
+        <div class="building-art"><div class="tower"></div></div>
+        <div class="building-name">D</div>
+      </button>
+    </div>
+
+    <div class="warning">
+      <strong>⚠ DELIVERY WARNING</strong>
+      WE will delever your food to the receptionist whenever you see the packege is out for delevery.
+    </div>
+
+    <label for="customerName">Enter your name</label>
+    <input id="customerName" type="text" maxlength="60" autocomplete="name" placeholder="Your name">
+
+    <div class="order-summary" id="orderSummary"></div>
+
+    <button class="place-order" id="placeOrderBtn" type="button">
+      PLACE ORDER
+    </button>
+
+    <p class="small-note">Your order details will be securely sent for order processing.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step success" id="step3">
+    <div class="success-icon">✓</div>
+    <h1 class="question">ORDER PLACED</h1>
+    <p id="successText">Your order has been received.</p>
+
+    <div class="invoice-box">
+      <h2>DOWNLOAD INVOICE</h2>
+      <p>Your invoice is ready.</p>
+      <button class="download" id="downloadInvoiceBtn" type="button">
+        DOWNLOAD PDF
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<!-- OUTSIDE DELIVERY POPUP -->
+<div class="popup-backdrop" id="outsidePopup">
+  <div class="popup">
+    <h2>DELIVERY UNAVAILABLE</h2>
+    <p>We can not delever out of Star Galaxy Appartments.</p>
+    <button class="understand" id="understandBtn" type="button">
+      I UNDERSTAND
+    </button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBq7UQEwoudC2g8DRrG7EwqblX9SIDCF8",
+  authDomain: "ticktok-7fb30.firebaseapp.com",
+  databaseURL: "https://ticktok-7fb30-default-rtdb.firebaseio.com",
+  projectId: "ticktok-7fb30",
+  storageBucket: "ticktok-7fb30.firebasestorage.app",
+  messagingSenderId: "493782050714",
+  appId: "1:493782050714:web:5f6bd9eae6af68b250fc23",
+  measurementId: "G-3KH8Y1SVDG"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const step1 = document.getElementById("step1");
+const step2 = document.getElementById("step2");
+const step3 = document.getElementById("step3");
+const outsidePopup = document.getElementById("outsidePopup");
+const customerName = document.getElementById("customerName");
+const orderSummary = document.getElementById("orderSummary");
+const placeOrderBtn = document.getElementById("placeOrderBtn");
+const downloadInvoiceBtn = document.getElementById("downloadInvoiceBtn");
+
+let selectedBlock = "";
+let currentOrder = null;
+
+const rawCart = localStorage.getItem("prachiOrderCart");
+const cart = rawCart ? JSON.parse(rawCart) : {};
+const total = Number(localStorage.getItem("prachiOrderTotal") || 0);
+
+function showStep(step){
+  [step1,step2,step3].forEach(el=>el.classList.remove("active"));
+  step.classList.add("active");
+}
+
+function renderSummary(){
+  const names = Object.keys(cart);
+
+  if(!names.length){
+    orderSummary.innerHTML = `
+      <h3>ORDER SUMMARY</h3>
+      <div class="summary-row">
+        <span>No items found</span>
+        <strong>₹0</strong>
+      </div>
+    `;
+    return;
+  }
+
+  orderSummary.innerHTML = `
+    <h3>ORDER SUMMARY</h3>
+    ${names.map(name=>{
+      const item = cart[name];
+      return `
+        <div class="summary-row">
+          <span>${escapeHtml(name)} × ${item.quantity}</span>
+          <strong>₹${item.price * item.quantity}</strong>
+        </div>
+      `;
+    }).join("")}
+    <div class="summary-row summary-total">
+      <span>Bill</span>
+      <strong>₹${total}</strong>
+    </div>
+  `;
+}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g,char=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[char]));
+}
+
+document.getElementById("yesBtn").onclick=()=>{
+  renderSummary();
+  showStep(step2);
+};
+
+document.getElementById("noBtn").onclick=()=>{
+  outsidePopup.classList.add("show");
+};
+
+document.getElementById("understandBtn").onclick=()=>{
+  window.location.href="index.html";
+};
+
+document.querySelectorAll(".building").forEach(button=>{
+  button.onclick=()=>{
+    document.querySelectorAll(".building").forEach(b=>b.classList.remove("selected"));
+    button.classList.add("selected");
+    selectedBlock=button.dataset.block;
+  };
+});
+
+placeOrderBtn.onclick=async()=>{
+  placeOrderBtn.classList.remove("shake");
+  void placeOrderBtn.offsetWidth;
+  placeOrderBtn.classList.add("shake");
+
+  const name=customerName.value.trim();
+
+  if(!selectedBlock){
+    alert("Please select your building / block.");
+    return;
+  }
+
+  if(!name){
+    customerName.focus();
+    alert("Please enter your name.");
+    return;
+  }
+
+  if(!Object.keys(cart).length){
+    alert("Your cart is empty.");
+    return;
+  }
+
+  currentOrder={
+    customerName:name,
+    block:selectedBlock,
+    bill:total,
+    food:Object.entries(cart).map(([foodName,item])=>({
+      name:foodName,
+      price:item.price,
+      quantity:item.quantity,
+      subtotal:item.price*item.quantity
+    })),
+    createdAt:Date.now()
+  };
+
+  placeOrderBtn.disabled=true;
+  placeOrderBtn.textContent="PLACING ORDER...";
+
+  try{
+    const orderRef=await push(ref(db,"orders"),{
+      ...currentOrder,
+      serverCreatedAt:serverTimestamp()
+    });
+
+    currentOrder.orderId=orderRef.key;
+
+    localStorage.setItem("prachiLastOrder",JSON.stringify(currentOrder));
+
+    document.getElementById("successText").textContent=
+      `Thank you ${name}. Your order for Block ${selectedBlock} has been received.`;
+
+    showStep(step3);
+  }catch(error){
+    console.error(error);
+    alert("The order could not be sent. Please check your Firebase Realtime Database rules and try again.");
+    placeOrderBtn.disabled=false;
+    placeOrderBtn.textContent="PLACE ORDER";
+  }
+};
+
+downloadInvoiceBtn.onclick=async()=>{
+  if(!currentOrder){
+    currentOrder=JSON.parse(localStorage.getItem("prachiLastOrder") || "null");
+  }
+
+  if(!currentOrder) return;
+
+  const { jsPDF } = window.jspdf;
+  const pdf=new jsPDF();
+
+  pdf.setFont("helvetica","bold");
+  pdf.setFontSize(22);
+  pdf.text("PRACHI CLOUD KITCHEN",20,25);
+
+  pdf.setFont("helvetica","normal");
+  pdf.setFontSize(12);
+  pdf.text("ORDER INVOICE",20,36);
+
+  pdf.text(`Order ID: ${currentOrder.orderId || "N/A"}`,20,50);
+  pdf.text(`Name: ${currentOrder.customerName}`,20,59);
+  pdf.text(`Block: ${currentOrder.block}`,20,68);
+
+  let y=84;
+
+  pdf.setFont("helvetica","bold");
+  pdf.text("Food",20,y);
+  pdf.text("Qty",125,y);
+  pdf.text("Amount",155,y);
+
+  y+=10;
+  pdf.setFont("helvetica","normal");
+
+  currentOrder.food.forEach(item=>{
+    pdf.text(String(item.name).slice(0,35),20,y);
+    pdf.text(String(item.quantity),125,y);
+    pdf.text(`Rs. ${item.subtotal}`,155,y);
+    y+=9;
+
+    if(y>270){
+      pdf.addPage();
+      y=25;
+    }
+  });
+
+  y+=8;
+  pdf.setFont("helvetica","bold");
+  pdf.line(20,y,190,y);
+  y+=10;
+  pdf.text(`TOTAL: Rs. ${currentOrder.bill}`,20,y);
+
+  pdf.setFont("helvetica","normal");
+  pdf.setFontSize(9);
+  pdf.text("Delivery: Star Galaxy Apartments receptionist",20,y+15);
+
+  pdf.save(`Prachi-Invoice-${currentOrder.orderId || "order"}.pdf`);
+};
+
+// Load jsPDF only when needed.
+const pdfScript=document.createElement("script");
+pdfScript.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js";
+pdfScript.async=true;
+document.head.appendChild(pdfScript);
+</script>
+
+</body>
+</html>
