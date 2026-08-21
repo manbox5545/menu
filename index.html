@@ -257,6 +257,7 @@ body{
   background:#ffe5e5;
 }
 
+.cart-breakdown{display:flex;flex-direction:column;gap:8px;text-align:left}.cart-breakdown>div{display:flex;justify-content:space-between;gap:16px}.cart-breakdown .cart-grand-total{border-top:1px solid rgba(128,128,128,.25);padding-top:8px;font-weight:800}.cart-breakdown .cart-grand-total span{font-size:1.05em}
 .cart-total{
   display:flex;
   justify-content:space-between;
@@ -1010,9 +1011,10 @@ body.dark .repeat-total{
       </div>
     </div>
 
-    <div class="cart-total">
-      <span>Total</span>
-      <span id="cartTotal">₹0</span>
+    <div class="cart-total cart-breakdown">
+      <div><span>Subtotal</span><span id="cartSubtotal">₹0</span></div>
+      <div><span>Delivery</span><span id="cartDelivery">₹0</span></div>
+      <div class="cart-grand-total"><span>Total</span><span id="cartTotal">₹0</span></div>
     </div>
 
     <button class="buy-now" id="buyNowBtn" type="button">
@@ -1398,7 +1400,7 @@ import {
   getDatabase, ref, onValue, push, serverTimestamp,
   query, orderByChild, equalTo
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
 const firebaseConfig = {
@@ -1416,12 +1418,36 @@ const firebaseApp = initializeApp(firebaseConfig);
 const prachiDb = getDatabase(firebaseApp);
 const prachiAuth = getAuth(firebaseApp);
 let currentUser = null;
-const authReady = (async () => {
-  if (!prachiAuth.currentUser) await signInAnonymously(prachiAuth);
-  currentUser = prachiAuth.currentUser;
-  if (!currentUser) throw new Error("Firebase user was not created.");
-  return currentUser;
-})();
+const authReady = new Promise(async (resolve, reject) => {
+  let settled = false;
+
+  const unsubscribe = onAuthStateChanged(prachiAuth, (user) => {
+    if (user && !settled) {
+      currentUser = user;
+      settled = true;
+      unsubscribe();
+      resolve(user);
+    }
+  }, (error) => {
+    if (!settled) {
+      settled = true;
+      unsubscribe();
+      reject(error);
+    }
+  });
+
+  try {
+    if (!prachiAuth.currentUser) {
+      await signInAnonymously(prachiAuth);
+    }
+  } catch (error) {
+    if (!settled) {
+      settled = true;
+      unsubscribe();
+      reject(error);
+    }
+  }
+});
 
 
 /* =========================================================
@@ -1616,9 +1642,15 @@ function updateCart() {
   }
 
 
-  /* Update total */
+  /* Update subtotal + delivery + final total */
 
-  cartTotal.textContent = "₹" + total;
+  const delivery = deliveryFor(total);
+  const cartSubtotal = document.getElementById("cartSubtotal");
+  const cartDelivery = document.getElementById("cartDelivery");
+
+  if (cartSubtotal) cartSubtotal.textContent = "₹" + total;
+  if (cartDelivery) cartDelivery.textContent = delivery === 0 ? "FREE" : "₹" + delivery;
+  cartTotal.textContent = "₹" + (total + delivery);
 
 
   /* =======================================================
@@ -1780,6 +1812,11 @@ buyNowBtn.onclick = () => {
   localStorage.setItem(
     "prachiOrderTotal",
     String(subtotal)
+  );
+
+  localStorage.setItem(
+    "prachiOrderDelivery",
+    String(deliveryFor(subtotal))
   );
 
 
@@ -2380,8 +2417,11 @@ document.getElementById(
   document.getElementById(
     "repeatTotal"
   ).innerHTML = `
-    <span>Total</span>
-    <span>₹${finalBill}</span>
+    <span>Subtotal</span>
+    <span>₹${repeatSubtotal}</span>
+    <span>Delivery</span>
+    <span>${repeatDelivery ? "₹" + repeatDelivery : "FREE"}</span>
+    <strong><span>Total</span><span>₹${finalBill}</span></strong>
   `;
 
 

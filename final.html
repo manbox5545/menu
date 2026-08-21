@@ -886,7 +886,7 @@ input:focus{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import { getDatabase, ref, push, serverTimestamp, onValue } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBq7UEsIwoudC2g8DRrG7EwqblX9SIDCF8",
@@ -903,12 +903,36 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 let currentUser = null;
-const authReady = (async () => {
-  if (!auth.currentUser) await signInAnonymously(auth);
-  currentUser = auth.currentUser;
-  if (!currentUser) throw new Error("Firebase user was not created.");
-  return currentUser;
-})();
+const authReady = new Promise(async (resolve, reject) => {
+  let settled = false;
+
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user && !settled) {
+      currentUser = user;
+      settled = true;
+      unsubscribe();
+      resolve(user);
+    }
+  }, (error) => {
+    if (!settled) {
+      settled = true;
+      unsubscribe();
+      reject(error);
+    }
+  });
+
+  try {
+    if (!auth.currentUser) {
+      await signInAnonymously(auth);
+    }
+  } catch (error) {
+    if (!settled) {
+      settled = true;
+      unsubscribe();
+      reject(error);
+    }
+  }
+});
 
 const step1 = document.getElementById("step1");
 const step2 = document.getElementById("step2");
