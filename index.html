@@ -1418,35 +1418,46 @@ const firebaseApp = initializeApp(firebaseConfig);
 const prachiDb = getDatabase(firebaseApp);
 const prachiAuth = getAuth(firebaseApp);
 let currentUser = null;
-const authReady = new Promise(async (resolve, reject) => {
-  let settled = false;
+const authReady = new Promise((resolve, reject) => {
+  let finished = false;
 
-  const unsubscribe = onAuthStateChanged(prachiAuth, (user) => {
-    if (user && !settled) {
-      currentUser = user;
-      settled = true;
-      unsubscribe();
-      resolve(user);
-    }
-  }, (error) => {
-    if (!settled) {
-      settled = true;
-      unsubscribe();
-      reject(error);
-    }
-  });
+  const finish = (user) => {
+    if (finished || !user) return;
 
-  try {
-    if (!prachiAuth.currentUser) {
-      await signInAnonymously(prachiAuth);
+    finished = true;
+    currentUser = user;
+    unsubscribe();
+    resolve(user);
+  };
+
+  const unsubscribe = onAuthStateChanged(
+    prachiAuth,
+    async (user) => {
+      if (user) {
+        finish(user);
+        return;
+      }
+
+      // No Firebase user yet: create the anonymous customer session.
+      try {
+        const result = await signInAnonymously(prachiAuth);
+        finish(result.user);
+      } catch (error) {
+        if (!finished) {
+          finished = true;
+          unsubscribe();
+          reject(error);
+        }
+      }
+    },
+    (error) => {
+      if (!finished) {
+        finished = true;
+        unsubscribe();
+        reject(error);
+      }
     }
-  } catch (error) {
-    if (!settled) {
-      settled = true;
-      unsubscribe();
-      reject(error);
-    }
-  }
+  );
 });
 
 
@@ -2440,119 +2451,109 @@ document.getElementById(
   "repeatOrderBtn"
 ).onclick = async () => {
 
-  const name =
-    document.getElementById(
-      "repeatName"
-    ).value.trim();
-
-
-  const phone =
-    "+91" +
-    document.getElementById(
-      "repeatPhone"
-    ).value.trim();
-
-
-  const finalBill =
-    repeatSubtotal + repeatDelivery;
-
-
-  await authReady;
-  if (!currentUser) throw new Error("No authenticated customer.");
-
-  const order = {
-
-    ownerUid: currentUser.uid,
-
-    customerName: name,
-
-    phone: phone,
-
-    block: repeatBlock,
-
-    paymentMethod: "Cash on Delivery",
-
-    bill: repeatSubtotal,
-
-    deliveryCharge: repeatDelivery,
-
-    finalBill: finalBill,
-
-    food: Object.entries(repeatCart)
-      .map(([name, item]) => ({
-
-        name: name,
-
-        price: item.price,
-
-        quantity: item.quantity,
-
-        subtotal:
-          item.price * item.quantity
-
-      })),
-
-    status: null,
-
-    createdAt: Date.now(),
-
-    serverCreatedAt: serverTimestamp()
-
-  };
-
-
   const btn =
     document.getElementById(
       "repeatOrderBtn"
     );
 
-
   btn.disabled = true;
-
-  btn.textContent =
-    "PLACING ORDER...";
-
+  btn.textContent = "PLACING ORDER...";
 
   try {
+
+    const name =
+      document.getElementById(
+        "repeatName"
+      ).value.trim();
+
+    const phone =
+      "+91" +
+      document.getElementById(
+        "repeatPhone"
+      ).value.trim();
+
+    const finalBill =
+      repeatSubtotal + repeatDelivery;
+
+    /*
+      IMPORTANT:
+      Wait for Firebase authentication BEFORE
+      creating the order. This prevents the first-order
+      permission error that used to disappear after refresh.
+    */
+    const user = await authReady;
+
+    if (!user) {
+      throw new Error("No authenticated customer.");
+    }
+
+    const order = {
+
+      ownerUid: user.uid,
+
+      customerName: name,
+
+      phone: phone,
+
+      block: repeatBlock,
+
+      paymentMethod: "Cash on Delivery",
+
+      bill: repeatSubtotal,
+
+      deliveryCharge: repeatDelivery,
+
+      finalBill: finalBill,
+
+      food: Object.entries(repeatCart)
+        .map(([name, item]) => ({
+
+          name: name,
+
+          price: item.price,
+
+          quantity: item.quantity,
+
+          subtotal:
+            item.price * item.quantity
+
+        })),
+
+      status: null,
+
+      createdAt: Date.now(),
+
+      serverCreatedAt: serverTimestamp()
+
+    };
 
     const orderRef = await push(
       ref(prachiDb, "orders"),
       order
     );
 
-
     localStorage.setItem(
       "prachiLastOrderId",
       orderRef.key
     );
 
-
     repeatPaymentOverlay.classList.remove(
       "show"
     );
 
-
     /* Empty cart safely */
-
     Object.keys(cart).forEach((key) => {
-
       delete cart[key];
-
     });
 
-
     /* Update UI once */
-
     updateCart();
-
 
     alert(
       "Order placed successfully!"
     );
 
-
     openOrders();
-
 
   } catch (error) {
 
@@ -2561,12 +2562,14 @@ document.getElementById(
       error
     );
 
-
+    /*
+      Do NOT expose Firebase rules/errors to customers.
+      This is a customer-facing message instead.
+    */
     alert(
-      "Could not place the order. " +
-      "Please check Firebase rules."
+      "We couldn't place your order right now. " +
+      "Please try again in a moment."
     );
-
 
   } finally {
 
