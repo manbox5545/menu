@@ -475,6 +475,20 @@ input:focus{
   background:#f6f6f6;
 }
 
+.availability-warning{
+  display:none;
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:13px;
+  background:#fff4d6;
+  border:1px solid #f0d27b;
+  color:#5d4800;
+  font-size:12px;
+  line-height:1.45;
+  font-weight:700;
+}
+.availability-warning.show{display:block}
+
 .order-summary h3{
   font-family:Anton,sans-serif;
   letter-spacing:1px;
@@ -793,6 +807,7 @@ input:focus{
     <div class="phone-error" id="phoneError">Please enter exactly 10 digits.</div>
 
     <div class="order-summary" id="orderSummary"></div>
+    <div class="availability-warning" id="availabilityWarning"></div>
 
     <button class="place-order" id="placeOrderBtn" type="button">
       PLACE ORDER
@@ -952,6 +967,53 @@ let currentOrder = null;
 const rawCart = localStorage.getItem("prachiOrderCart");
 const cart = rawCart ? JSON.parse(rawCart) : {};
 const total = Number(localStorage.getItem("prachiOrderTotal") || 0);
+
+const menuAvailabilityRef = ref(db,"menuAvailability");
+let menuAvailability = {};
+
+function menuKey(name){
+  return String(name || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,"_")
+    .replace(/^_+|_+$/g,"");
+}
+
+function unavailableCartItems(){
+  return Object.keys(cart)
+    .filter((name) => menuAvailability[menuKey(name)] === false);
+}
+
+function renderAvailabilityWarning(){
+  const warning = document.getElementById("availabilityWarning");
+  if(!warning) return;
+
+  const unavailable = unavailableCartItems();
+
+  if(!unavailable.length){
+    warning.classList.remove("show");
+    warning.textContent = "";
+    placeOrderBtn.disabled = false;
+    return;
+  }
+
+  warning.textContent =
+    unavailable.length === 1
+      ? `${unavailable[0]} is currently unavailable. Please return to the menu and choose another item.`
+      : "Some items in your cart are currently unavailable. Please return to the menu and update your order.";
+
+  warning.classList.add("show");
+  placeOrderBtn.disabled = true;
+}
+
+onValue(
+  menuAvailabilityRef,
+  (snapshot) => {
+    menuAvailability = snapshot.val() || {};
+    renderAvailabilityWarning();
+  },
+  (error) => console.error("Menu availability read failed:",error)
+);
 
 function showStep(step){
   document.querySelectorAll(".step").forEach(el=>{
@@ -1126,6 +1188,7 @@ customerPhone.addEventListener("input",()=>{
 
 document.getElementById("yesBtn").onclick=()=>{
   renderSummary();
+  renderAvailabilityWarning();
   showStep(step2);
 };
 
@@ -1146,6 +1209,18 @@ document.querySelectorAll(".building").forEach(button=>{
 });
 
 placeOrderBtn.onclick=()=>{
+  const unavailable = unavailableCartItems();
+
+  if(unavailable.length){
+    renderAvailabilityWarning();
+    alert(
+      unavailable.length === 1
+        ? `${unavailable[0]} is currently unavailable. Please return to the menu.`
+        : "Some items in your cart are currently unavailable. Please return to the menu."
+    );
+    return;
+  }
+
   placeOrderBtn.classList.remove("shake");
   void placeOrderBtn.offsetWidth;
   placeOrderBtn.classList.add("shake");
@@ -1209,6 +1284,18 @@ document.querySelectorAll(".payment-option").forEach(button=>{
 
 document.getElementById("confirmOrderBtn").onclick=async()=>{
   const confirmBtn=document.getElementById("confirmOrderBtn");
+  const unavailable = unavailableCartItems();
+
+  if(unavailable.length){
+    renderAvailabilityWarning();
+    alert(
+      unavailable.length === 1
+        ? `${unavailable[0]} is currently unavailable. Please return to the menu.`
+        : "Some items in your cart are currently unavailable. Please return to the menu."
+    );
+    showStep(step1);
+    return;
+  }
 
   try {
     await authReady;
