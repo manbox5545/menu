@@ -91,6 +91,13 @@ body::before{
   contain:paint;
 }
 
+.hero-video{
+  display:block;
+  background:#111;
+  object-fit:cover;
+  contain:paint;
+}
+
 @media (hover:hover) and (pointer:fine){
   .hero-image{
     transition:transform .2s ease;
@@ -1041,10 +1048,98 @@ body.dark .repeat-total{
   }
 }
 
+
+/* ================= VIDEO SOUND PERMISSION ================= */
+.video-sound-overlay,.ordering-closed-overlay{
+  position:fixed;
+  inset:0;
+  z-index:10030;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(5px);
+}
+.video-sound-overlay.hidden,.ordering-closed-overlay:not(.show){
+  display:none;
+}
+.video-sound-box,.ordering-closed-box{
+  width:min(440px,100%);
+  padding:30px 22px;
+  border-radius:22px;
+  background:#fff;
+  color:#111;
+  text-align:center;
+  box-shadow:0 20px 70px rgba(0,0,0,.45);
+}
+.video-sound-box h2,.ordering-closed-box h2{
+  font-family:Anton,sans-serif;
+  letter-spacing:1px;
+  margin-bottom:10px;
+}
+.video-sound-box p,.ordering-closed-box p{
+  color:#555;
+  font-size:14px;
+  line-height:1.55;
+  margin-bottom:18px;
+}
+.video-sound-btn,.ordering-closed-btn{
+  width:100%;
+  padding:14px 18px;
+  border:0;
+  border-radius:13px;
+  background:#111;
+  color:#fff;
+  font:800 15px Inter,sans-serif;
+  cursor:pointer;
+}
+.buy-now.ordering-closed{
+  opacity:.55;
+  cursor:not-allowed;
+}
+body.dark .video-sound-box,body.dark .ordering-closed-box{
+  background:#1b1b1b;
+  color:#fff;
+}
+body.dark .video-sound-box p,body.dark .ordering-closed-box p{
+  color:#bbb;
+}
+body.dark .video-sound-btn,body.dark .ordering-closed-btn{
+  background:#fff;
+  color:#111;
+}
+
 </style>
 </head>
 
 <body>
+
+<!-- VIDEO AUDIO PERMISSION -->
+<div class="video-sound-overlay" id="videoSoundOverlay" role="dialog" aria-modal="true">
+  <div class="video-sound-box">
+    <h2>PLAY VIDEO WITH SOUND?</h2>
+    <p>Allow the intro video to play with audio.</p>
+    <button class="video-sound-btn" id="enableVideoSoundBtn" type="button">
+      🔊 PLAY WITH SOUND
+    </button>
+  </div>
+</div>
+
+<!-- ORDERING HOURS NOTICE -->
+<div class="ordering-closed-overlay" id="orderingClosedOverlay" role="dialog" aria-modal="true">
+  <div class="ordering-closed-box">
+    <h2>ORDERS ARE CLOSED</h2>
+    <p id="orderingClosedMessage">
+      We accept orders from 11:00 AM to 7:00 PM only.
+      Please come back during our ordering hours.
+    </p>
+    <button class="ordering-closed-btn" id="closeOrderingClosedBtn" type="button">
+      OK
+    </button>
+  </div>
+</div>
+
 
 <!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav" id="bottomNav">
@@ -1192,15 +1287,19 @@ body.dark .repeat-total{
 
   <p>Fresh • Homemade • Delicious</p>
 
-  <!-- YOUR FOOD IMAGE RESTORED -->
-  <img
-    class="hero-image"
-    src="image.png"
-    width="480"
-    height="640"
-    alt="Indian Food"
-    decoding="async"
-    fetchpriority="high">
+<video
+  id="heroVideo"
+  class="hero-image hero-video"
+  autoplay
+  muted
+  loop
+  playsinline
+  preload="auto">
+
+  <source
+    src="https://res.cloudinary.com/ddcmbjnzh/video/upload/f_mp4,vc_h264/v1788271417/intro_mzp8wn.mp4"
+    type="video/mp4">
+</video>
 
 </section>
 
@@ -1942,6 +2041,51 @@ function removeItem(name) {
 }
 
 
+
+/* =========================================================
+   ORDERING HOURS
+   Orders are accepted from 11:00 AM through 6:59 PM.
+   At 7:00 PM ordering closes.
+   Uses the visitor's local browser time.
+========================================================= */
+
+const ORDER_START_MINUTES = 11 * 60;
+const ORDER_END_MINUTES = 19 * 60;
+
+const orderingClosedOverlay =
+  document.getElementById("orderingClosedOverlay");
+
+const orderingClosedMessage =
+  document.getElementById("orderingClosedMessage");
+
+const closeOrderingClosedBtn =
+  document.getElementById("closeOrderingClosedBtn");
+
+function isOrderingOpen() {
+  const now = new Date();
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  return minutes >= ORDER_START_MINUTES && minutes < ORDER_END_MINUTES;
+}
+
+function showOrderingClosed() {
+  if (orderingClosedMessage) {
+    orderingClosedMessage.textContent =
+      "We accept orders from 11:00 AM to 7:00 PM only. " +
+      "Ordering is currently closed. Please come back during our ordering hours.";
+  }
+  orderingClosedOverlay?.classList.add("show");
+}
+
+closeOrderingClosedBtn?.addEventListener("click", () => {
+  orderingClosedOverlay?.classList.remove("show");
+});
+
+orderingClosedOverlay?.addEventListener("click", (e) => {
+  if (e.target === orderingClosedOverlay) {
+    orderingClosedOverlay.classList.remove("show");
+  }
+});
+
 /* =========================================================
    BUY NOW
 ========================================================= */
@@ -1949,6 +2093,11 @@ function removeItem(name) {
 const buyNowBtn = document.getElementById("buyNowBtn");
 
 buyNowBtn.onclick = () => {
+
+  if (!isOrderingOpen()) {
+    showOrderingClosed();
+    return;
+  }
 
   const cartKeys = Object.keys(cart);
 
@@ -2395,6 +2544,10 @@ document.getElementById(
 ========================================================= */
 
 function openRepeatCheckout() {
+  if (!isOrderingOpen()) {
+    showOrderingClosed();
+    return;
+  }
 
   profile = getProfile();
 
@@ -2553,6 +2706,11 @@ document.getElementById(
   "repeatNextBtn"
 ).onclick = () => {
 
+  if (!isOrderingOpen()) {
+    showOrderingClosed();
+    return;
+  }
+
   const name =
     document.getElementById(
       "repeatName"
@@ -2630,6 +2788,11 @@ document.getElementById(
 document.getElementById(
   "repeatOrderBtn"
 ).onclick = async () => {
+
+  if (!isOrderingOpen()) {
+    showOrderingClosed();
+    return;
+  }
 
   const btn =
     document.getElementById(
@@ -2780,6 +2943,85 @@ updateCart();
 
 showNavPage("home");
 
+
+/* HERO VIDEO: autoplay, loop, viewport pause, tab pause */
+const heroVideo = document.getElementById("heroVideo");
+
+if (heroVideo) {
+  heroVideo.muted = true;
+  heroVideo.defaultMuted = true;
+  heroVideo.playsInline = true;
+  heroVideo.controls = false;
+
+  const videoSoundOverlay =
+    document.getElementById("videoSoundOverlay");
+
+  const enableVideoSoundBtn =
+    document.getElementById("enableVideoSoundBtn");
+
+  const soundWasEnabled =
+    localStorage.getItem("prachiVideoSoundEnabled") === "1";
+
+  if (soundWasEnabled) {
+    videoSoundOverlay?.classList.add("hidden");
+  }
+
+  const enableVideoSound = async () => {
+    try {
+      heroVideo.muted = false;
+      heroVideo.defaultMuted = false;
+      await heroVideo.play();
+
+      localStorage.setItem("prachiVideoSoundEnabled", "1");
+      videoSoundOverlay?.classList.add("hidden");
+    } catch (error) {
+      console.warn("Video sound could not be enabled.", error);
+      heroVideo.muted = true;
+      heroVideo.defaultMuted = true;
+      alert("Your browser blocked video audio. Please try again.");
+    }
+  };
+
+  enableVideoSoundBtn?.addEventListener("click", enableVideoSound);
+
+  let videoVisible = false;
+
+  const playHeroVideo = async () => {
+    if (!videoVisible || document.hidden) return;
+
+    try {
+      const soundEnabled =
+        localStorage.getItem("prachiVideoSoundEnabled") === "1";
+
+      heroVideo.muted = !soundEnabled;
+      heroVideo.defaultMuted = !soundEnabled;
+
+      await heroVideo.play();
+    } catch (_) {
+      console.debug("Hero video playback was blocked.");
+    }
+  };
+
+  const stopHeroVideo = () => {
+    heroVideo.pause();
+    try { heroVideo.currentTime = 0; } catch (_) {}
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    videoVisible = entries[0].isIntersecting;
+    if (videoVisible) playHeroVideo();
+    else stopHeroVideo();
+  }, { threshold: 0.70 });
+
+  observer.observe(heroVideo);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) heroVideo.pause();
+    else if (videoVisible) playHeroVideo();
+  });
+
+  window.addEventListener("pagehide", () => heroVideo.pause());
+}
 </script>
 
 </body>
