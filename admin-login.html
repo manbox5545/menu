@@ -119,7 +119,9 @@ import {
 import {
   getAuth,
   signInWithEmailAndPassword,
-  onAuthStateChanged
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
@@ -138,6 +140,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
+
+// Keep the admin logged in on this browser/device
+await setPersistence(auth, browserLocalPersistence);
 
 const form = document.getElementById("loginForm");
 
