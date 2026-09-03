@@ -1110,6 +1110,29 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
   color:#111;
 }
 
+
+/* ================= STORE CLOSED BANNER ================= */
+.store-closed-banner{
+  position:fixed;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10030;
+  width:min(720px,calc(100% - 30px));
+  padding:13px 18px;
+  border-radius:15px;
+  background:#fff0ef;
+  border:2px solid #e74c3c;
+  color:#8f261c;
+  text-align:center;
+  font-weight:800;
+  box-shadow:0 12px 35px rgba(0,0,0,.22);
+  display:none;
+}
+.store-closed-banner.show{display:block}
+.buy-now.store-closed{
+  opacity:.6;
+}
 </style>
 </head>
 
@@ -1140,6 +1163,9 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
   </div>
 </div>
 
+<div class="store-closed-banner" id="storeClosedBanner" role="status">
+  🔴 STORE CURRENTLY CLOSED — WE ARE NOT ACCEPTING NEW ORDERS RIGHT NOW.
+</div>
 
 <!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav" id="bottomNav">
@@ -1640,6 +1666,12 @@ const authReady = new Promise((resolve, reject) => {
 const menuAvailabilityRef = ref(prachiDb,"menuAvailability");
 let menuAvailability = {};
 
+const storeStatusRef = ref(prachiDb,"storeStatus");
+let storeIsOpen = true;
+let storeStatusLoaded = false;
+const storeClosedBanner = document.getElementById("storeClosedBanner");
+const buyNowBtn = document.getElementById("buyNowBtn");
+
 function menuKey(name){
   return String(name || "")
     .trim()
@@ -2043,14 +2075,55 @@ function removeItem(name) {
 
 
 /* =========================================================
+   STORE STATUS
+   Admin can close the entire store from the admin panel.
+========================================================= */
+function applyStoreStatus(){
+  if(storeClosedBanner){
+    storeClosedBanner.classList.toggle("show",!storeIsOpen);
+    storeClosedBanner.textContent = storeIsOpen
+      ? ""
+      : "🔴 STORE CURRENTLY CLOSED — WE ARE NOT ACCEPTING NEW ORDERS RIGHT NOW.";
+  }
+
+  if(buyNowBtn){
+    buyNowBtn.classList.toggle("store-closed",!storeIsOpen);
+    buyNowBtn.setAttribute("aria-disabled",String(!storeIsOpen));
+  }
+}
+
+onValue(
+  storeStatusRef,
+  snapshot => {
+    const value = snapshot.val();
+    storeIsOpen = value?.isOpen !== false;
+    storeStatusLoaded = true;
+    applyStoreStatus();
+  },
+  error => {
+    console.error("Store status read failed:",error);
+    storeStatusLoaded = true;
+    storeIsOpen = true;
+    applyStoreStatus();
+  }
+);
+
+function showStoreClosed(){
+  if(orderingClosedMessage){
+    orderingClosedMessage.textContent =
+      "The store is currently closed. Please come back when the owner reopens it.";
+  }
+  orderingClosedOverlay?.classList.add("show");
+}
+
+/* =========================================================
    ORDERING HOURS
    Orders are accepted from 11:00 AM through 6:59 PM.
    At 7:00 PM ordering closes.
    Uses the visitor's local browser time.
 ========================================================= */
-
-const ORDER_START_MINUTES = 11 * 60;
-const ORDER_END_MINUTES = 19 * 60;
+const ORDER_START_MINUTES = 0;
+const ORDER_END_MINUTES = 24 * 60;
 
 const orderingClosedOverlay =
   document.getElementById("orderingClosedOverlay");
@@ -2090,9 +2163,17 @@ orderingClosedOverlay?.addEventListener("click", (e) => {
    BUY NOW
 ========================================================= */
 
-const buyNowBtn = document.getElementById("buyNowBtn");
-
 buyNowBtn.onclick = () => {
+
+  if(!storeStatusLoaded){
+    alert("Checking store status. Please try again in a moment.");
+    return;
+  }
+
+  if(!storeIsOpen){
+    showStoreClosed();
+    return;
+  }
 
   if (!isOrderingOpen()) {
     showOrderingClosed();

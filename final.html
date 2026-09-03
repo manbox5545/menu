@@ -737,10 +737,60 @@ input:focus{
     min-height:300px;
   }
 }
+
+/* ================= STORE CLOSED ================= */
+.store-closed-overlay{
+  position:fixed;
+  inset:0;
+  z-index:60;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.68);
+  backdrop-filter:blur(6px);
+}
+.store-closed-overlay.show{display:flex}
+.store-closed-card{
+  width:min(460px,100%);
+  background:#fff;
+  border-radius:24px;
+  padding:28px;
+  text-align:center;
+  box-shadow:0 25px 80px rgba(0,0,0,.45);
+}
+.store-closed-card h2{
+  font-family:Anton,sans-serif;
+  font-size:32px;
+  margin-bottom:10px;
+}
+.store-closed-card p{
+  color:#555;
+  line-height:1.5;
+  margin-bottom:20px;
+}
+.store-closed-btn{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:13px;
+  background:#111;
+  color:#fff;
+  font:800 15px Inter,sans-serif;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
+
+<div class="store-closed-overlay" id="storeClosedOverlay" role="dialog" aria-modal="true">
+  <div class="store-closed-card">
+    <h2>🔴 STORE CLOSED</h2>
+    <p id="storeClosedMessage">The store is currently closed. Please come back when the owner reopens it.</p>
+    <button class="store-closed-btn" id="storeClosedBtn" type="button">OK</button>
+  </div>
+</div>
 
 <main class="checkout">
 
@@ -971,6 +1021,13 @@ const total = Number(localStorage.getItem("prachiOrderTotal") || 0);
 const menuAvailabilityRef = ref(db,"menuAvailability");
 let menuAvailability = {};
 
+const storeStatusRef = ref(db,"storeStatus");
+let storeIsOpen = true;
+let storeStatusLoaded = false;
+const storeClosedOverlay = document.getElementById("storeClosedOverlay");
+const storeClosedMessage = document.getElementById("storeClosedMessage");
+const storeClosedBtn = document.getElementById("storeClosedBtn");
+
 function menuKey(name){
   return String(name || "")
     .trim()
@@ -1013,6 +1070,38 @@ onValue(
     renderAvailabilityWarning();
   },
   (error) => console.error("Menu availability read failed:",error)
+);
+
+function showStoreClosed(){
+  if(storeClosedMessage){
+    storeClosedMessage.textContent =
+      "The store is currently closed. Please come back when the owner reopens it.";
+  }
+  storeClosedOverlay?.classList.add("show");
+}
+
+function hideStoreClosed(){
+  storeClosedOverlay?.classList.remove("show");
+}
+
+storeClosedBtn?.addEventListener("click",hideStoreClosed);
+storeClosedOverlay?.addEventListener("click",event=>{
+  if(event.target===storeClosedOverlay) hideStoreClosed();
+});
+
+onValue(
+  storeStatusRef,
+  snapshot => {
+    const value = snapshot.val();
+    storeIsOpen = value?.isOpen !== false;
+    storeStatusLoaded = true;
+    if(!storeIsOpen) showStoreClosed();
+  },
+  error => {
+    console.error("Store status read failed:",error);
+    storeStatusLoaded = true;
+    storeIsOpen = true;
+  }
 );
 
 function showStep(step){
@@ -1187,6 +1276,14 @@ customerPhone.addEventListener("input",()=>{
 });
 
 document.getElementById("yesBtn").onclick=()=>{
+  if(!storeStatusLoaded){
+    alert("Checking store status. Please try again in a moment.");
+    return;
+  }
+  if(!storeIsOpen){
+    showStoreClosed();
+    return;
+  }
   renderSummary();
   renderAvailabilityWarning();
   showStep(step2);
@@ -1209,6 +1306,15 @@ document.querySelectorAll(".building").forEach(button=>{
 });
 
 placeOrderBtn.onclick=()=>{
+  if(!storeStatusLoaded){
+    alert("Checking store status. Please try again in a moment.");
+    return;
+  }
+  if(!storeIsOpen){
+    showStoreClosed();
+    return;
+  }
+
   const unavailable = unavailableCartItems();
 
   if(unavailable.length){
@@ -1284,6 +1390,16 @@ document.querySelectorAll(".payment-option").forEach(button=>{
 
 document.getElementById("confirmOrderBtn").onclick=async()=>{
   const confirmBtn=document.getElementById("confirmOrderBtn");
+
+  if(!storeStatusLoaded){
+    alert("Checking store status. Please try again in a moment.");
+    return;
+  }
+  if(!storeIsOpen){
+    showStoreClosed();
+    showStep(step1);
+    return;
+  }
   const unavailable = unavailableCartItems();
 
   if(unavailable.length){
