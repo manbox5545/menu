@@ -1378,6 +1378,25 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
 </div>
 
 
+<!-- SPECIAL COMBOS -->
+
+<h2 class="sectionTitle">Special Combos</h2>
+
+<div class="card">
+
+  <div class="header">
+    <div>Combo</div>
+    <div style="text-align:right">Price</div>
+  </div>
+
+  <div class="item" data-name="4 Roti + Aaloo Bhujia + Dal Chawal" data-price="150">
+    <div class="name">4 Roti + Aaloo Bhujia + Dal Chawal</div>
+    <div class="price">₹150</div>
+  </div>
+
+</div>
+
+
 <!-- RICE -->
 
 <h2 class="sectionTitle">Rice</h2>
@@ -1595,7 +1614,7 @@ import { initializeApp }
   from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
-  getDatabase, ref, onValue, push, serverTimestamp,
+  getDatabase, ref, onValue, push, serverTimestamp, update,
   query, orderByChild, equalTo
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
@@ -1666,12 +1685,6 @@ const authReady = new Promise((resolve, reject) => {
 const menuAvailabilityRef = ref(prachiDb,"menuAvailability");
 let menuAvailability = {};
 
-const storeStatusRef = ref(prachiDb,"storeStatus");
-let storeIsOpen = true;
-let storeStatusLoaded = false;
-const storeClosedBanner = document.getElementById("storeClosedBanner");
-const buyNowBtn = document.getElementById("buyNowBtn");
-
 function menuKey(name){
   return String(name || "")
     .trim()
@@ -1679,6 +1692,50 @@ function menuKey(name){
     .replace(/[^a-z0-9]+/g,"_")
     .replace(/^_+|_+$/g,"");
 }
+/* =========================
+   MENU PRICES
+   Prices are stored in Firebase so the admin can edit them.
+   The same price is pushed into the menu and current cart.
+========================= */
+const menuPricesRef = ref(prachiDb,"menuPrices");
+let menuPrices = {};
+
+function applyMenuPrices(){
+  let cartChanged = false;
+
+  document.querySelectorAll(".menu .item").forEach((item) => {
+    const name = item.dataset.name || "";
+    const price = Number(menuPrices[menuKey(name)]);
+    if(!name || !Number.isFinite(price) || price <= 0) return;
+
+    item.dataset.price = String(price);
+    const priceEl = item.querySelector(".price");
+    if(priceEl) priceEl.textContent = `₹${price}`;
+
+    if(cart[name] && Number(cart[name].price) !== price){
+      cart[name].price = price;
+      cartChanged = true;
+    }
+  });
+
+  if(cartChanged) updateCart();
+}
+
+onValue(
+  menuPricesRef,
+  snapshot => {
+    menuPrices = snapshot.val() || {};
+    applyMenuPrices();
+  },
+  error => console.error("Menu price read failed:",error)
+);
+
+const storeStatusRef = ref(prachiDb,"storeStatus");
+let storeIsOpen = true;
+let storeStatusLoaded = false;
+const storeClosedBanner = document.getElementById("storeClosedBanner");
+const buyNowBtn = document.getElementById("buyNowBtn");
+
 
 function isMenuItemAvailable(name){
   return menuAvailability[menuKey(name)] !== false;
@@ -2654,6 +2711,13 @@ function openRepeatCheckout() {
 
   }
 
+  // Use the latest Firebase menu prices for saved/repeat carts too.
+  Object.keys(repeatCart).forEach((name) => {
+    const latestPrice = Number(menuPrices[menuKey(name)]);
+    if(Number.isFinite(latestPrice) && latestPrice > 0){
+      repeatCart[name].price = latestPrice;
+    }
+  });
 
     const unavailableRepeatItems = Object.keys(repeatCart)
     .filter((name) => !isMenuItemAvailable(name));
