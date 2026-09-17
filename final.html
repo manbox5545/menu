@@ -967,36 +967,76 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
-let currentUser = null;
-const authReady = new Promise(async (resolve, reject) => {
-  let settled = false;
 
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (user && !settled) {
-      currentUser = user;
-      settled = true;
+let currentUser = null;
+let authPromise = null;
+
+/*
+  CUSTOMER AUTH
+  --------------
+  The first order can be clicked while Firebase Anonymous Auth is
+  still initializing. Keep one shared promise and always wait for a
+  real authenticated user before writing the order.
+*/
+function ensureAuthenticated(){
+  if(auth.currentUser){
+    currentUser = auth.currentUser;
+    return Promise.resolve(currentUser);
+  }
+
+  if(authPromise) return authPromise;
+
+  authPromise = new Promise((resolve,reject)=>{
+    let finished = false;
+
+    const unsubscribe = onAuthStateChanged(auth, user=>{
+      if(finished) return;
+
+      if(user){
+        currentUser = user;
+        finished = true;
+        unsubscribe();
+        resolve(user);
+      }
+    }, error=>{
+      if(finished) return;
+      finished = true;
       unsubscribe();
-      resolve(user);
-    }
-  }, (error) => {
-    if (!settled) {
-      settled = true;
-      unsubscribe();
+      authPromise = null;
       reject(error);
-    }
+    });
+
+    signInAnonymously(auth).catch(error=>{
+      /*
+        signInAnonymously can report an error if another auth
+        operation is already in progress. Give the auth listener
+        a moment to deliver the authenticated user first.
+      */
+      if(auth.currentUser){
+        currentUser = auth.currentUser;
+        if(!finished){
+          finished = true;
+          unsubscribe();
+          resolve(currentUser);
+        }
+        return;
+      }
+
+      if(!finished){
+        finished = true;
+        unsubscribe();
+        authPromise = null;
+        reject(error);
+      }
+    });
   });
 
-  try {
-    if (!auth.currentUser) {
-      await signInAnonymously(auth);
-    }
-  } catch (error) {
-    if (!settled) {
-      settled = true;
-      unsubscribe();
-      reject(error);
-    }
-  }
+  return authPromise;
+}
+
+/* Start authentication immediately, but do not block page rendering. */
+ensureAuthenticated().catch(error=>{
+  console.error("Initial Firebase authentication failed:",error);
 });
 
 const step1 = document.getElementById("step1");
@@ -1414,15 +1454,28 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
   }
 
   try {
-    await authReady;
+    /*
+      IMPORTANT:
+      Do not depend on a page-load auth promise here. Wait for the
+      authenticated Firebase user at the exact moment the order is
+      submitted. This fixes the first-order race condition.
+    */
+    await ensureAuthenticated();
   } catch(error) {
     console.error("Firebase authentication failed:",error);
-    alert("Could not authenticate your account. Please refresh and try again.");
+    confirmBtn.disabled=false;
+    confirmBtn.textContent="PLACE ORDER";
+    alert(
+      "We could not connect your customer account to Firebase. " +
+      "Please check that Anonymous Authentication is enabled in Firebase."
+    );
     return;
   }
 
   if(!currentUser){
-    alert("No customer account is available. Please refresh and try again.");
+    confirmBtn.disabled=false;
+    confirmBtn.textContent="PLACE ORDER";
+    alert("Customer authentication is not ready. Please try again.");
     return;
   }
 
@@ -1454,10 +1507,19 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
   confirmBtn.textContent="PLACING ORDER...";
 
   try{
+    /*
+      A successful push() is the ONLY point at which we show
+      "ORDER PLACED". If Firebase rejects the write, success is
+      never displayed.
+    */
     const orderRef=await push(ref(db,"orders"),{
       ...currentOrder,
       serverCreatedAt:serverTimestamp()
     });
+
+    if(!orderRef || !orderRef.key){
+      throw new Error("Firebase did not return an order ID.");
+    }
 
     currentOrder.orderId=orderRef.key;
 
@@ -1469,6 +1531,7 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
       phone:currentOrder.phone,
       block:currentOrder.block
     }));
+
     showOrderStatus("");
     listenForOrderStatus(currentOrder.orderId);
 
@@ -1486,11 +1549,36 @@ document.getElementById("confirmOrderBtn").onclick=async()=>{
     `;
 
     showStep(step3);
+
   }catch(error){
-    console.error(error);
-    alert("The order could not be sent. Please check your Firebase Realtime Database rules and try again.");
+    console.error("Firebase order write failed:",error);
+
     confirmBtn.disabled=false;
     confirmBtn.textContent="PLACE ORDER";
+
+    /*
+      Never pretend that an order succeeded after a failed Firebase
+      write. Show the actual Firebase error in the console and give
+      the customer a short, useful message.
+    */
+    const code=String(error?.code || "").toLowerCase();
+
+    if(code.includes("permission-denied")){
+      alert(
+        "ORDER NOT SENT. Firebase rejected the order write. " +
+        "Please check the Realtime Database rules for /orders."
+      );
+    }else if(code.includes("network")){
+      alert(
+        "ORDER NOT SENT. Your internet connection or Firebase connection " +
+        "was interrupted. Please try again."
+      );
+    }else{
+      alert(
+        "ORDER NOT SENT. Firebase could not save the order. " +
+        "Please try again."
+      );
+    }
   }
 };
 
