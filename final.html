@@ -3,1554 +3,252 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>Prachi Cloud Kitchen — Checkout</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
 <style>
-@font-face{
-  font-family:FoodDelight;
-  src:url("FoodDelight.ttf") format("truetype");
-}
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-body{
-  min-height:100vh;
-  font-family:Inter,sans-serif;
-  color:#111;
-  background:
-    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
-    url("img.png") center center / cover no-repeat fixed;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:30px 15px;
-}
-
-.checkout{
-  width:min(680px,100%);
-  max-height:92vh;
-  overflow:auto;
-  background:rgba(255,255,255,.96);
-  border-radius:28px;
-  padding:30px;
-  box-shadow:0 25px 80px rgba(0,0,0,.45);
-}
-
-.logo{
-  text-align:center;
-  font-family:FoodDelight,Anton,sans-serif;
-  font-size:clamp(35px,7vw,60px);
-  letter-spacing:3px;
-  line-height:1;
-  margin-bottom:8px;
-}
-
-.subtitle{
-  text-align:center;
-  color:#666;
-  margin-bottom:28px;
-}
-
-.step{
-  display:none;
-}
-
-.step.active{
-  display:block;
-  animation:fadeUp .3s ease;
-}
-
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(10px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-.question{
-  font-family:Anton,sans-serif;
-  letter-spacing:1.5px;
-  font-size:clamp(28px,6vw,42px);
-  text-align:center;
-  margin-bottom:24px;
-}
-
-.yes-no{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-}
-
-.choice{
-  min-height:125px;
-  border:0;
-  border-radius:20px;
-  cursor:pointer;
-  font:800 25px Inter,sans-serif;
-  transition:transform .18s,box-shadow .18s;
-  box-shadow:0 10px 25px rgba(0,0,0,.12);
-}
-
-.choice:hover{
-  transform:translateY(-4px);
-  box-shadow:0 16px 35px rgba(0,0,0,.18);
-}
-
-.yes{
-  background:#111;
-  color:#fff;
-}
-
-.no{
-  background:#eee;
-  color:#111;
-}
-
-.popup-backdrop{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  z-index:20;
-}
-
-.popup-backdrop.show{
-  display:flex;
-}
-
-.popup{
-  width:min(430px,100%);
-  background:#fff;
-  border-radius:25px;
-  padding:28px;
-  text-align:center;
-  box-shadow:0 25px 70px rgba(0,0,0,.45);
-  animation:pop .22s ease;
-}
-
-@keyframes pop{
-  from{opacity:0;transform:scale(.94)}
-  to{opacity:1;transform:scale(1)}
-}
-
-.popup h2{
-  font-family:Anton,sans-serif;
-  letter-spacing:1px;
-  font-size:28px;
-  margin-bottom:12px;
-}
-
-.popup p{
-  color:#555;
-  line-height:1.5;
-  margin-bottom:20px;
-}
-
-.understand{
-  width:100%;
-  padding:14px;
-  border:0;
-  border-radius:13px;
-  background:#27ae60;
-  color:#fff;
-  font:800 16px Inter,sans-serif;
-  cursor:pointer;
-}
-
-.buildings{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-bottom:18px;
-}
-
-.building{
-  border:2px solid transparent;
-  border-radius:18px;
-  background:#f2f2f2;
-  padding:15px 8px 12px;
-  cursor:pointer;
-  transition:transform .18s,border-color .18s,background .18s;
-}
-
-.building:hover{
-  transform:translateY(-4px);
-}
-
-.building.selected{
-  border-color:#111;
-  background:#e8e8e8;
-}
-
-.building-art{
-  height:100px;
-  display:flex;
-  align-items:end;
-  justify-content:center;
-  margin-bottom:10px;
-}
-
-.tower{
-  width:52px;
-  height:82px;
-  background:linear-gradient(90deg,#555,#999 45%,#444);
-  border-radius:5px 5px 2px 2px;
-  position:relative;
-  box-shadow:5px 0 0 rgba(0,0,0,.08);
-}
-
-.tower:before{
-  content:"";
-  position:absolute;
-  left:7px;
-  right:7px;
-  top:9px;
-  height:8px;
-  background:repeating-linear-gradient(
-    90deg,#d9d9d9 0 7px,transparent 7px 12px
-  );
-  box-shadow:0 17px 0 rgba(255,255,255,.65),
-             0 34px 0 rgba(255,255,255,.65),
-             0 51px 0 rgba(255,255,255,.65);
-}
-
-.building:nth-child(2) .tower{
-  height:94px;
-  width:58px;
-}
-
-.building:nth-child(3) .tower{
-  height:72px;
-  width:64px;
-  border-radius:14px 14px 2px 2px;
-}
-
-.building:nth-child(4) .tower{
-  height:88px;
-  width:48px;
-  transform:skewY(-3deg);
-}
-
-.building-name{
-  font:800 18px Inter,sans-serif;
-}
-
-.warning{
-  padding:14px 16px;
-  border-radius:14px;
-  background:#fff4d6;
-  border:1px solid #f0d27b;
-  color:#5d4800;
-  font-size:13px;
-  line-height:1.45;
-  margin-bottom:22px;
-}
-
-.warning strong{
-  display:block;
-  margin-bottom:4px;
-  letter-spacing:.5px;
-}
-
-label{
-  display:block;
-  font-weight:700;
-  margin-bottom:8px;
-}
-
-input{
-  width:100%;
-  border:2px solid #ddd;
-  border-radius:13px;
-  padding:14px 15px;
-  font:500 16px Inter,sans-serif;
-  outline:0;
-  transition:border-color .18s,box-shadow .18s;
-}
-
-input:focus{
-  border-color:#111;
-  box-shadow:0 0 0 4px rgba(0,0,0,.08);
-}
-
-.next,
-.place-order{
-  width:100%;
-  margin-top:18px;
-  padding:15px 18px;
-  border:0;
-  border-radius:14px;
-  background:#111;
-  color:#fff;
-  font:800 16px Inter,sans-serif;
-  letter-spacing:.7px;
-  cursor:pointer;
-}
-
-.next:hover{
-  opacity:.9;
-}
-
-.place-order{
-  margin-top:22px;
-  background:#111;
-  box-shadow:0 10px 25px rgba(0,0,0,.2);
-}
-
-.place-order.shake{
-  animation:shake .45s ease;
-}
-
-@keyframes shake{
-  0%,100%{transform:translateX(0)}
-  20%{transform:translateX(-7px)}
-  40%{transform:translateX(7px)}
-  60%{transform:translateX(-5px)}
-  80%{transform:translateX(5px)}
-}
-
-.payment-options{
-  display:grid;
-  gap:13px;
-  margin-bottom:18px;
-}
-
-.payment-option{
-  width:100%;
-  display:grid;
-  grid-template-columns:42px 1fr 28px;
-  align-items:center;
-  gap:12px;
-  text-align:left;
-  border:2px solid #ddd;
-  border-radius:17px;
-  padding:15px;
-  background:#fff;
-  color:#111;
-  cursor:pointer;
-  transition:transform .18s,border-color .18s,box-shadow .18s;
-}
-
-.payment-option:hover:not(.unavailable){
-  transform:translateY(-2px);
-  box-shadow:0 8px 20px rgba(0,0,0,.1);
-}
-
-.payment-option.selected{
-  border-color:#111;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-}
-
-.payment-option.unavailable{
-  cursor:not-allowed;
-  opacity:.55;
-  background:#f5f5f5;
-}
-
-.payment-icon{
-  width:42px;
-  height:42px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#f0f0f0;
-  font-size:22px;
-}
-
-.payment-option strong{
-  display:block;
-  font-size:15px;
-}
-
-.payment-option small{
-  display:block;
-  margin-top:4px;
-  color:#777;
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:.4px;
-}
-
-.payment-check{
-  font-weight:900;
-  text-align:center;
-}
-
-.checkout-final-total{
-  margin:15px 0 0;
-  padding:15px;
-  border-top:2px solid #111;
-  display:flex;
-  justify-content:space-between;
-  font-size:19px;
-  font-weight:800;
-}
-
-.payment-note{
-  padding:14px 16px;
-  border-radius:14px;
-  background:#f4f4f4;
-  color:#555;
-  font-size:13px;
-  line-height:1.45;
-  margin-bottom:4px;
-}
-
-.payment-note strong{
-  display:block;
-  color:#111;
-  margin-bottom:4px;
-  letter-spacing:.6px;
-}
-
-.phone-label{
-  margin-top:18px;
-}
-
-.phone-input{
-  display:grid;
-  grid-template-columns:auto 1fr;
-  align-items:center;
-  border:2px solid #ddd;
-  border-radius:13px;
-  overflow:hidden;
-  background:#fff;
-  transition:border-color .18s,box-shadow .18s;
-}
-
-.phone-input:focus-within{
-  border-color:#111;
-  box-shadow:0 0 0 4px rgba(0,0,0,.08);
-}
-
-.country-code{
-  align-self:stretch;
-  display:flex;
-  align-items:center;
-  padding:0 12px;
-  background:#f2f2f2;
-  color:#111;
-  font-weight:800;
-  white-space:nowrap;
-}
-
-.phone-input input{
-  border:0;
-  border-radius:0;
-  box-shadow:none;
-}
-
-.phone-input input:focus{
-  border:0;
-  box-shadow:none;
-}
-
-.phone-error{
-  display:none;
-  color:#c62828;
-  font-size:12px;
-  font-weight:700;
-  margin-top:7px;
-}
-
-.phone-error.show{
-  display:block;
-}
-
-.order-summary{
-  margin-top:20px;
-  padding:16px;
-  border-radius:16px;
-  background:#f6f6f6;
-}
-
-.availability-warning{
-  display:none;
-  margin-top:12px;
-  padding:12px 14px;
-  border-radius:13px;
-  background:#fff4d6;
-  border:1px solid #f0d27b;
-  color:#5d4800;
-  font-size:12px;
-  line-height:1.45;
-  font-weight:700;
-}
-.availability-warning.show{display:block}
-
-.order-summary h3{
-  font-family:Anton,sans-serif;
-  letter-spacing:1px;
-  margin-bottom:10px;
-}
-
-.summary-row{
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  padding:6px 0;
-  font-size:14px;
-}
-
-.summary-total{
-  border-top:2px solid #111;
-  margin-top:8px;
-  padding-top:10px;
-  font-weight:800;
-}
-
-.order-success-overlay{
-  position:fixed;
-  inset:0;
-  z-index:30;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:rgba(0,0,0,.62);
-  backdrop-filter:blur(7px);
-  -webkit-backdrop-filter:blur(7px);
-}
-
-.order-success-overlay.active{
-  display:flex;
-  animation:fadeUp .3s ease;
-}
-
-.order-success-card{
-  width:min(560px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:26px;
-  padding:28px;
-  box-shadow:0 25px 80px rgba(0,0,0,.5);
-}
-
-.success{
-  text-align:center;
-}
-
-.success-icon{
-  width:70px;
-  height:70px;
-  margin:0 auto 15px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#27ae60;
-  color:#fff;
-  font-size:35px;
-}
-
-.notification-btn{
-  width:100%;
-  margin-top:18px;
-  padding:13px 16px;
-  border:0;
-  border-radius:13px;
-  background:#111;
-  color:#fff;
-  font:800 13px Inter,sans-serif;
-  letter-spacing:.5px;
-  cursor:pointer;
-}
-
-.notification-btn:hover{
-  opacity:.9;
-}
-
-.status-live{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  padding:10px 0 17px;
-  color:#111;
-  font-size:13px;
-}
-
-.live-dot{
-  width:9px;
-  height:9px;
-  border-radius:50%;
-  background:#27ae60;
-  box-shadow:0 0 0 5px rgba(39,174,96,.12);
-}
-
-.order-status-board{
-  margin-top:24px;
-  background:#fff;
-  border-radius:20px;
-  padding:22px;
-  text-align:left;
-  box-shadow:0 8px 30px rgba(0,0,0,.08);
-}
-
-.status-heading{
-  font:800 15px Inter,sans-serif;
-  letter-spacing:.7px;
-  margin-bottom:18px;
-  color:#111;
-}
-
-.status-line{
-  display:grid;
-  grid-template-columns:34px 1fr;
-  gap:12px;
-  align-items:start;
-  padding:13px 0;
-  border-bottom:1px solid #eee;
-}
-
-.status-line:last-child{
-  border-bottom:0;
-  padding-bottom:0;
-}
-
-.status-dot{
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:#eee;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  font-weight:800;
-  color:#666;
-}
-
-.status-line.active .status-dot{
-  background:#27ae60;
-  color:#fff;
-}
-
-.status-line strong{
-  display:block;
-  font-size:14px;
-  margin-bottom:4px;
-}
-
-.status-line small{
-  display:block;
-  color:#777;
-  line-height:1.4;
-  font-size:12px;
-}
-
-.order-info-board{
-  margin-top:14px;
-  padding:15px;
-  border-radius:15px;
-  background:#f7f7f7;
-  text-align:left;
-  font-size:13px;
-  line-height:1.6;
-}
-
-.small-note{
-  text-align:center;
-  color:#777;
-  font-size:12px;
-  margin-top:15px;
-}
-
-@media(max-width:600px){
-  html,
-  body{
-    width:100%;
-    min-height:100%;
-    overflow-x:hidden;
-  }
-
-  body{
-    padding:15px 15px 30px;
-    align-items:flex-start;
-  }
-
-  .checkout{
-    width:100%;
-    max-width:680px;
-    margin:10px auto 25px;
-    max-height:none;
-    padding:22px 17px;
-    border-radius:24px;
-  }
-
-  .yes-no{
-    grid-template-columns:1fr;
-  }
-
-  .choice{
-    min-height:95px;
-  }
-
-  .buildings{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .building{
-    min-width:0;
-  }
-
-  .warning{
-    font-size:13px;
-  }
-
-  .payment-option{
-    grid-template-columns:38px minmax(0,1fr) 24px;
-    gap:9px;
-    padding:13px;
-  }
-
-  .payment-option strong,
-  .payment-option small{
-    overflow-wrap:anywhere;
-  }
-
-  .checkout-final-total{
-    font-size:18px;
-  }
-
-  .order-success-card{
-    max-height:calc(100vh - 30px);
-    padding:22px 16px;
-  }
-
-  .order-status-board{
-    padding:17px;
-  }
-
-  .invoice-box{
-    min-height:300px;
-  }
-}
-
-/* ================= STORE CLOSED ================= */
-.store-closed-overlay{
-  position:fixed;
-  inset:0;
-  z-index:60;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:rgba(0,0,0,.68);
-  backdrop-filter:blur(6px);
-}
-.store-closed-overlay.show{display:flex}
-.store-closed-card{
-  width:min(460px,100%);
-  background:#fff;
-  border-radius:24px;
-  padding:28px;
-  text-align:center;
-  box-shadow:0 25px 80px rgba(0,0,0,.45);
-}
-.store-closed-card h2{
-  font-family:Anton,sans-serif;
-  font-size:32px;
-  margin-bottom:10px;
-}
-.store-closed-card p{
-  color:#555;
-  line-height:1.5;
-  margin-bottom:20px;
-}
-.store-closed-btn{
-  width:100%;
-  padding:14px;
-  border:0;
-  border-radius:13px;
-  background:#111;
-  color:#fff;
-  font:800 15px Inter,sans-serif;
-  cursor:pointer;
-}
+:root{--ink:#111;--muted:#707070;--line:#e8e8e8;--soft:#f6f6f6;--green:#20a65a;--danger:#c62828;--shadow:0 28px 90px rgba(0,0,0,.28)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;font-family:Inter,sans-serif;color:var(--ink);background:linear-gradient(135deg,rgba(0,0,0,.7),rgba(0,0,0,.35)),url("img.png") center/cover fixed;display:flex;justify-content:center;padding:26px 14px}
+button,input{font:inherit}.checkout{width:min(760px,100%);margin:auto;background:rgba(255,255,255,.97);border-radius:30px;padding:28px;box-shadow:var(--shadow);overflow:hidden}
+.brand{text-align:center}.logo{font-family:Anton,sans-serif;font-size:clamp(42px,8vw,70px);letter-spacing:4px;line-height:1}.subtitle{color:var(--muted);margin:7px 0 20px}
+.progress{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:20px 0 30px}.progress span{height:5px;border-radius:99px;background:#e9e9e9}.progress span.active{background:#111}
+.step{display:none}.step.active{display:block;animation:up .28s ease}@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-family:Anton,sans-serif;font-size:clamp(30px,6vw,44px);letter-spacing:1.4px;text-align:center;margin-bottom:9px}.lead{text-align:center;color:var(--muted);margin-bottom:23px;line-height:1.5}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.choice{min-height:125px;border:0;border-radius:20px;cursor:pointer;font-weight:800;font-size:24px;box-shadow:0 12px 28px rgba(0,0,0,.1);transition:.18s}.choice:hover{transform:translateY(-3px)}.yes{background:#111;color:#fff}.no{background:#eee}
+.section-card{background:var(--soft);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:16px}
+label{display:block;font-weight:800;font-size:13px;margin:0 0 7px}.field{margin-top:15px}input{width:100%;border:2px solid #ddd;border-radius:13px;padding:13px 14px;outline:0;background:#fff}input:focus{border-color:#111;box-shadow:0 0 0 4px rgba(0,0,0,.07)}
+.phone{display:grid;grid-template-columns:auto 1fr;border:2px solid #ddd;border-radius:13px;overflow:hidden;background:#fff}.phone:focus-within{border-color:#111}.country{display:flex;align-items:center;padding:0 12px;background:#f0f0f0;font-weight:800}.phone input{border:0;border-radius:0;box-shadow:none}
+.error{display:none;color:var(--danger);font-size:12px;font-weight:700;margin-top:6px}.error.show{display:block}
+.buildings{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.building{border:2px solid transparent;border-radius:17px;background:#eee;padding:18px 8px;cursor:pointer;font-weight:800;font-size:20px}.building.selected{border-color:#111;background:#ddd}.tower{height:70px;width:42px;margin:0 auto 9px;background:linear-gradient(90deg,#555,#aaa,#444);border-radius:5px;position:relative}.tower:after{content:"";position:absolute;left:7px;right:7px;top:9px;height:7px;background:repeating-linear-gradient(90deg,#ddd 0 7px,transparent 7px 12px);box-shadow:0 16px 0 #ddd,0 32px 0 #ddd,0 48px 0 #ddd}
+.notice{margin-top:15px;padding:13px 14px;border-radius:14px;background:#fff4d6;border:1px solid #efd17a;color:#5d4800;font-size:12px;line-height:1.5}.notice strong{display:block;margin-bottom:3px}
+.summary{margin-top:16px;background:#f7f7f7;border-radius:18px;padding:16px}.summary h3{font-family:Anton,sans-serif;letter-spacing:1px;margin-bottom:9px}.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:13px}.row.total{border-top:2px solid #111;margin-top:7px;padding-top:10px;font-weight:800;font-size:15px}
+.primary,.secondary{width:100%;border:0;border-radius:14px;padding:15px;margin-top:17px;font-weight:800;cursor:pointer}.primary{background:#111;color:#fff}.secondary{background:#eee;color:#111}.primary:disabled{opacity:.55;cursor:not-allowed}
+.payments{display:grid;gap:11px}.payment{display:grid;grid-template-columns:42px 1fr 25px;align-items:center;text-align:left;gap:10px;border:2px solid #ddd;border-radius:17px;padding:13px;background:#fff;cursor:pointer}.payment.selected{border-color:#111}.payment.off{opacity:.5;cursor:not-allowed}.payicon{width:42px;height:42px;border-radius:12px;background:#eee;display:grid;place-items:center;font-size:20px}.payment strong,.payment small{display:block}.payment small{color:#777;font-size:10px;margin-top:3px;font-weight:700}
+.total-box{display:flex;justify-content:space-between;border-top:2px solid #111;margin-top:16px;padding-top:13px;font-size:20px;font-weight:800}
+.account-box{background:#111;color:#fff;border-radius:21px;padding:20px;margin-bottom:16px}.account-box h2{font-family:Anton,sans-serif;font-size:28px;letter-spacing:1px}.account-box p{color:#ccc;font-size:12px;line-height:1.5;margin:4px 0 15px}.account-fields{display:grid;gap:10px}.account-fields input{border:0}.account-note{font-size:11px;color:#bbb;margin-top:10px}.switch{color:#fff;text-decoration:underline;cursor:pointer;background:none;border:0;font-weight:700}
+.status{display:none;margin-top:10px;padding:11px 13px;border-radius:12px;font-size:12px;font-weight:700}.status.show{display:block}.status.bad{background:#ffe9e9;color:#a51f1f}.status.good{background:#e9f8ef;color:#18743f}
+.success-overlay,.closed,.outside{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.7);backdrop-filter:blur(7px);z-index:50}.success-overlay.active,.closed.show,.outside.show{display:flex}.card{width:min(570px,100%);background:#fff;border-radius:27px;padding:27px;box-shadow:var(--shadow);max-height:92vh;overflow:auto;text-align:center}.tick{width:70px;height:70px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:35px;margin:0 auto 14px}.card h2{font-family:Anton,sans-serif;font-size:38px}.info{margin-top:18px;background:#f6f6f6;border-radius:16px;padding:15px;text-align:left;line-height:1.65;font-size:13px}.live{margin-top:16px;text-align:left;padding:16px;border-radius:17px;border:1px solid var(--line)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-right:7px}
+@media(max-width:600px){body{padding:10px}.checkout{padding:21px 15px;border-radius:24px}.choice-grid{grid-template-columns:1fr}.choice{min-height:88px}.buildings{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
-
 <body>
 
-<div class="store-closed-overlay" id="storeClosedOverlay" role="dialog" aria-modal="true">
-  <div class="store-closed-card">
-    <h2>🔴 STORE CLOSED</h2>
-    <p id="storeClosedMessage">The store is currently closed. Please come back when the owner reopens it.</p>
-    <button class="store-closed-btn" id="storeClosedBtn" type="button">OK</button>
-  </div>
-</div>
+<div class="closed" id="closedOverlay"><div class="card"><h2>🔴 STORE CLOSED</h2><p id="closedMessage">The store is currently closed.</p><button class="primary" id="closedBtn">OK</button></div></div>
+<div class="outside" id="outsideOverlay"><div class="card"><h2>DELIVERY UNAVAILABLE</h2><p class="lead">We currently deliver only inside Star Galaxy Apartments.</p><button class="primary" id="outsideBtn">I UNDERSTAND</button></div></div>
 
 <main class="checkout">
+  <header class="brand"><div class="logo">PRACHI</div><p class="subtitle">Cloud Kitchen • Secure Checkout</p></header>
+  <div class="progress"><span id="p1" class="active"></span><span id="p2"></span><span id="p3"></span><span id="p4"></span></div>
 
-  <div class="logo">PRACHI</div>
-  <p class="subtitle">Cloud Kitchen • Checkout</p>
-
-  <!-- STEP 1 -->
   <section class="step active" id="step1">
-    <h1 class="question">Do you live in Star Galaxy Apartments?</h1>
-
-    <div class="yes-no">
-      <button class="choice yes" id="yesBtn" type="button">YES</button>
-      <button class="choice no" id="noBtn" type="button">NO</button>
-    </div>
+    <h1>WHERE ARE YOU?</h1><p class="lead">We use this only to confirm delivery eligibility.</p>
+    <div class="choice-grid"><button class="choice yes" id="yesBtn">YES<br><small>Star Galaxy</small></button><button class="choice no" id="noBtn">NO<br><small>Outside</small></button></div>
   </section>
 
-  <!-- STEP 2 -->
   <section class="step" id="step2">
-    <h1 class="question">Select your building / block</h1>
-
-    <div class="buildings">
-      <button class="building" data-block="A" type="button">
-        <div class="building-art"><div class="tower"></div></div>
-        <div class="building-name">A</div>
-      </button>
-
-      <button class="building" data-block="B" type="button">
-        <div class="building-art"><div class="tower"></div></div>
-        <div class="building-name">B</div>
-      </button>
-
-      <button class="building" data-block="C" type="button">
-        <div class="building-art"><div class="tower"></div></div>
-        <div class="building-name">C</div>
-      </button>
-
-      <button class="building" data-block="D" type="button">
-        <div class="building-art"><div class="tower"></div></div>
-        <div class="building-name">D</div>
-      </button>
-    </div>
-
-    <div class="warning">
-      <strong>⚠ DELIVERY WARNING</strong>
-      WE will delever your food to the receptionist whenever you see the packege is out for delevery.
-    </div>
-
-    <label for="customerName">Enter your name</label>
-    <input id="customerName" type="text" maxlength="60" autocomplete="name" placeholder="Your name">
-
-    <label for="customerPhone" class="phone-label">📱 Enter your phone number</label>
-    <div class="phone-input">
-      <span class="country-code">🇮🇳 +91</span>
-      <input
-        id="customerPhone"
-        type="tel"
-        inputmode="numeric"
-        autocomplete="tel-national"
-        maxlength="10"
-        pattern="[0-9]{10}"
-        placeholder="10-digit mobile number"
-        aria-label="10 digit Indian phone number">
-    </div>
-    <div class="phone-error" id="phoneError">Please enter exactly 10 digits.</div>
-
-    <div class="order-summary" id="orderSummary"></div>
-    <div class="availability-warning" id="availabilityWarning"></div>
-
-    <button class="place-order" id="placeOrderBtn" type="button">
-      PLACE ORDER
-    </button>
-
-    <p class="small-note">Your order details will be securely sent for order processing.</p>
-  </section>
-
-  <!-- PAYMENT STEP -->
-  <section class="step" id="paymentStep">
-    <h1 class="question">How would you like to pay?</h1>
-
-    <div class="payment-options">
-      <button class="payment-option selected" data-payment="Cash on Delivery" type="button">
-        <span class="payment-icon">💵</span>
-        <span><strong>Cash on Delivery</strong><small>Pay when your food arrives</small></span>
-        <span class="payment-check">✓</span>
-      </button>
-
-      <button class="payment-option unavailable" data-payment="QR" type="button">
-        <span class="payment-icon">▦</span>
-        <span><strong>QR Payment</strong><small>CURRENTLY UNAVAILABLE</small></span>
-        <span class="payment-check">—</span>
-      </button>
-    </div>
-
-    <div class="payment-note">
-      <strong>PAYMENT</strong>
-      Cash on Delivery is currently available. QR payment will be enabled later.
-      <br><br>
-      Delivery charge is free for the orrders more than 300.
-      Orders under ₹300 with Cash on Delivery have a ₹20 delivery charge.
-    </div>
-
-    <div class="checkout-final-total" id="checkoutFinalTotal">
-      <span>Total</span>
-      <span>₹0</span>
-    </div>
-
-    <button class="place-order" id="confirmOrderBtn" type="button">PLACE ORDER</button>
-  </section>
-
-  <!-- ORDER PLACED OVERLAY -->
-  <section class="order-success-overlay" id="step3">
-    <div class="order-success-card">
-      <div class="success-icon">✓</div>
-      <h1 class="question">ORDER PLACED</h1>
-      <p id="successText">Your order has been received.</p>
-
-      <button class="notification-btn" id="notificationBtn" type="button">
-        🔔 ENABLE ORDER NOTIFICATIONS
-      </button>
-
-      <div class="order-status-board">
-        <div class="status-heading">WHAT'S GOING ON WITH YOUR ORDER?</div>
-
-        <div class="status-live">
-          <span class="live-dot"></span>
-          <strong id="liveOrderStatus">Our admin is receiving your order</strong>
-        </div>
-
-        <div class="status-line active">
-          <span class="status-dot">1</span>
-          <div>
-            <strong>Order received</strong>
-            <small id="statusDetail">Our admin is receiving your order.</small>
-          </div>
-        </div>
+    <h1>DELIVERY DETAILS</h1><p class="lead">Tell us where to bring your order.</p>
+    <div class="section-card">
+      <label>BUILDING / BLOCK</label>
+      <div class="buildings">
+        <button class="building" data-block="A"><div class="tower"></div>A</button>
+        <button class="building" data-block="B"><div class="tower"></div>B</button>
+        <button class="building" data-block="C"><div class="tower"></div>C</button>
+        <button class="building" data-block="D"><div class="tower"></div>D</button>
       </div>
-
-      <div class="order-info-board" id="finalOrderInfo"></div>
-      <button class="notification-btn" id="backHomeBtn" type="button">
-        BACK TO HOME
-      </button>
+      <div class="field"><label for="customerName">YOUR NAME</label><input id="customerName" maxlength="60" autocomplete="name" placeholder="Enter your name"></div>
+      <div class="field"><label for="customerPhone">PHONE NUMBER</label><div class="phone"><span class="country">🇮🇳 +91</span><input id="customerPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" placeholder="10-digit mobile number"></div><div class="error" id="phoneError">Enter exactly 10 digits.</div></div>
+      <div class="notice"><strong>⚠ DELIVERY</strong>Your food will be delivered to the receptionist when the package is out for delivery.</div>
     </div>
+    <div class="summary" id="orderSummary"></div>
+    <div class="status bad" id="availabilityWarning"></div>
+    <button class="primary" id="continueBtn">CONTINUE TO ACCOUNT</button>
   </section>
 
+  <section class="step" id="step3">
+    <h1>YOUR ACCOUNT</h1><p class="lead">Create or sign in to your Prachi account. Your account keeps your orders tied to you.</p>
+    <div class="account-box">
+      <h2 id="accountTitle">CREATE ACCOUNT</h2>
+      <p id="accountDescription">Use your email and a password. Returning customers can sign in instead.</p>
+      <div class="account-fields">
+        <input id="email" type="email" autocomplete="email" placeholder="Email address">
+        <input id="password" type="password" autocomplete="new-password" placeholder="Password (minimum 6 characters)">
+      </div>
+      <div class="account-note">Already have an account? <button class="switch" id="accountSwitch">Sign in</button></div>
+      <div class="status" id="accountStatus"></div>
+    </div>
+    <button class="primary" id="accountBtn">CREATE ACCOUNT & CONTINUE</button>
+    <button class="secondary" id="backToDetails">BACK</button>
+  </section>
+
+  <section class="step" id="step4">
+    <h1>PAYMENT</h1><p class="lead">Choose how you want to pay.</p>
+    <div class="payments">
+      <button class="payment selected" data-payment="Cash on Delivery"><span class="payicon">💵</span><span><strong>Cash on Delivery</strong><small>Pay when your food arrives</small></span><b>✓</b></button>
+      <button class="payment off" data-payment="QR"><span class="payicon">▦</span><span><strong>QR Payment</strong><small>CURRENTLY UNAVAILABLE</small></span><b>—</b></button>
+    </div>
+    <div class="notice"><strong>PAYMENT INFO</strong>Cash on Delivery is currently available. Delivery is free for orders of ₹300 or more. Orders under ₹300 have a ₹20 delivery charge.</div>
+    <div class="total-box"><span>FINAL TOTAL</span><span id="finalTotal">₹0</span></div>
+    <div class="status bad" id="orderError"></div>
+    <button class="primary" id="confirmOrderBtn">PLACE ORDER</button>
+    <button class="secondary" id="backToAccount">BACK</button>
+  </section>
 </main>
 
-<!-- OUTSIDE DELIVERY POPUP -->
-<div class="popup-backdrop" id="outsidePopup">
-  <div class="popup">
-    <h2>DELIVERY UNAVAILABLE</h2>
-    <p>We can not delever out of Star Galaxy Appartments.</p>
-    <button class="understand" id="understandBtn" type="button">
-      I UNDERSTAND
-    </button>
+<div class="success-overlay" id="successOverlay">
+  <div class="card">
+    <div class="tick">✓</div><h2>ORDER PLACED</h2><p id="successText" class="lead"></p>
+    <div class="live"><span class="dot"></span><strong id="liveStatus">Order received</strong><p id="statusDetail" style="color:#777;margin-top:5px">Our admin is receiving your order.</p></div>
+    <div class="info" id="finalInfo"></div>
+    <button class="primary" id="notificationBtn">🔔 ENABLE ORDER NOTIFICATIONS</button>
+    <button class="secondary" id="homeBtn">BACK TO HOME</button>
   </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getDatabase, ref, push, serverTimestamp, onValue } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {getDatabase,ref,push,set,onValue,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBq7UEsIwoudC2g8DRrG7EwqblX9SIDCF8",
-  authDomain: "ticktok-7fb30.firebaseapp.com",
-  databaseURL: "https://ticktok-7fb30-default-rtdb.firebaseio.com",
-  projectId: "ticktok-7fb30",
-  storageBucket: "ticktok-7fb30.firebasestorage.app",
-  messagingSenderId: "493782050714",
-  appId: "1:493782050714:web:5f6bd9eae6af68b250fc23",
-  measurementId: "G-3KH8Y1SVDG"
+const firebaseConfig={
+ apiKey:"AIzaSyBq7UEsIwoudC2g8DRrG7EwqblX9SIDCF8",
+ authDomain:"ticktok-7fb30.firebaseapp.com",
+ databaseURL:"https://ticktok-7fb30-default-rtdb.firebaseio.com",
+ projectId:"ticktok-7fb30",
+ storageBucket:"ticktok-7fb30.firebasestorage.app",
+ messagingSenderId:"493782050714",
+ appId:"1:493782050714:web:5f6bd9eae6af68b250fc23",
+ measurementId:"G-3KH8Y1SVDG"
+};
+const app=initializeApp(firebaseConfig),db=getDatabase(app),auth=getAuth(app);
+
+const $=id=>document.getElementById(id);
+const raw=localStorage.getItem("prachiOrderCart");
+const cart=raw?JSON.parse(raw):{};
+const subtotal=Number(localStorage.getItem("prachiOrderTotal")||0);
+let selectedBlock="",paymentMethod="Cash on Delivery",deliveryCharge=0,currentUser=null,signInMode=false,storeIsOpen=true,storeLoaded=false,menuAvailability={};
+
+onAuthStateChanged(auth,user=>{currentUser=user||null;if(user){$("email").value=user.email||"";$("password").value="";}});
+const menuKey=n=>String(n||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+const unavailable=()=>Object.keys(cart).filter(n=>menuAvailability[menuKey(n)]===false);
+
+onValue(ref(db,"menuAvailability"),s=>{menuAvailability=s.val()||{};renderAvailability();});
+onValue(ref(db,"storeStatus"),s=>{const v=s.val();storeIsOpen=v?.isOpen!==false;storeLoaded=true;if(!storeIsOpen)$("closedOverlay").classList.add("show");});
+
+function renderAvailability(){
+ const bad=unavailable(),el=$("availabilityWarning");
+ if(!bad.length){el.classList.remove("show");el.textContent="";$("continueBtn").disabled=false;return}
+ el.textContent=bad.length===1?`${bad[0]} is currently unavailable. Please return to the menu.`:"Some items in your cart are currently unavailable. Please return to the menu.";
+ el.classList.add("show");$("continueBtn").disabled=true;
+}
+function summary(){
+ const names=Object.keys(cart);
+ $("orderSummary").innerHTML="<h3>YOUR ORDER</h3>"+(names.length?names.map(n=>`<div class="row"><span>${escapeHtml(n)} × ${cart[n].quantity}</span><strong>₹${cart[n].price*cart[n].quantity}</strong></div>`).join(""):"<div class='row'><span>No items found</span><strong>₹0</strong></div>")+`<div class="row total"><span>SUBTOTAL</span><strong>₹${subtotal}</strong></div>`;
+}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function step(n){
+ document.querySelectorAll(".step").forEach(x=>x.classList.remove("active"));
+ $("step"+n).classList.add("active");
+ for(let i=1;i<=4;i++)$("p"+i).classList.toggle("active",i<=n);
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function message(el,text,good=false){el.textContent=text;el.className="status show "+(good?"good":"bad")}
+
+$("yesBtn").onclick=()=>{if(!storeLoaded||!storeIsOpen)return;summary();renderAvailability();step(2)};
+$("noBtn").onclick=()=>$("outsideOverlay").classList.add("show");
+$("outsideBtn").onclick=()=>location.href="index.html";
+$("closedBtn").onclick=()=>$("closedOverlay").classList.remove("show");
+
+document.querySelectorAll(".building").forEach(b=>b.onclick=()=>{document.querySelectorAll(".building").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");selectedBlock=b.dataset.block});
+$("customerPhone").oninput=e=>{e.target.value=e.target.value.replace(/\D/g,"").slice(0,10);$("phoneError").classList.remove("show")};
+
+$("continueBtn").onclick=()=>{
+ if(!selectedBlock){message($("availabilityWarning"),"Select your building / block first.");return}
+ if(!$("customerName").value.trim()){ $("customerName").focus();return}
+ if(!/^\d{10}$/.test($("customerPhone").value.trim())){$("phoneError").classList.add("show");return}
+ if(!Object.keys(cart).length){message($("availabilityWarning"),"Your cart is empty.");return}
+ step(3);
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
+$("accountSwitch").onclick=()=>{signInMode=!signInMode;$("accountTitle").textContent=signInMode?"SIGN IN":"CREATE ACCOUNT";$("accountDescription").textContent=signInMode?"Sign in to your existing Prachi account.":"Use your email and a password. Returning customers can sign in instead.";$("accountBtn").textContent=signInMode?"SIGN IN & CONTINUE":"CREATE ACCOUNT & CONTINUE";$("password").autocomplete=signInMode?"current-password":"new-password";$("accountSwitch").textContent=signInMode?"Create account":"Sign in";$("accountStatus").className="status"};
 
-let currentUser = null;
-let authPromise = null;
-
-/*
-  CUSTOMER AUTH
-  --------------
-  The first order can be clicked while Firebase Anonymous Auth is
-  still initializing. Keep one shared promise and always wait for a
-  real authenticated user before writing the order.
-*/
-function ensureAuthenticated(){
-  if(auth.currentUser){
-    currentUser = auth.currentUser;
-    return Promise.resolve(currentUser);
-  }
-
-  if(authPromise) return authPromise;
-
-  authPromise = new Promise((resolve,reject)=>{
-    let finished = false;
-
-    const unsubscribe = onAuthStateChanged(auth, user=>{
-      if(finished) return;
-
-      if(user){
-        currentUser = user;
-        finished = true;
-        unsubscribe();
-        resolve(user);
-      }
-    }, error=>{
-      if(finished) return;
-      finished = true;
-      unsubscribe();
-      authPromise = null;
-      reject(error);
-    });
-
-    signInAnonymously(auth).catch(error=>{
-      /*
-        signInAnonymously can report an error if another auth
-        operation is already in progress. Give the auth listener
-        a moment to deliver the authenticated user first.
-      */
-      if(auth.currentUser){
-        currentUser = auth.currentUser;
-        if(!finished){
-          finished = true;
-          unsubscribe();
-          resolve(currentUser);
-        }
-        return;
-      }
-
-      if(!finished){
-        finished = true;
-        unsubscribe();
-        authPromise = null;
-        reject(error);
-      }
-    });
-  });
-
-  return authPromise;
-}
-
-/* Start authentication immediately, but do not block page rendering. */
-ensureAuthenticated().catch(error=>{
-  console.error("Initial Firebase authentication failed:",error);
-});
-
-const step1 = document.getElementById("step1");
-const step2 = document.getElementById("step2");
-const step3 = document.getElementById("step3");
-const outsidePopup = document.getElementById("outsidePopup");
-const customerName = document.getElementById("customerName");
-const customerPhone = document.getElementById("customerPhone");
-const phoneError = document.getElementById("phoneError");
-const orderSummary = document.getElementById("orderSummary");
-const placeOrderBtn = document.getElementById("placeOrderBtn");
-
-let selectedBlock = "";
-let paymentMethod = "Cash on Delivery";
-let deliveryCharge = 0;
-let currentOrder = null;
-
-const rawCart = localStorage.getItem("prachiOrderCart");
-const cart = rawCart ? JSON.parse(rawCart) : {};
-const total = Number(localStorage.getItem("prachiOrderTotal") || 0);
-
-const menuAvailabilityRef = ref(db,"menuAvailability");
-let menuAvailability = {};
-
-const storeStatusRef = ref(db,"storeStatus");
-let storeIsOpen = true;
-let storeStatusLoaded = false;
-const storeClosedOverlay = document.getElementById("storeClosedOverlay");
-const storeClosedMessage = document.getElementById("storeClosedMessage");
-const storeClosedBtn = document.getElementById("storeClosedBtn");
-
-function menuKey(name){
-  return String(name || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g,"_")
-    .replace(/^_+|_+$/g,"");
-}
-
-function unavailableCartItems(){
-  return Object.keys(cart)
-    .filter((name) => menuAvailability[menuKey(name)] === false);
-}
-
-function renderAvailabilityWarning(){
-  const warning = document.getElementById("availabilityWarning");
-  if(!warning) return;
-
-  const unavailable = unavailableCartItems();
-
-  if(!unavailable.length){
-    warning.classList.remove("show");
-    warning.textContent = "";
-    placeOrderBtn.disabled = false;
-    return;
-  }
-
-  warning.textContent =
-    unavailable.length === 1
-      ? `${unavailable[0]} is currently unavailable. Please return to the menu and choose another item.`
-      : "Some items in your cart are currently unavailable. Please return to the menu and update your order.";
-
-  warning.classList.add("show");
-  placeOrderBtn.disabled = true;
-}
-
-onValue(
-  menuAvailabilityRef,
-  (snapshot) => {
-    menuAvailability = snapshot.val() || {};
-    renderAvailabilityWarning();
-  },
-  (error) => console.error("Menu availability read failed:",error)
-);
-
-function showStoreClosed(){
-  if(storeClosedMessage){
-    storeClosedMessage.textContent =
-      "The store is currently closed. Please come back when the owner reopens it.";
-  }
-  storeClosedOverlay?.classList.add("show");
-}
-
-function hideStoreClosed(){
-  storeClosedOverlay?.classList.remove("show");
-}
-
-storeClosedBtn?.addEventListener("click",hideStoreClosed);
-storeClosedOverlay?.addEventListener("click",event=>{
-  if(event.target===storeClosedOverlay) hideStoreClosed();
-});
-
-onValue(
-  storeStatusRef,
-  snapshot => {
-    const value = snapshot.val();
-    storeIsOpen = value?.isOpen !== false;
-    storeStatusLoaded = true;
-    if(!storeIsOpen) showStoreClosed();
-  },
-  error => {
-    console.error("Store status read failed:",error);
-    storeStatusLoaded = true;
-    storeIsOpen = true;
-  }
-);
-
-function showStep(step){
-  document.querySelectorAll(".step").forEach(el=>{
-    el.classList.remove("active");
-  });
-
-  step.classList.add("active");
-}
-
-function renderSummary(){
-  const names = Object.keys(cart);
-
-  if(!names.length){
-    orderSummary.innerHTML = `
-      <h3>ORDER SUMMARY</h3>
-      <div class="summary-row">
-        <span>No items found</span>
-        <strong>₹0</strong>
-      </div>
-    `;
-    return;
-  }
-
-  orderSummary.innerHTML = `
-    <h3>ORDER SUMMARY</h3>
-    ${names.map(name=>{
-      const item = cart[name];
-      return `
-        <div class="summary-row">
-          <span>${escapeHtml(name)} × ${item.quantity}</span>
-          <strong>₹${item.price * item.quantity}</strong>
-        </div>
-      `;
-    }).join("")}
-    <div class="summary-row summary-total">
-      <span>Bill</span>
-      <strong>₹${total}</strong>
-    </div>
-  `;
-}
-
-function escapeHtml(value){
-  return String(value).replace(/[&<>"']/g,char=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
-  }[char]));
-}
-
-const STATUS_MESSAGES={
-  "Order taken":{
-    detail:"Our admin has taken your order.",
-    index:1
-  },
-  "Preparing your food":{
-    detail:"The kitchen is preparing your food.",
-    index:2
-  },
-  "Packaging it":{
-    detail:"Your food is being packaged.",
-    index:3
-  },
-  "Billing it":{
-    detail:"Your order is being billed.",
-    index:4
-  },
-  "Order has been canceled":{
-    detail:"Your order has been canceled.",
-    index:5
-  },
-  "Out for delivery":{
-    detail:"Your order is out for delivery.",
-    index:6
-  }
+$("accountBtn").onclick=async()=>{
+ const email=$("email").value.trim(),password=$("password").value;
+ if(!email||!email.includes("@")){message($("accountStatus"),"Enter a valid email address.");return}
+ if(password.length<6){message($("accountStatus"),"Password must contain at least 6 characters.");return}
+ const btn=$("accountBtn");btn.disabled=true;btn.textContent=signInMode?"SIGNING IN...":"CREATING ACCOUNT...";
+ try{
+  const cred=signInMode?await signInWithEmailAndPassword(auth,email,password):await createUserWithEmailAndPassword(auth,email,password);
+  currentUser=cred.user;
+  const profile={name:$("customerName").value.trim(),phone:"+91"+$("customerPhone").value.trim(),block:selectedBlock,email:currentUser.email,updatedAt:serverTimestamp()};
+  await set(ref(db,`customers/${currentUser.uid}`),profile);
+  message($("accountStatus"),"Account ready.",true);
+  calculateTotal();step(4);
+ }catch(e){
+  const code=e?.code||"";
+  const text=code.includes("email-already-in-use")?"This email already has an account. Switch to Sign in.":code.includes("invalid-credential")?"Email or password is incorrect.":code.includes("weak-password")?"Choose a stronger password (6+ characters).":code.includes("network")?"Network error. Check your internet connection.":"Could not authenticate. Check Firebase Authentication and try again.";
+  message($("accountStatus"),text);
+ }finally{btn.disabled=false;btn.textContent=signInMode?"SIGN IN & CONTINUE":"CREATE ACCOUNT & CONTINUE"}
 };
 
-let lastKnownStatus="";
-let notificationEnabled=false;
+function calculateTotal(){
+ deliveryCharge=subtotal<300?20:0;
+ $("finalTotal").textContent="₹"+(subtotal+deliveryCharge);
+}
+document.querySelectorAll(".payment").forEach(p=>p.onclick=()=>{if(p.classList.contains("off"))return;document.querySelectorAll(".payment").forEach(x=>{x.classList.remove("selected");x.querySelector("b").textContent="—"});p.classList.add("selected");p.querySelector("b").textContent="✓";paymentMethod=p.dataset.payment;calculateTotal()});
+$("backToDetails").onclick=()=>step(2);
+$("backToAccount").onclick=()=>step(3);
 
-function showOrderStatus(status){
-  const data=STATUS_MESSAGES[status];
-  const live=document.getElementById("liveOrderStatus");
-  const detail=document.getElementById("statusDetail");
-
-  if(!data){
-    live.textContent="Our admin is receiving your order";
-    detail.textContent="Our admin is receiving your order.";
-    return;
-  }
-
-  live.textContent=status;
-  detail.textContent=data.detail;
-
-  if(status!==lastKnownStatus && lastKnownStatus){
-    notifyOrderStatus(status,data.detail);
-  }
-
-  lastKnownStatus=status;
+const statuses={
+"Order taken":["Order taken","Our admin has taken your order."],
+"Preparing your food":["Preparing your food","The kitchen is preparing your food."],
+"Packaging it":["Packaging it","Your food is being packaged."],
+"Billing it":["Billing it","Your order is being billed."],
+"Order has been canceled":["Order canceled","Your order has been canceled."],
+"Out for delivery":["Out for delivery","Your order is out for delivery."]
+};
+let notificationEnabled=false,lastStatus="";
+function watchStatus(id){
+ onValue(ref(db,`orders/${id}/status`),s=>{
+  const st=s.val(),data=statuses[st]||["Order received","Our admin is receiving your order."];
+  $("liveStatus").textContent=data[0];$("statusDetail").textContent=data[1];
+  if(st&&lastStatus&&st!==lastStatus&&notificationEnabled&&"Notification"in window&&Notification.permission==="granted")new Notification("Prachi Cloud Kitchen",{body:data[1],icon:"img.png",tag:"prachi-order-status"});
+  lastStatus=st||"";
+ });
 }
 
-function notifyOrderStatus(title,message){
-  if(!notificationEnabled || Notification.permission!=="granted") return;
-
-  const notification=new Notification("Prachi Cloud Kitchen",{
-    body:message,
-    icon:"img.png",
-    tag:"prachi-order-status"
-  });
-
-  try{
-    const AudioContextClass=window.AudioContext||window.webkitAudioContext;
-    if(AudioContextClass){
-      const audio=new AudioContextClass();
-      const oscillator=audio.createOscillator();
-      const gain=audio.createGain();
-      oscillator.frequency.value=880;
-      gain.gain.value=.04;
-      oscillator.connect(gain);
-      gain.connect(audio.destination);
-      oscillator.start();
-      oscillator.stop(audio.currentTime+.18);
-    }
-  }catch(error){
-    console.log("Notification sound unavailable.",error);
-  }
-
-  setTimeout(()=>notification.close(),5000);
-}
-
-const notificationBtn=document.getElementById("notificationBtn");
-
-notificationBtn.onclick=async()=>{
-  if(!("Notification" in window)){
-    return;
-  }
-
-  const permission=await Notification.requestPermission();
-
-  if(permission==="granted"){
-    notificationEnabled=true;
-    notificationBtn.textContent="✓ ORDER NOTIFICATIONS ENABLED";
-  }else{
-    notificationBtn.textContent="🔔 NOTIFICATIONS BLOCKED";
-  }
+$("confirmOrderBtn").onclick=async()=>{
+ const btn=$("confirmOrderBtn");$("orderError").className="status";
+ if(!storeLoaded||!storeIsOpen){$("closedOverlay").classList.add("show");return}
+ if(!currentUser){step(3);return}
+ const bad=unavailable();if(bad.length){message($("orderError"),"Some cart items are unavailable. Please return to the menu.");return}
+ btn.disabled=true;btn.textContent="PLACING ORDER...";
+ const name=$("customerName").value.trim(),phone="+91"+$("customerPhone").value.trim();
+ const food=Object.entries(cart).map(([foodName,item])=>({name:foodName,price:Number(item.price),quantity:Number(item.quantity),subtotal:Number(item.price)*Number(item.quantity)}));
+ const order={ownerUid:currentUser.uid,customerName:name,phone,block:selectedBlock,paymentMethod,bill:subtotal,deliveryCharge,finalBill:subtotal+deliveryCharge,food,customerEmail:currentUser.email||"",status:"Order received",createdAt:Date.now(),serverCreatedAt:serverTimestamp()};
+ try{
+  const orderRef=push(ref(db,"orders"));await set(orderRef,order);
+  if(!orderRef.key)throw new Error("No order ID");
+  const saved={...order,orderId:orderRef.key};
+  localStorage.setItem("prachiLastOrder",JSON.stringify(saved));localStorage.setItem("prachiLastOrderId",orderRef.key);
+  localStorage.setItem("prachiProfile",JSON.stringify({ownerUid:currentUser.uid,name,phone,block:selectedBlock,email:currentUser.email||""}));
+  $("successText").textContent=`Thank you ${escapeHtml(name)}. Your order has been received.`;
+  $("finalInfo").innerHTML=`<strong>ORDER ID</strong><br>${escapeHtml(orderRef.key)}<br><br><strong>CUSTOMER</strong><br>${escapeHtml(name)}<br>📱 ${escapeHtml(phone)}<br>🏢 Block ${escapeHtml(selectedBlock)}<br>💵 ${escapeHtml(paymentMethod)}<br>🚚 Delivery ₹${deliveryCharge}<br>🧾 Final bill ₹${subtotal+deliveryCharge}`;
+  $("successOverlay").classList.add("active");watchStatus(orderRef.key);
+ }catch(e){console.error(e);message($("orderError"),"Order could not be saved. Please try again. Your order was NOT marked as placed.");}
+ finally{btn.disabled=false;btn.textContent="PLACE ORDER"}
 };
 
-document.getElementById("backHomeBtn").onclick=()=>{
-  window.location.href="index.html";
+$("notificationBtn").onclick=async()=>{
+ if(!("Notification"in window))return;
+ const p=await Notification.requestPermission();
+ $("notificationBtn").textContent=p==="granted"?"✓ ORDER NOTIFICATIONS ENABLED":"🔔 NOTIFICATIONS BLOCKED";
+ notificationEnabled=p==="granted";
 };
+$("homeBtn").onclick=()=>location.href="index.html";
 
-function listenForOrderStatus(orderId){
-  if(!orderId || !currentUser) return;
-
-  onValue(ref(db,`orders/${orderId}/status`),snapshot=>{
-    const status=snapshot.val();
-    if(status){
-      showOrderStatus(status);
-    }else{
-      showOrderStatus("");
-    }
-  });
-}
-
-
-customerPhone.addEventListener("input",()=>{
-  customerPhone.value=customerPhone.value.replace(/\D/g,"").slice(0,10);
-  phoneError.classList.remove("show");
-});
-
-document.getElementById("yesBtn").onclick=()=>{
-  if(!storeStatusLoaded){
-    return;
-  }
-  if(!storeIsOpen){
-    showStoreClosed();
-    return;
-  }
-  renderSummary();
-  renderAvailabilityWarning();
-  showStep(step2);
-};
-
-document.getElementById("noBtn").onclick=()=>{
-  outsidePopup.classList.add("show");
-};
-
-document.getElementById("understandBtn").onclick=()=>{
-  window.location.href="index.html";
-};
-
-document.querySelectorAll(".building").forEach(button=>{
-  button.onclick=()=>{
-    document.querySelectorAll(".building").forEach(b=>b.classList.remove("selected"));
-    button.classList.add("selected");
-    selectedBlock=button.dataset.block;
-  };
-});
-
-placeOrderBtn.onclick=()=>{
-  if(!storeStatusLoaded){
-    return;
-  }
-  if(!storeIsOpen){
-    showStoreClosed();
-    return;
-  }
-
-  const unavailable = unavailableCartItems();
-
-  if(unavailable.length){
-    renderAvailabilityWarning();
-    return;
-    return;
-  }
-
-  placeOrderBtn.classList.remove("shake");
-  void placeOrderBtn.offsetWidth;
-  placeOrderBtn.classList.add("shake");
-
-  const name=customerName.value.trim();
-
-  if(!selectedBlock){
-    return;
-  }
-
-  if(!name){
-    customerName.focus();
-    return;
-  }
-
-  const phone=customerPhone.value.trim();
-
-  if(!/^\d{10}$/.test(phone)){
-    customerPhone.focus();
-    phoneError.classList.add("show");
-    return;
-  }
-
-  if(!Object.keys(cart).length){
-    return;
-  }
-
-  const subtotal=Object.values(cart).reduce((sum,item)=>sum+(item.price*item.quantity),0);
-  deliveryCharge=subtotal<300?20:0;
-  const finalTotalBox=document.getElementById("checkoutFinalTotal");
-  if(finalTotalBox){
-    finalTotalBox.innerHTML=`
-      <span>Total</span>
-      <span>₹${subtotal+deliveryCharge}</span>
-    `;
-  }
-
-  showStep(document.getElementById("paymentStep"));
-};
-
-document.querySelectorAll(".payment-option").forEach(button=>{
-  button.onclick=()=>{
-    if(button.classList.contains("unavailable")){
-      return;
-    }
-
-    document.querySelectorAll(".payment-option").forEach(b=>{
-      b.classList.remove("selected");
-      b.querySelector(".payment-check").textContent="—";
-    });
-
-    button.classList.add("selected");
-    button.querySelector(".payment-check").textContent="✓";
-    paymentMethod=button.dataset.payment;
-  };
-});
-
-document.getElementById("confirmOrderBtn").onclick=async()=>{
-  const confirmBtn=document.getElementById("confirmOrderBtn");
-
-  if(!storeStatusLoaded){
-    return;
-  }
-  if(!storeIsOpen){
-    showStoreClosed();
-    showStep(step1);
-    return;
-  }
-  const unavailable = unavailableCartItems();
-
-  if(unavailable.length){
-    renderAvailabilityWarning();
-    return;
-    showStep(step1);
-    return;
-  }
-
-  try {
-    /*
-      IMPORTANT:
-      Do not depend on a page-load auth promise here. Wait for the
-      authenticated Firebase user at the exact moment the order is
-      submitted. This fixes the first-order race condition.
-    */
-    await ensureAuthenticated();
-  } catch(error) {
-    console.error("Firebase authentication failed:",error);
-    confirmBtn.disabled=false;
-    confirmBtn.textContent="PLACE ORDER";
-    return;
-    return;
-  }
-
-  if(!currentUser){
-    confirmBtn.disabled=false;
-    confirmBtn.textContent="PLACE ORDER";
-    return;
-  }
-
-  confirmBtn.classList.remove("shake");
-  void confirmBtn.offsetWidth;
-  confirmBtn.classList.add("shake");
-
-  const name=customerName.value.trim();
-
-  currentOrder={
-    ownerUid:currentUser.uid,
-    customerName:name,
-    phone:"+91"+customerPhone.value,
-    block:selectedBlock,
-    paymentMethod,
-    bill:total,
-    deliveryCharge:paymentMethod==="Cash on Delivery" && total<300 ? 20 : 0,
-    finalBill:total+(paymentMethod==="Cash on Delivery" && total<300 ? 20 : 0),
-    food:Object.entries(cart).map(([foodName,item])=>({
-      name:foodName,
-      price:item.price,
-      quantity:item.quantity,
-      subtotal:item.price*item.quantity
-    })),
-    createdAt:Date.now()
-  };
-
-  confirmBtn.disabled=true;
-  confirmBtn.textContent="PLACING ORDER...";
-
-  try{
-    /*
-      A successful push() is the ONLY point at which we show
-      "ORDER PLACED". If Firebase rejects the write, success is
-      never displayed.
-    */
-    const orderRef=await push(ref(db,"orders"),{
-      ...currentOrder,
-      serverCreatedAt:serverTimestamp()
-    });
-
-    if(!orderRef || !orderRef.key){
-      throw new Error("Firebase did not return an order ID.");
-    }
-
-    currentOrder.orderId=orderRef.key;
-
-    localStorage.setItem("prachiLastOrder",JSON.stringify(currentOrder));
-    localStorage.setItem("prachiLastOrderId",orderRef.key);
-    localStorage.setItem("prachiProfile",JSON.stringify({
-      ownerUid:currentUser.uid,
-      name:currentOrder.customerName,
-      phone:currentOrder.phone,
-      block:currentOrder.block
-    }));
-
-    showOrderStatus("");
-    listenForOrderStatus(currentOrder.orderId);
-
-    document.getElementById("successText").textContent=
-      `Thank you ${name}. Your order for Block ${selectedBlock} has been received.`;
-
-    document.getElementById("finalOrderInfo").innerHTML=`
-      <strong>Order details</strong><br>
-      👤 ${escapeHtml(name)}<br>
-      📱 ${escapeHtml(currentOrder.phone)}<br>
-      🏢 Block ${escapeHtml(selectedBlock)}<br>
-      💵 ${escapeHtml(currentOrder.paymentMethod)}<br>
-      🚚 Delivery: ₹${currentOrder.deliveryCharge}<br>
-      🧾 Final bill: ₹${currentOrder.finalBill}
-    `;
-
-    showStep(step3);
-
-  }catch(error){
-    console.error("Firebase order write failed:",error);
-
-    confirmBtn.disabled=false;
-    confirmBtn.textContent="PLACE ORDER";
-
-    /*
-      Never pretend that an order succeeded after a failed Firebase
-      write. Show the actual Firebase error in the console and give
-      the customer a short, useful message.
-    */
-    const code=String(error?.code || "").toLowerCase();
-
-    // No browser alert is shown. The detailed Firebase error remains in the console.
-  }
-};
-
-
-
-
+summary();calculateTotal();
 </script>
-
 </body>
 </html>
