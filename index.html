@@ -937,6 +937,34 @@ body.dark .theme-toggle{
   font-size:13px;
   font-weight:700;
 }
+.repeat-online-payment{
+  margin-top:10px;
+  padding:14px;
+  border-radius:14px;
+  background:#f7f7f7;
+  border:1px solid #e5e5e5;
+}
+.repeat-online-payment[hidden]{display:none}
+.repeat-online-amount{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  margin-bottom:10px;
+}
+.repeat-online-amount strong{font-size:16px}
+.repeat-online-amount small{font-size:12px;color:#777}
+.repeat-payment-option{
+  cursor:pointer;
+  user-select:none;
+}
+.repeat-payment-option + .repeat-payment-option{margin-top:10px}
+.repeat-payment-option.selected{
+  background:#f7f7f7;
+}
+body.dark .repeat-online-payment{
+  background:#292929;
+  border-color:#444;
+}
 
 .repeat-total{
   margin-top:18px;
@@ -1267,25 +1295,46 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
     <button class="close-panel" id="closeRepeatPaymentBtn" type="button">×</button>
     <h2>PAYMENT</h2>
 
-    <div class="repeat-payment-option">
+    <div class="repeat-payment-option selected" id="repeatCodOption" role="button" tabindex="0">
       <span>💵</span>
       <div>
         <strong>Cash on Delivery</strong>
         <small>Available</small>
       </div>
-      <b>✓</b>
+      <b id="repeatCodCheck">✓</b>
     </div>
 
-    <div class="qr-unavailable">
-      ▦ QR Payment — CURRENTLY UNAVAILABLE
+    <div class="repeat-payment-option" id="repeatOnlinePaymentOption" role="button" tabindex="0">
+      <span>⚡</span>
+      <div>
+        <strong>Online Payment</strong>
+        <small>Pay your exact order total online</small>
+      </div>
+      <b id="repeatOnlinePaymentCheck"></b>
+    </div>
+
+    <div class="repeat-online-payment" id="repeatOnlinePayment" hidden>
+      <div class="repeat-online-amount">
+        <strong>Order total: <span id="repeatOnlineExpectedAmount">₹0</span></strong>
+        <small>Enter the same amount in the payment form below.</small>
+      </div>
+
+      <form>
+        <script
+          src="https://checkout.razorpay.com/v1/payment-button.js"
+          data-payment_button_id="pl_TeIv4f6IRLhXmZ"
+          async>
+        </script>
+      </form>
     </div>
 
     <div class="repeat-total" id="repeatTotal"></div>
 
     <button class="repeat-next" id="repeatOrderBtn" type="button">
-      PAY ON DELIVERY & ORDER
+      PAY ON DELIVERY &amp; ORDER
     </button>
   </div>
+</div>
 </div>
 
 <!-- SETTINGS -->
@@ -2320,6 +2369,7 @@ let repeatBlock = "";
 let repeatCart = {};
 let repeatSubtotal = 0;
 let repeatDelivery = 0;
+let repeatPaymentMethod = "Cash on Delivery";
 
 
 /* =========================================================
@@ -2844,6 +2894,66 @@ document.getElementById(
 
 
 /* =========================================================
+   REPEAT PAYMENT METHOD
+========================================================= */
+
+const repeatCodOption =
+  document.getElementById("repeatCodOption");
+
+const repeatOnlinePaymentOption =
+  document.getElementById("repeatOnlinePaymentOption");
+
+const repeatOnlinePayment =
+  document.getElementById("repeatOnlinePayment");
+
+const repeatCodCheck =
+  document.getElementById("repeatCodCheck");
+
+const repeatOnlinePaymentCheck =
+  document.getElementById("repeatOnlinePaymentCheck");
+
+const repeatOnlineExpectedAmount =
+  document.getElementById("repeatOnlineExpectedAmount");
+
+function selectRepeatPaymentMethod(method){
+  repeatPaymentMethod = method;
+
+  const online = method === "Online Payment";
+
+  repeatCodOption.classList.toggle("selected", !online);
+  repeatOnlinePaymentOption.classList.toggle("selected", online);
+
+  repeatCodCheck.textContent = online ? "" : "✓";
+  repeatOnlinePaymentCheck.textContent = online ? "✓" : "";
+
+  repeatOnlinePayment.hidden = !online;
+
+  const btn = document.getElementById("repeatOrderBtn");
+  btn.style.display = online ? "none" : "block";
+  btn.textContent = "PAY ON DELIVERY & ORDER";
+}
+
+repeatCodOption.onclick = () =>
+  selectRepeatPaymentMethod("Cash on Delivery");
+
+repeatOnlinePaymentOption.onclick = () =>
+  selectRepeatPaymentMethod("Online Payment");
+
+repeatCodOption.onkeydown = (event) => {
+  if(event.key === "Enter" || event.key === " "){
+    event.preventDefault();
+    repeatCodOption.click();
+  }
+};
+
+repeatOnlinePaymentOption.onkeydown = (event) => {
+  if(event.key === "Enter" || event.key === " "){
+    event.preventDefault();
+    repeatOnlinePaymentOption.click();
+  }
+};
+
+/* =========================================================
    REPEAT CHECKOUT NEXT
 ========================================================= */
 
@@ -2919,6 +3029,11 @@ document.getElementById(
   `;
 
 
+  repeatOnlineExpectedAmount.textContent =
+    `₹${finalBill}`;
+
+  selectRepeatPaymentMethod("Cash on Delivery");
+
   repeatOverlay.classList.remove("show");
 
   repeatPaymentOverlay.classList.add("show");
@@ -2936,6 +3051,10 @@ document.getElementById(
 
   if (!isOrderingOpen()) {
     showOrderingClosed();
+    return;
+  }
+
+  if (repeatPaymentMethod !== "Cash on Delivery") {
     return;
   }
 
