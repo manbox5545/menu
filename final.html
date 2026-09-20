@@ -86,9 +86,9 @@ label{display:block;font-weight:800;font-size:13px;margin:0 0 7px}.field{margin-
     <h1>PAYMENT</h1><p class="lead">Choose how you want to pay.</p>
     <div class="payments">
       <button class="payment selected" data-payment="Cash on Delivery"><span class="payicon">💵</span><span><strong>Cash on Delivery</strong><small>Pay when your food arrives</small></span><b>✓</b></button>
-      <button class="payment off" data-payment="QR"><span class="payicon">▦</span><span><strong>QR Payment</strong><small>CURRENTLY UNAVAILABLE</small></span><b>—</b></button>
+      <button class="payment" data-payment="Online Payment"><span class="payicon">⚡</span><span><strong>Online Payment</strong><small>Pay securely online</small></span><b>—</b></button>
     </div>
-    <div class="notice"><strong>PAYMENT INFO</strong>Cash on Delivery is currently available. Delivery is free for orders of ₹300 or more. Orders under ₹300 have a ₹20 delivery charge.</div>
+    <div class="notice"><strong>PAYMENT INFO</strong>Choose Cash on Delivery or Online Payment. Delivery is free for orders of ₹300 or more. Orders under ₹300 have a ₹20 delivery charge.</div>
     <div class="total-box"><span>FINAL TOTAL</span><span id="finalTotal">₹0</span></div>
     <div class="status bad" id="orderError"></div>
     <button class="primary" id="confirmOrderBtn">PLACE ORDER</button>
@@ -218,11 +218,37 @@ function watchStatus(id){
  });
 }
 
+function buildPendingOrder(){
+ const name=$("customerName").value.trim(),phone="+91"+$("customerPhone").value.trim();
+ const food=Object.entries(cart).map(([foodName,item])=>({name:foodName,price:Number(item.price),quantity:Number(item.quantity),subtotal:Number(item.price)*Number(item.quantity)}));
+ return {
+  ownerUid:currentUser?.uid||"",
+  customerName:name,
+  phone,
+  block:selectedBlock,
+  paymentMethod,
+  bill:subtotal,
+  deliveryCharge,
+  finalBill:subtotal+deliveryCharge,
+  food,
+  customerEmail:currentUser?.email||"",
+  status:"Payment pending"
+ };
+}
+
 $("confirmOrderBtn").onclick=async()=>{
  const btn=$("confirmOrderBtn");$("orderError").className="status";
  if(!storeLoaded||!storeIsOpen){$("closedOverlay").classList.add("show");return}
  if(!currentUser){step(3);return}
  const bad=unavailable();if(bad.length){message($("orderError"),"Some cart items are unavailable. Please return to the menu.");return}
+
+ if(paymentMethod==="Online Payment"){
+  const pending=buildPendingOrder();
+  localStorage.setItem("prachiPendingOnlineOrder",JSON.stringify(pending));
+  window.location.href="onlinep.html";
+  return;
+ }
+
  btn.disabled=true;btn.textContent="PLACING ORDER...";
  const name=$("customerName").value.trim(),phone="+91"+$("customerPhone").value.trim();
  const food=Object.entries(cart).map(([foodName,item])=>({name:foodName,price:Number(item.price),quantity:Number(item.quantity),subtotal:Number(item.price)*Number(item.quantity)}));
