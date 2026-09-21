@@ -32,6 +32,9 @@ label{display:block;font-weight:800;font-size:13px;margin:0 0 7px}.field{margin-
 .success-overlay,.closed,.outside{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.7);backdrop-filter:blur(7px);z-index:50}.success-overlay.active,.closed.show,.outside.show{display:flex}.card{width:min(570px,100%);background:#fff;border-radius:27px;padding:27px;box-shadow:var(--shadow);max-height:92vh;overflow:auto;text-align:center}.tick{width:70px;height:70px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:35px;margin:0 auto 14px}.card h2{font-family:Anton,sans-serif;font-size:38px}.info{margin-top:18px;background:#f6f6f6;border-radius:16px;padding:15px;text-align:left;line-height:1.65;font-size:13px}.live{margin-top:16px;text-align:left;padding:16px;border-radius:17px;border:1px solid var(--line)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-right:7px}
 @media(max-width:600px){body{padding:10px}.checkout{padding:21px 15px;border-radius:24px}.choice-grid{grid-template-columns:1fr}.choice{min-height:88px}.buildings{grid-template-columns:repeat(2,1fr)}}
 </style>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -110,6 +113,56 @@ label{display:block;font-weight:800;font-size:13px;margin:0 0 7px}.field{margin-
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import {getDatabase,ref,push,set,onValue,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+/* =========================================================
+   EMAILJS ORDER ALERT
+========================================================= */
+
+const EMAILJS_PUBLIC_KEY = "DoqheCBlqkY3YcrWk";
+const EMAILJS_SERVICE_ID = "service_uvitnxr";
+const EMAILJS_TEMPLATE_ID = "template_oi3odsr";
+
+if (typeof emailjs !== "undefined") {
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
+
+async function sendEmailOrderAlert(orderId, order) {
+  const items = (order.food || [])
+    .map(item => `• ${item.name} × ${item.quantity} — ₹${item.subtotal}`)
+    .join("\n");
+
+  const templateParams = {
+    order_id: orderId,
+    customer_name: order.customerName || "",
+    customer_phone: order.phone || "",
+    customer_block: order.block || "",
+    items,
+    subtotal: order.bill ?? 0,
+    delivery_charge: order.deliveryCharge ? `₹${order.deliveryCharge}` : "FREE",
+    total: order.finalBill ?? 0,
+    payment_method: order.paymentMethod || "",
+    customer_email: order.customerEmail || "Not provided",
+    order_status: order.status || "Order received"
+  };
+
+  try {
+    if (
+      EMAILJS_PUBLIC_KEY.includes("PASTE_YOUR_") ||
+      EMAILJS_SERVICE_ID.includes("PASTE_YOUR_") ||
+      EMAILJS_TEMPLATE_ID.includes("PASTE_YOUR_")
+    ) {
+      console.warn("EmailJS is not configured yet.");
+      return false;
+    }
+
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+    console.log("EmailJS order alert sent.");
+    return true;
+  } catch (error) {
+    console.error("EmailJS notification failed:", error);
+    return false;
+  }
+}
 
 const firebaseConfig={
  apiKey:"AIzaSyBq7UEsIwoudC2g8DRrG7EwqblX9SIDCF8",
@@ -256,6 +309,7 @@ $("confirmOrderBtn").onclick=async()=>{
  try{
   const orderRef=push(ref(db,"orders"));await set(orderRef,order);
   if(!orderRef.key)throw new Error("No order ID");
+  await sendEmailOrderAlert(orderRef.key, { ...order, status: "Order received" });
   const saved={...order,orderId:orderRef.key};
   localStorage.setItem("prachiLastOrder",JSON.stringify(saved));localStorage.setItem("prachiLastOrderId",orderRef.key);
   localStorage.setItem("prachiProfile",JSON.stringify({ownerUid:currentUser.uid,name,phone,block:selectedBlock,email:currentUser.email||""}));
