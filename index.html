@@ -1162,6 +1162,9 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
   opacity:.6;
 }
 </style>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 
 <body>
@@ -1654,10 +1657,54 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
 
 
 <script type="module">
-
 /* =========================================================
-   FIREBASE
+   EMAILJS ORDER ALERT
 ========================================================= */
+const EMAILJS_PUBLIC_KEY = "DoqheCBlqkY3YcrWk";
+const EMAILJS_SERVICE_ID = "service_uvitnxr";
+const EMAILJS_TEMPLATE_ID = "template_oi3odsr";
+
+if (typeof emailjs !== "undefined") {
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
+
+async function sendEmailOrderAlert(orderId, order) {
+  const items = (order.food || [])
+    .map(item => `• ${item.name} × ${item.quantity} — ₹${item.subtotal}`)
+    .join("\n");
+
+  const templateParams = {
+    order_id: orderId,
+    customer_name: order.customerName || "",
+    customer_phone: order.phone || "",
+    customer_block: order.block || "",
+    items,
+    subtotal: order.bill ?? 0,
+    delivery_charge: order.deliveryCharge ? `₹${order.deliveryCharge}` : "FREE",
+    total: order.finalBill ?? 0,
+    payment_method: order.paymentMethod || "",
+    customer_email: order.customerEmail || "Not provided",
+    order_status: order.status || "Order received"
+  };
+
+  try {
+    if (
+      EMAILJS_PUBLIC_KEY.includes("PASTE_YOUR_") ||
+      EMAILJS_SERVICE_ID.includes("PASTE_YOUR_") ||
+      EMAILJS_TEMPLATE_ID.includes("PASTE_YOUR_")
+    ) {
+      console.warn("EmailJS is not configured yet.");
+      return false;
+    }
+
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+    console.log("EmailJS order alert sent.");
+    return true;
+  } catch (error) {
+    console.error("EmailJS notification failed:", error);
+    return false;
+  }
+}
 
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
@@ -3145,6 +3192,8 @@ document.getElementById(
       ref(prachiDb, "orders"),
       order
     );
+
+    await sendEmailOrderAlert(orderRef.key, order);
 
     localStorage.setItem(
       "prachiLastOrderId",
