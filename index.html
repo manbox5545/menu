@@ -1057,11 +1057,7 @@ body.dark .repeat-total{
   .price{
     font-size:19px;
   }
-.cart{
-    top:75px;
-    left:10px;
-    width:calc(100% - 20px);
-  }
+  .cart{top:auto;left:auto;width:100%;}
 }
 
 
@@ -1161,6 +1157,876 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
 .buy-now.store-closed{
   opacity:.6;
 }
+
+/* =========================================================
+   UI REFRESH — PRESENTATION ONLY
+   Backend/data logic intentionally left untouched.
+========================================================= */
+:root{
+  --accent:#ffb703;
+  --accent-2:#fb8500;
+  --ink:#111;
+  --paper:#fffaf2;
+  --muted:#a9a9a9;
+  --panel:rgba(20,20,20,.78);
+  --line:rgba(255,255,255,.12);
+}
+
+body{
+  background:#090909;
+  color:#fff;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+body::before{
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.40),rgba(0,0,0,.78)),
+    url("img.png") center/cover no-repeat;
+  filter:saturate(1.05);
+}
+
+.hero{
+  min-height:auto;
+  padding:118px 20px 70px;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  width:560px;
+  height:560px;
+  left:50%;
+  top:8%;
+  transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(255,183,3,.16),transparent 68%);
+  pointer-events:none;
+}
+
+.hero h1{
+  position:relative;
+  z-index:1;
+  max-width:1000px;
+  font-size:clamp(48px,8vw,108px);
+  line-height:.92;
+  letter-spacing:clamp(2px,.6vw,8px);
+  text-wrap:balance;
+}
+
+.hero p{
+  position:relative;
+  z-index:1;
+  margin-top:20px;
+  color:#ffe6a7;
+  font-size:clamp(15px,2vw,21px);
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.hero-media{
+  position:relative;
+  z-index:2;
+  width:min(1080px,94vw);
+  margin:46px auto 0;
+  border-radius:32px;
+  overflow:hidden;
+  background:#050505;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 28px 90px rgba(0,0,0,.55),0 0 0 1px rgba(255,183,3,.08);
+  isolation:isolate;
+}
+
+.hero-media::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.04),transparent 48%,rgba(0,0,0,.28));
+}
+
+.hero-video{
+  display:block;
+  width:100%;
+  height:min(68vh,720px);
+  min-height:420px;
+  aspect-ratio:16/9;
+  object-fit:cover;
+  cursor:pointer;
+  background:#050505;
+}
+
+.video-control-hint{
+  position:absolute;
+  left:50%;
+  top:50%;
+  z-index:5;
+  width:74px;
+  height:74px;
+  transform:translate(-50%,-50%) scale(1);
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.45);
+  border-radius:50%;
+  background:rgba(0,0,0,.48);
+  color:#fff;
+  font-size:25px;
+  pointer-events:none;
+  opacity:0;
+  box-shadow:0 10px 35px rgba(0,0,0,.35);
+  transition:opacity .18s ease,transform .18s ease;
+}
+.hero-media.is-paused .video-control-hint{
+  opacity:1;
+}
+.hero-media.flash .video-control-hint{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1.08);
+}
+
+.hero-badge{
+  position:absolute;
+  left:20px;
+  bottom:20px;
+  z-index:6;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 12px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  background:rgba(0,0,0,.55);
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1px;
+  backdrop-filter:blur(8px);
+}
+.hero-badge i{
+  width:7px;height:7px;border-radius:50%;
+  background:#ffb703;
+  box-shadow:0 0 12px #ffb703;
+}
+
+.menu{
+  width:min(1120px,94vw);
+  max-width:none;
+  padding:15px 0 80px;
+}
+
+.sectionTitle{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin:88px 0 22px;
+  color:#fff;
+  font-size:clamp(30px,4vw,48px);
+  letter-spacing:2px;
+  text-shadow:none;
+}
+.sectionTitle::before{
+  content:"";
+  width:38px;
+  height:4px;
+  flex:0 0 38px;
+  border-radius:99px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  box-shadow:0 0 18px rgba(255,183,3,.25);
+}
+
+.card{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:24px;
+  background:rgba(255,255,255,.97);
+  box-shadow:0 18px 55px rgba(0,0,0,.28);
+  overflow:hidden;
+}
+
+.header{
+  padding:17px 24px;
+  background:#161616;
+  color:#d7d7d7;
+  border-bottom:1px solid #2a2a2a;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+}
+
+.item{
+  padding:19px 24px;
+  min-height:68px;
+  border-bottom:1px solid #ececec;
+  transition:background .15s ease,transform .15s ease;
+}
+.item:hover{
+  background:#fff7e7;
+}
+.name{
+  font-size:18px;
+  font-weight:700;
+}
+.price{
+  color:#b75b00;
+  font-size:18px;
+}
+
+.menu-intro{
+  width:min(900px,100%);
+  margin:0 auto 12px;
+  padding:0 5px;
+  color:#cfcfcf;
+  text-align:center;
+  line-height:1.7;
+  font-size:14px;
+}
+
+.food-showcase{
+  width:min(1120px,94vw);
+  margin:10px auto 0;
+}
+.showcase-grid{
+  display:grid;
+  grid-template-columns:1.35fr .82fr .82fr;
+  grid-auto-rows:230px;
+  gap:14px;
+}
+.food-tile{
+  position:relative;
+  overflow:hidden;
+  min-height:180px;
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.12);
+  background:#151515;
+  box-shadow:0 18px 55px rgba(0,0,0,.28);
+}
+.food-tile:first-child{grid-row:span 2}
+.food-tile img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  transition:transform .35s ease;
+}
+.food-tile::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 34%,rgba(0,0,0,.78));
+}
+.food-tile:hover img{transform:scale(1.035)}
+.food-caption{
+  position:absolute;
+  left:18px;
+  right:18px;
+  bottom:17px;
+  z-index:2;
+}
+.food-caption strong{
+  display:block;
+  font-size:18px;
+  color:#fff;
+}
+.food-caption span{
+  display:block;
+  margin-top:3px;
+  color:#ffd98b;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.footer{
+  padding:90px 20px 125px;
+  border-top:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.35));
+}
+.footer h3:first-child{
+  font-size:28px;
+  letter-spacing:1px;
+}
+.footer p{color:#cfcfcf}
+
+.bottom-nav{
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(10,10,10,.88);
+  box-shadow:0 18px 60px rgba(0,0,0,.45);
+  backdrop-filter:blur(12px);
+}
+.nav-item.active,
+.nav-item:hover{
+  background:linear-gradient(135deg,rgba(255,183,3,.18),rgba(251,133,0,.10));
+}
+.nav-item small{letter-spacing:1px}
+
+#cartBtn{
+  background:linear-gradient(135deg,#fff,#fff4dc);
+  color:#111;
+}
+
+.buy-now,.repeat-next{
+  background:linear-gradient(135deg,#151515,#000);
+}
+.buy-now:hover,.repeat-next:hover{
+  box-shadow:0 14px 35px rgba(0,0,0,.32);
+}
+
+@media(max-width:800px){
+  .hero{padding-top:100px}
+  .hero-video{
+    min-height:260px;
+    height:58vw;
+  }
+  .hero-media{border-radius:24px}
+  .showcase-grid{
+    grid-template-columns:1fr 1fr;
+    grid-auto-rows:190px;
+  }
+  .food-tile:first-child{grid-column:span 2;grid-row:span 1}
+}
+@media(max-width:560px){
+  .hero{padding:90px 12px 48px}
+  .hero h1{font-size:clamp(40px,12vw,66px)}
+  .hero-video{min-height:220px;height:62vw}
+  .video-control-hint{width:62px;height:62px;font-size:21px}
+  .hero-badge{left:12px;bottom:12px}
+  .menu,.food-showcase{width:calc(100% - 20px)}
+  .sectionTitle{margin-top:60px;font-size:30px}
+  .sectionTitle::before{width:28px;flex-basis:28px}
+  .item{padding:17px 16px}
+  .name{font-size:16px}
+  .price{font-size:17px}
+  .showcase-grid{
+    grid-template-columns:1fr;
+    grid-auto-rows:220px;
+  }
+  .food-tile:first-child{grid-column:auto}
+}
+
+/* Low-end-device mode: reduce visual work without changing functionality. */
+@media (prefers-reduced-motion:reduce){
+  .food-tile img,.item{transition:none}
+}
+
+
+/* =========================================================
+   IMPRESSIVE FOOD CATALOGUE — UI ONLY
+   Keeps existing .item, data-name, data-price and click logic.
+========================================================= */
+
+.menu{
+  width:min(1180px,94vw);
+  padding:10px 0 100px;
+}
+
+.sectionTitle{
+  position:relative;
+  display:block;
+  margin:100px 0 26px;
+  padding-left:0;
+  font-size:clamp(34px,5vw,64px);
+  line-height:.95;
+  letter-spacing:-1px;
+  text-transform:none;
+}
+
+.sectionTitle::before{
+  content:"";
+  display:block;
+  width:48px;
+  height:5px;
+  margin-bottom:13px;
+  border-radius:99px;
+  background:linear-gradient(90deg,#ffb703,#fb8500);
+  box-shadow:0 0 22px rgba(255,183,3,.28);
+}
+
+.card{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  overflow:visible;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  border-radius:0;
+}
+
+.header{
+  grid-column:1/-1;
+  padding:0 3px 8px;
+  background:transparent;
+  border:0;
+  color:#858585;
+  font-size:10px;
+  letter-spacing:1.8px;
+}
+
+.item{
+  position:relative;
+  min-height:210px;
+  display:flex;
+  align-items:flex-end;
+  padding:0;
+  overflow:hidden;
+  isolation:isolate;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:26px;
+  background:#171717;
+  color:#fff;
+  cursor:pointer;
+  box-shadow:0 16px 45px rgba(0,0,0,.24);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+
+.item::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-2;
+  background-image:var(--food-image);
+  background-size:cover;
+  background-position:center;
+  transform:scale(1.01);
+  transition:transform .3s ease,filter .3s ease;
+}
+
+.item::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.02) 22%,rgba(0,0,0,.22) 42%,rgba(0,0,0,.88) 100%),
+    linear-gradient(90deg,rgba(0,0,0,.10),transparent 60%);
+}
+
+.item:hover{
+  background:#171717;
+  transform:translateY(-4px);
+  border-color:rgba(255,183,3,.42);
+  box-shadow:0 24px 55px rgba(0,0,0,.38),0 0 0 1px rgba(255,183,3,.06);
+}
+
+.item:hover::before{
+  transform:scale(1.055);
+}
+
+.item:active{
+  transform:translateY(-1px) scale(.995);
+}
+
+.item .name{
+  position:relative;
+  z-index:2;
+  width:100%;
+  padding:62px 18px 18px;
+  font-size:clamp(17px,2vw,23px);
+  line-height:1.05;
+  font-weight:800;
+  letter-spacing:-.35px;
+  text-shadow:0 2px 12px rgba(0,0,0,.65);
+}
+
+.item .price{
+  position:absolute;
+  z-index:3;
+  right:14px;
+  top:14px;
+  padding:8px 11px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;
+  background:rgba(0,0,0,.58);
+  color:#ffd166;
+  font-size:14px;
+  font-weight:900;
+  text-align:center;
+  backdrop-filter:blur(7px);
+  box-shadow:0 8px 22px rgba(0,0,0,.2);
+}
+
+.item .name::after{
+  content:"ADD  +";
+  display:block;
+  width:max-content;
+  margin-top:9px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#fff;
+  color:#111;
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:1px;
+  text-shadow:none;
+  box-shadow:0 6px 18px rgba(0,0,0,.18);
+}
+
+.item.unavailable{
+  opacity:.48;
+  filter:grayscale(.45);
+}
+
+.item.unavailable .name::after{
+  content:"CURRENTLY UNAVAILABLE";
+  color:#777;
+  background:#ddd;
+}
+
+/* Individual demo images. These are presentation-only; data/backend is untouched. */
+.card:nth-of-type(1) .item:nth-child(2){--food-image:url("https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=76")}
+.card:nth-of-type(1) .item:nth-child(3){--food-image:url("https://images.unsplash.com/photo-1626132647523-66f5bf380027?auto=format&fit=crop&w=900&q=76")}
+.card:nth-of-type(1) .item:nth-child(4){--food-image:url("https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=900&q=76")}
+.card:nth-of-type(1) .item:nth-child(5){--food-image:url("https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=900&q=76")}
+.card:nth-of-type(1) .item:nth-child(6){--food-image:url("https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=900&q=76")}
+.card:nth-of-type(1) .item:nth-child(7){--food-image:url("https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=76")}
+
+/* Reliable fallback + JS-assigned images cover all categories. */
+.item{--food-image:url("https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=76")}
+
+@media(max-width:760px){
+  .menu{width:calc(100% - 22px)}
+  .sectionTitle{
+    margin:72px 0 20px;
+    font-size:clamp(32px,10vw,50px);
+  }
+  .sectionTitle::before{width:34px;height:4px;margin-bottom:10px}
+  .card{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .header{display:none}
+  .item{
+    min-height:205px;
+    border-radius:21px;
+  }
+  .item .name{
+    padding:62px 14px 14px;
+    font-size:17px;
+  }
+  .item .price{
+    top:10px;
+    right:10px;
+    padding:7px 9px;
+    font-size:13px;
+  }
+}
+
+@media(max-width:430px){
+  .menu{width:calc(100% - 18px)}
+  .card{gap:9px}
+  .item{min-height:185px;border-radius:19px}
+  .item .name{font-size:15.5px;padding:55px 12px 12px}
+  .item .name::after{font-size:8px;padding:6px 8px}
+}
+
+/* Reduce expensive effects on low-end/touch devices. */
+@media(pointer:coarse){
+  .item{box-shadow:0 10px 28px rgba(0,0,0,.24);transition:transform .12s ease}
+  .item:hover{transform:none}
+  .item:hover::before{transform:none}
+}
+
+/* ================= FOOD DETAIL — FULL SCREEN ================= */
+.food-detail-overlay{
+  position:fixed;
+  inset:0;
+  z-index:10050;
+  display:none;
+  width:100vw;
+  height:100dvh;
+  min-height:100vh;
+  padding:0;
+  align-items:stretch;
+  justify-content:stretch;
+  background:#090909;
+  backdrop-filter:none;
+}
+.food-detail-overlay.show{display:flex}
+.food-detail-panel{
+  position:relative;
+  width:100vw;
+  height:100dvh;
+  min-height:100vh;
+  max-height:none;
+  overflow:auto;
+  border:0;
+  border-radius:0;
+  background:#111;
+  color:#fff;
+  box-shadow:none;
+}
+.food-detail-close{
+  position:fixed;
+  z-index:10052;
+  top:18px;
+  right:18px;
+  width:48px;
+  height:48px;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:50%;
+  background:rgba(0,0,0,.68);
+  color:#fff;
+  font-size:30px;
+  line-height:1;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+}
+.food-detail-image-wrap{
+  position:relative;
+  width:100%;
+  height:min(58vh,620px);
+  min-height:280px;
+  aspect-ratio:auto;
+  background:#0c0c0c;
+  overflow:hidden;
+}
+.food-detail-image-wrap img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+.food-detail-stock{
+  position:absolute;
+  left:clamp(16px,4vw,40px);
+  bottom:clamp(16px,4vw,40px);
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(0,0,0,.72);
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+.food-detail-stock.out{
+  background:#e5e5e5;
+  color:#555;
+}
+.food-detail-content{
+  width:min(1000px,92vw);
+  margin:0 auto;
+  padding:clamp(28px,5vw,56px) 0 120px;
+}
+.food-detail-price{
+  display:inline-flex;
+  padding:8px 13px;
+  border-radius:999px;
+  background:rgba(255,183,3,.13);
+  color:#ffd166;
+  font-weight:900;
+  font-size:15px;
+}
+.food-detail-content h2{
+  margin-top:14px;
+  font-family:Anton,sans-serif;
+  font-size:clamp(38px,7vw,78px);
+  line-height:.98;
+  letter-spacing:.5px;
+}
+.food-detail-content p{
+  max-width:800px;
+  margin-top:16px;
+  color:#cfcfcf;
+  line-height:1.75;
+  font-size:clamp(15px,1.7vw,18px);
+}
+.food-detail-order-row{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:24px;
+  margin-top:30px;
+  padding:20px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  background:#101010;
+}
+.food-detail-label{
+  display:block;
+  margin-bottom:8px;
+  color:#888;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1.5px;
+}
+.food-detail-qty{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.food-detail-qty button{
+  width:42px;
+  height:42px;
+  border:0;
+  border-radius:11px;
+  background:#292929;
+  color:#fff;
+  font-size:23px;
+  cursor:pointer;
+}
+.food-detail-qty span{
+  min-width:28px;
+  text-align:center;
+  font-weight:900;
+}
+.food-detail-total{text-align:right}
+.food-detail-total span{
+  display:block;
+  color:#888;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  margin-bottom:5px;
+}
+.food-detail-total strong{font-size:24px}
+.food-detail-order-btn{
+  width:100%;
+  margin-top:16px;
+  padding:17px;
+  border:0;
+  border-radius:15px;
+  background:linear-gradient(135deg,#ffb703,#fb8500);
+  color:#111;
+  font:900 16px Inter,sans-serif;
+  letter-spacing:.8px;
+  cursor:pointer;
+  box-shadow:0 10px 28px rgba(251,133,0,.22);
+}
+.food-detail-order-btn:disabled{
+  background:#4a4a4a;
+  color:#9a9a9a;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+@media(max-width:700px){
+  .food-detail-close{
+    top:12px;
+    right:12px;
+    width:44px;
+    height:44px;
+  }
+  .food-detail-image-wrap{
+    height:48vh;
+    min-height:250px;
+  }
+  .food-detail-content{
+    width:calc(100% - 32px);
+    padding:24px 0 110px;
+  }
+  .food-detail-order-row{
+    flex-direction:column;
+    align-items:stretch;
+    gap:20px;
+  }
+  .food-detail-total{text-align:left}
+}
+
+
+/* ================= RUNNING ORDER BELT ================= */
+.order-belt{
+  position:relative;
+  width:calc(100% + 8vw);
+  margin:10px -4vw 30px;
+  overflow:hidden;
+  transform:rotate(-2.2deg);
+  transform-origin:center;
+  border-top:2px solid rgba(255,183,3,.75);
+  border-bottom:2px solid rgba(255,183,3,.75);
+  background:linear-gradient(135deg,#ffb703,#fb8500);
+  box-shadow:0 14px 35px rgba(0,0,0,.35),0 0 28px rgba(255,183,3,.16);
+}
+.order-belt::before,
+.order-belt::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.order-belt::before{
+  background:repeating-linear-gradient(
+    135deg,
+    rgba(255,255,255,.16) 0 16px,
+    transparent 16px 32px
+  );
+  animation:beltShine .9s linear infinite;
+}
+.order-belt::after{
+  background:linear-gradient(90deg,rgba(0,0,0,.16),transparent 15%,transparent 85%,rgba(0,0,0,.16));
+}
+.order-belt-track{
+  position:relative;
+  z-index:1;
+  display:flex;
+  width:max-content;
+  align-items:center;
+  gap:28px;
+  padding:14px 0;
+  white-space:nowrap;
+  color:#111;
+  font-family:Anton,Inter,sans-serif;
+  font-size:clamp(20px,3vw,34px);
+  letter-spacing:1.2px;
+  animation:orderBeltMove 12s linear infinite;
+}
+.order-belt-track span{
+  display:inline-block;
+  text-shadow:0 2px 0 rgba(255,255,255,.16);
+}
+.order-belt-track b{
+  font-size:1.15em;
+}
+@keyframes orderBeltMove{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+@keyframes beltShine{
+  from{transform:translateX(-35px)}
+  to{transform:translateX(35px)}
+}
+@media(max-width:760px){
+  .order-belt{
+    width:calc(100% + 20px);
+    margin:6px -10px 22px;
+    transform:rotate(-2.5deg);
+  }
+  .order-belt-track{
+    gap:20px;
+    padding:11px 0;
+    font-size:clamp(18px,6vw,27px);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .order-belt-track,.order-belt::before{animation:none}
+}
+
+
+/* Theme-matching MPoxel link */
+.mpoxel-link{
+  color:#ffd166;
+  text-decoration:none;
+  font-weight:800;
+  transition:color .2s ease,opacity .2s ease;
+}
+.mpoxel-link:hover{
+  color:#ffb703;
+  text-decoration:none;
+}
+
+
+/* Full-screen screens always sit above bottom navigation */
+body:has(.cart-overlay.show) .bottom-nav,
+body:has(.food-detail-overlay.show) .bottom-nav,
+body:has(.orders-overlay.show) .bottom-nav,
+body:has(.repeat-overlay.show) .bottom-nav,
+body:has(.repeat-payment-overlay.show) .bottom-nav,
+body:has(.settings-overlay.show) .bottom-nav{
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
 </style>
 
   <!-- EmailJS -->
@@ -1345,15 +2211,6 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
   <div class="settings-panel">
     <button class="close-panel" id="closeSettingsBtn" type="button">×</button>
     <h2>SETTINGS</h2>
-    <div class="theme-row">
-      <div>
-        <strong>THEME</strong>
-        <div style="font-size:12px;color:#777;margin-top:4px">
-          Switch between light and dark mode.
-        </div>
-      </div>
-      <button class="theme-toggle" id="settingsThemeBtn" type="button">🌙 THEME</button>
-    </div>
   </div>
 </div>
 
@@ -1365,26 +2222,108 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
 
   <p>Fresh • Homemade • Delicious</p>
 
-<video
-  id="heroVideo"
-  class="hero-image hero-video"
-  autoplay
-  muted
-  loop
-  playsinline
-  preload="auto">
+  <div class="hero-media" id="heroMedia">
+    <video
+      id="heroVideo"
+      class="hero-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      aria-label="Prachi Cloud Kitchen intro video">
 
-  <source
-    src="https://res.cloudinary.com/ddcmbjnzh/video/upload/f_mp4,vc_h264/v1788271417/intro_mzp8wn.mp4"
-    type="video/mp4">
-</video>
+      <source
+        src="https://res.cloudinary.com/ddcmbjnzh/video/upload/f_mp4,vc_h264/v1788271417/intro_mzp8wn.mp4"
+        type="video/mp4">
+    </video>
+
+    <div class="video-control-hint" id="videoControlHint" aria-hidden="true">▶</div>
+    <div class="hero-badge"><i></i> TAP VIDEO TO PLAY / PAUSE</div>
+  </div>
 
 </section>
 
 
+
+<!-- ================= FOOD SHOWCASE / DEMO IMAGES ================= -->
+<section class="food-showcase" aria-label="Food showcase">
+  <div class="menu-intro">
+    <strong style="color:#fff">Homestyle food, presented like a premium kitchen.</strong><br>
+    Demo photography is used below for the visual redesign; replace these image URLs with the kitchen's own food photos when available.
+  </div>
+
+  <div class="showcase-grid">
+    <article class="food-tile">
+      <img loading="lazy" decoding="async"
+        src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1200&q=78"
+        alt="Indian food platter">
+      <div class="food-caption">
+        <strong>Homestyle Indian Plates</strong>
+        <span>Freshly prepared • Comfort food</span>
+      </div>
+    </article>
+
+    <article class="food-tile">
+      <img loading="lazy" decoding="async"
+        src="https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=900&q=78"
+        alt="Indian curry dish">
+      <div class="food-caption">
+        <strong>Rich Curries</strong>
+        <span>Warm • Aromatic • Homemade</span>
+      </div>
+    </article>
+
+    <article class="food-tile">
+      <img loading="lazy" decoding="async"
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8nD6rNk1f0Eh0LKsz-tM77M_03Dk_GCzq7RBzgzjWaQ&s=10"
+        alt="Indian flatbread">
+      <div class="food-caption">
+        <strong>Fresh Breads</strong>
+        <span>Roti • Paratha • Lachha</span>
+      </div>
+    </article>
+
+    <article class="food-tile">
+      <img loading="lazy" decoding="async"
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqwG1JSy3HA8XHggRGJJUNf3_ixu250e4e-ODLzfUcEw&s=10"
+        alt="Indian rice meal">
+      <div class="food-caption">
+        <strong>Rice &amp; Combos</strong>
+        <span>Simple • Filling • Delicious</span>
+      </div>
+    </article>
+
+    <article class="food-tile">
+      <img loading="lazy" decoding="async"
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOztxeEG-JsNTQcjB44rLxtdjnXD9Cjq6QDIgWYOkHaw&s=10"
+        alt="Indian dessert">
+      <div class="food-caption">
+        <strong>Sweet Finish</strong>
+        <span>Halwa &amp; homemade desserts</span>
+      </div>
+    </article>
+  </div>
+</section>
+
 <!-- ================= MENU ================= -->
 
 <div class="menu">
+
+
+<!-- ================= ORDER BELT ================= -->
+<div class="order-belt" aria-label="Order food announcement">
+  <div class="order-belt-track">
+    <span>ORDER FOOD HERE 👇</span>
+    <b>•</b>
+    <span>HURRY UP</span>
+    <b>•</b>
+    <span>ORDER FOOD HERE 👇</span>
+    <b>•</b>
+    <span>HURRY UP</span>
+    <b>•</b>
+  </div>
+</div>
 
 <!-- INDIAN BREADS -->
 
@@ -1641,6 +2580,44 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
 </div>
 
 
+<!-- ================= FOOD DETAIL MODAL ================= -->
+<div class="food-detail-overlay" id="foodDetailOverlay" role="dialog" aria-modal="true" aria-labelledby="foodDetailTitle">
+  <div class="food-detail-panel" id="foodDetailPanel">
+    <button class="food-detail-close" id="foodDetailClose" type="button" aria-label="Close">×</button>
+
+    <div class="food-detail-image-wrap">
+      <img id="foodDetailImage" src="" alt="" />
+      <div class="food-detail-stock" id="foodDetailStock"></div>
+    </div>
+
+    <div class="food-detail-content">
+      <div class="food-detail-price" id="foodDetailPrice"></div>
+      <h2 id="foodDetailTitle"></h2>
+      <p id="foodDetailDescription"></p>
+
+      <div class="food-detail-order-row">
+        <div>
+          <span class="food-detail-label">QUANTITY</span>
+          <div class="food-detail-qty">
+            <button type="button" id="foodQtyMinus" aria-label="Decrease quantity">−</button>
+            <span id="foodQtyValue">1</span>
+            <button type="button" id="foodQtyPlus" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+
+        <div class="food-detail-total">
+          <span>TOTAL</span>
+          <strong id="foodDetailTotal">₹0</strong>
+        </div>
+      </div>
+
+      <button class="food-detail-order-btn" id="foodDetailOrderBtn" type="button">
+        ORDER NOW
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= FOOTER ================= -->
 
 <footer class="footer">
@@ -1651,10 +2628,76 @@ body.dark .video-sound-btn,body.dark .ordering-closed-btn{
 
   <br>
 
-  <h3>A website by mpoxel.in<a=href"mpoxel.in"></h3>
+  <h3>A website by <a class="mpoxel-link" href="https://mpoxel.in/" target="_blank" rel="noopener noreferrer">mpoxel.in</a></h3>
 
 </footer>
 
+
+
+<script>
+/* =========================================================
+   FOOD CARD VISUALS — ONE EXPLICIT IMAGE PER ITEM
+   No fallback image is shared between menu items.
+========================================================= */
+(() => {
+const imageMap = {
+  "roti": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgZ73wOVx4D6bIiWU7EhobG9Bl8tY61Wm9LV30slmD_g&s=10",
+  "roti with ghee": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVVtnlEW0Jm7NNhqc8dBPuPw1h5YWqO0l4ANwnVVc6nQ&s=10",
+  "paratha": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkJugTc3U5ofAXmhaIrHzgl8uvqLQoMaPUCDDDX1-iYQ&s=10",
+  "lachha paratha": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5aunq7QJjeqUG0k5iwlGOS2kAXF91ys7fcNh5hVb5Lw&s=10",
+  "aaloo paratha": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8nD6rNk1f0Eh0LKsz-tM77M_03Dk_GCzq7RBzgzjWaQ&s=10",
+  "sattu paratha": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwG4KrNA43PpqBObCGIijcIJUU0IhDP1V8UGCjjCsvpg&s=10",
+
+  "4 roti + aaloo bhujia + dal chawal": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQjqq_8Y5Kha73pXbFf0ULDJPopxyG-Txro-CvrMQrDQ&s=10",
+  "fried rice": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr4KA26v28FJOmOWBaeoxlPtVOaG9tttshUnV-b4rpLA&s=10",
+  "jeera rice": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqXXJ7QUkyXWvhVLdlw4yz-FHAWzNjsVZBr6p2RETxSQ&s=10",
+  "poha": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLkBp4S2yTF_sNM0Kvsprz8XlclvtDRkXb50YXws3syA&s=10",
+
+  "kadhai paneer": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=900&q=76",
+  "matar paneer": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZz0S7gJzffviHdulxXcqt9AQxP1LuUmjOigISV3fjIg&s=10",
+  "palak paneer": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4-I8mFH3My_QvQYNOseYDx0BOKNj7DGbxHwzSJaeZlQ&s=10",
+
+  "litti chokha 2pcs.": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlquTUBCKz3tMEaMhSXUanE1i6VG-UdPIZYULN7VVfZw&s=10",
+  "bhindi bhujia": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTK6-xpQ1vjV6V72oJp9a0_ZMH1Tg02v6kaGEdZ-tIvKQ&s=10",
+  "bharwa karela": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRya2mQoHmxTcY6SLS7IRTTv5-E8wtj_eqvnF5phDG3cw&s=10",
+  "baigan bharta": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnqsjq5ARoBI-y2i8iv8GmOdYlPHr9HketUK6UKVVZtA&s=10",
+  "lauki sabji": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7mp_f0uTUy6uRbqKbTUpPVw-y47mjwYBRpZ7SZg9zMw&s=10",
+  "aaloo sabji": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBya83G9Bo0AfzH8bzbMeWBcO42v4cNPLIA-L2KTHWRg&s=10",
+  "aaloo baigan": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAMg61GpbV2AhwQtEUGbYqUNuCZ8SeECKOhK4hjl2Mrw&s=10",
+  "kofta sabji": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtMYRS9vXRlojCFHaqQHcoJ02r277nfGogB7vn1Gf9qQ&s=10",
+  "gatte ki sabji": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUP1vOC-s5_avif5JH8mYgQuexJjqPLtrnds28XUyatQ&s=10",
+  "bhujia sabji": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVI8nDSWAm3eYXsdGI0gf9ICxpn53XKVA3E7nFFI3W3Q&s=10",
+
+  "chole bhature": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRcpteSpJS20R9o1sLd1fMY4zV50Y7eu6sk1dsRgJoAg&s=10",
+
+  "chana dal": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjLUe_OJ15Fo5AGvFxz731tQzn_wukLuP36ug88ZtoNg&s=10",
+  "dal fry": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS68hY8LmJOYpAhRteB6q9W-aMjeHZtwHYjvUy96SIFbw&s=10",
+  "dal tadka": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO0L6Cnk7aOMzJ2dxsa58ttm_Ewzce-CJE6D9BP2oEeA&s=10",
+
+  "mango halwa": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqa8Xax6cHFxfUb3tnhyzLpJrk7HiHtxbc3UO-ztbe-w&s=10",
+  "loki halwa": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTzyOe6vAw2P8jC0H4cV-QUYunnICDNyOVoMigYVvgAg&s=10",
+  "suji halwa": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPg2Kp4vos7cEUYKdJlF9BX7GGwSYlc85cox2ow8oGCw&s=10",
+  "sada halwa": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTx_7CWt4AdpGd3UhKZfcebpsEDh3PF1YZ5bXXrC05MSQ&s=10"
+};
+
+  document.querySelectorAll(".menu .item").forEach(item => {
+    const key = (item.dataset.name || "").trim().toLowerCase();
+    const image = imageMap[key];
+
+    if (image) {
+      item.style.setProperty("--food-image", `url("${image}")`);
+      item.dataset.foodImage = image;
+    }
+
+    item.setAttribute(
+      "aria-label",
+      `${item.dataset.name || "Food item"}, ₹${item.dataset.price || ""}`
+    );
+  });
+
+  window.prachiFoodImages = imageMap;
+})();
+</script>
 
 <script type="module">
 /* =========================================================
@@ -1870,29 +2913,6 @@ onValue(
 );
 
 /* =========================================================
-   DARK MODE
-========================================================= */
-
-// Dark mode is the default.
-document.body.classList.add("dark");
-
-const settingsThemeBtn = document.getElementById("settingsThemeBtn");
-
-if (settingsThemeBtn) {
-  settingsThemeBtn.textContent = "☀️ LIGHT MODE";
-
-  settingsThemeBtn.onclick = () => {
-    document.body.classList.toggle("dark");
-
-    const isDark = document.body.classList.contains("dark");
-
-    settingsThemeBtn.textContent =
-      isDark ? "☀️ LIGHT MODE" : "🌙 DARK MODE";
-  };
-}
-
-
-/* =========================================================
    CART
 ========================================================= */
 
@@ -1944,31 +2964,163 @@ function animateItemToCart(item){
   },{once:true});
 }
 
-document.querySelector(".menu").addEventListener("click", (e) => {
+/* =========================================================
+   FOOD DETAIL / ORDER MODAL
+   Clicking a food opens details instead of instantly adding
+   a single quantity to the cart.
+========================================================= */
 
-  const item = e.target.closest(".item");
+const foodDetailOverlay = document.getElementById("foodDetailOverlay");
+const foodDetailPanel = document.getElementById("foodDetailPanel");
+const foodDetailClose = document.getElementById("foodDetailClose");
+const foodDetailImage = document.getElementById("foodDetailImage");
+const foodDetailStock = document.getElementById("foodDetailStock");
+const foodDetailTitle = document.getElementById("foodDetailTitle");
+const foodDetailPrice = document.getElementById("foodDetailPrice");
+const foodDetailDescription = document.getElementById("foodDetailDescription");
+const foodQtyMinus = document.getElementById("foodQtyMinus");
+const foodQtyPlus = document.getElementById("foodQtyPlus");
+const foodQtyValue = document.getElementById("foodQtyValue");
+const foodDetailTotal = document.getElementById("foodDetailTotal");
+const foodDetailOrderBtn = document.getElementById("foodDetailOrderBtn");
 
-  if (!item) return;
+const foodDescriptions = {
+  "Roti":"Soft, freshly cooked Indian flatbread, ideal with dal, sabji or your favourite curry.",
+  "Roti with Ghee":"Fresh roti finished with a layer of ghee for a rich, buttery taste.",
+  "Paratha":"Golden, flaky Indian flatbread with a satisfying crisp outside and soft centre.",
+  "Lachha Paratha":"Layered and flaky paratha cooked until crisp and golden.",
+  "Aaloo Paratha":"Stuffed paratha filled with a seasoned potato mixture and cooked until golden.",
+  "Sattu Paratha":"Traditional paratha filled with a savoury roasted sattu mixture and spices.",
+  "4 Roti + Aaloo Bhujia + Dal Chawal":"A complete homestyle combo with four rotis, aaloo bhujia and dal chawal.",
+  "Fried Rice":"Fragrant rice tossed with vegetables and seasoning for a hearty, savoury meal.",
+  "Jeera Rice":"Long-grain rice tempered with aromatic cumin for a simple, comforting side.",
+  "Poha":"Light and comforting flattened rice prepared with classic Indian seasoning.",
+  "Kadhai Paneer":"Paneer cooked with peppers, onions and aromatic spices in a bold kadhai-style gravy.",
+  "Matar Paneer":"Tender paneer and green peas cooked in a creamy, spiced tomato-based gravy.",
+  "Palak Paneer":"Soft paneer in a smooth spinach-based gravy with aromatic Indian spices.",
+  "Litti chokha 2pcs.":"Two traditional littis served with a rustic chokha-style accompaniment.",
+  "Bhindi Bhujia":"Sliced okra cooked with onions and spices for a classic dry Indian sabji.",
+  "Bharwa Karela":"Bitter gourd prepared with a flavourful spiced stuffing and cooked until tender.",
+  "Baigan Bharta":"Roasted eggplant mashed and cooked with onion, tomato and aromatic spices.",
+  "Lauki Sabji":"Tender bottle gourd cooked into a light, homestyle Indian curry.",
+  "Aaloo Sabji":"Comforting potato curry made with simple Indian spices and a homestyle finish.",
+  "Aaloo Baigan":"Potato and eggplant cooked together with fragrant spices in a homestyle sabji.",
+  "Kofta Sabji":"Soft koftas served in a rich, spiced Indian gravy.",
+  "Gatte Ki Sabji":"Traditional gram-flour dumplings simmered in a tangy, spiced gravy.",
+  "Bhujia Sabji":"A simple, dry-style Indian vegetable preparation with aromatic spices.",
+  "Chole bhature":"Spiced chickpea curry paired with fluffy, fried bhature for a filling North Indian meal.",
+  "Chana Dal":"Creamy split chickpeas cooked with mild spices for a comforting dal.",
+  "Dal Fry":"Yellow dal finished with a fragrant tempering of spices for a homestyle taste.",
+  "Dal Tadka":"Dal topped with an aromatic tadka of spices for a rich and warming finish.",
+  "Mango Halwa":"Sweet, smooth halwa with a fruity mango flavour and comforting dessert texture.",
+  "Loki Halwa":"Bottle-gourd halwa cooked into a sweet, rich and creamy Indian dessert.",
+  "Suji Halwa":"Classic semolina halwa with a soft texture and warm, comforting sweetness.",
+  "Sada Halwa":"Simple traditional halwa with a smooth texture and delicate sweetness."
+};
 
-  const name = item.dataset.name;
+let selectedFoodItem = null;
+let selectedFoodQuantity = 1;
+
+function foodImageForItem(item){
+  return item.dataset.foodImage ||
+    window.prachiFoodImages?.[(item.dataset.name || "").trim().toLowerCase()] ||
+    "";
+}
+
+function updateFoodDetailTotal(){
+  if(!selectedFoodItem) return;
+  const price = Number(selectedFoodItem.dataset.price) || 0;
+  foodQtyValue.textContent = String(selectedFoodQuantity);
+  foodDetailTotal.textContent = `₹${price * selectedFoodQuantity}`;
+}
+
+function closeFoodDetail(){
+  foodDetailOverlay?.classList.remove("show");
+  document.body.style.overflow = "";
+  selectedFoodItem = null;
+}
+
+function openFoodDetail(item){
+  const name = item.dataset.name || "Food item";
   const price = Number(item.dataset.price);
 
-  if (!name || !Number.isFinite(price)) return;
+  if(!name || !Number.isFinite(price)) return;
 
-  if (!isMenuItemAvailable(name)) return;
+  selectedFoodItem = item;
+  selectedFoodQuantity = 1;
 
-  animateItemToCart(item);
+  const available = isMenuItemAvailable(name);
+  const image = foodImageForItem(item);
 
-  if (cart[name]) {
-    cart[name].quantity++;
-  } else {
+  foodDetailImage.src = image;
+  foodDetailImage.alt = name;
+  foodDetailTitle.textContent = name;
+  foodDetailPrice.textContent = `₹${price}`;
+  foodDetailDescription.textContent =
+    foodDescriptions[name] ||
+    "A freshly prepared item from Prachi Cloud Kitchen.";
+
+  foodDetailStock.textContent = available ? "AVAILABLE" : "CURRENTLY OUT OF STOCK";
+  foodDetailStock.classList.toggle("out", !available);
+
+  foodDetailOrderBtn.disabled = !available;
+  foodDetailOrderBtn.textContent = available ? "ORDER NOW" : "OUT OF STOCK";
+
+  updateFoodDetailTotal();
+
+  foodDetailOverlay.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+document.querySelector(".menu").addEventListener("click", (e) => {
+  const item = e.target.closest(".item");
+  if (!item) return;
+
+  openFoodDetail(item);
+});
+
+foodQtyMinus?.addEventListener("click", () => {
+  selectedFoodQuantity = Math.max(1, selectedFoodQuantity - 1);
+  updateFoodDetailTotal();
+});
+
+foodQtyPlus?.addEventListener("click", () => {
+  selectedFoodQuantity = Math.min(99, selectedFoodQuantity + 1);
+  updateFoodDetailTotal();
+});
+
+foodDetailOrderBtn?.addEventListener("click", () => {
+  if(!selectedFoodItem) return;
+
+  const name = selectedFoodItem.dataset.name;
+  const price = Number(selectedFoodItem.dataset.price);
+
+  if(!name || !Number.isFinite(price) || !isMenuItemAvailable(name)) return;
+
+  if(cart[name]){
+    cart[name].quantity += selectedFoodQuantity;
+  }else{
     cart[name] = {
-      price: price,
-      quantity: 1
+      price,
+      quantity:selectedFoodQuantity
     };
   }
 
+  animateItemToCart(selectedFoodItem);
   updateCart();
+  closeFoodDetail();
+});
+
+foodDetailClose?.addEventListener("click", closeFoodDetail);
+
+foodDetailOverlay?.addEventListener("click", (e) => {
+  if(e.target === foodDetailOverlay) closeFoodDetail();
+});
+
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape" && foodDetailOverlay?.classList.contains("show")){
+    closeFoodDetail();
+  }
 });
 
 
@@ -2718,15 +3870,6 @@ settingsOverlay.onclick = (e) => {
 };
 
 
-/* =========================================================
-   SETTINGS THEME BUTTON
-========================================================= */
-
-settingsThemeBtn.onclick = () => {
-
-  themeBtn.click();
-
-};
 
 
 /* =========================================================
@@ -3296,6 +4439,37 @@ if (heroVideo) {
   };
 
   enableVideoSoundBtn?.addEventListener("click", enableVideoSound);
+
+  // UI-only enhancement: click the existing video to pause/play it.
+  const heroMedia = document.getElementById("heroMedia");
+  const videoControlHint = document.getElementById("videoControlHint");
+
+  const flashVideoState = () => {
+    if (!heroMedia) return;
+    heroMedia.classList.add("flash");
+    window.setTimeout(() => heroMedia.classList.remove("flash"), 220);
+  };
+
+  heroVideo.addEventListener("click", async () => {
+    if (heroVideo.paused) {
+      try { await heroVideo.play(); } catch (_) {}
+    } else {
+      heroVideo.pause();
+    }
+    if (heroMedia) heroMedia.classList.toggle("is-paused", heroVideo.paused);
+    if (videoControlHint) videoControlHint.textContent = heroVideo.paused ? "▶" : "Ⅱ";
+    flashVideoState();
+  });
+
+  heroVideo.addEventListener("play", () => {
+    heroMedia?.classList.remove("is-paused");
+    if (videoControlHint) videoControlHint.textContent = "Ⅱ";
+  });
+
+  heroVideo.addEventListener("pause", () => {
+    heroMedia?.classList.add("is-paused");
+    if (videoControlHint) videoControlHint.textContent = "▶";
+  });
 
   let videoVisible = false;
 
