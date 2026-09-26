@@ -1108,7 +1108,7 @@ body.dark .repeat-total{
   line-height:1.55;
   margin-bottom:18px;
 }
-.video-sound-btn,.ordering-closed-btn{
+.video-sound-btn,.video-manual-btn,.ordering-closed-btn{
   width:100%;
   padding:14px 18px;
   border:0;
@@ -1117,6 +1117,61 @@ body.dark .repeat-total{
   color:#fff;
   font:800 15px Inter,sans-serif;
   cursor:pointer;
+}
+
+.video-permission-icon{
+  width:58px;
+  height:58px;
+  margin:0 auto 14px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#111;
+  color:#fff;
+  font-size:21px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+.video-permission-actions{
+  display:grid;
+  gap:10px;
+}
+
+.video-manual-btn{
+  background:#f0f0f0;
+  color:#111;
+  border:1px solid #ddd;
+}
+
+.video-manual-btn:hover{
+  background:#e7e7e7;
+}
+
+.video-permission-note{
+  display:block;
+  margin-top:14px;
+  color:#777;
+  font-size:11px;
+  line-height:1.45;
+}
+
+body.dark .video-permission-icon{
+  background:#fff;
+  color:#111;
+}
+
+body.dark .video-manual-btn{
+  background:#292929;
+  color:#fff;
+  border-color:#444;
+}
+
+body.dark .video-manual-btn:hover{
+  background:#333;
+}
+
+body.dark .video-permission-note{
+  color:#aaa;
 }
 .buy-now.ordering-closed{
   opacity:.55;
@@ -2035,14 +2090,26 @@ body:has(.settings-overlay.show) .bottom-nav{
 
 <body>
 
-<!-- VIDEO AUDIO PERMISSION -->
+<!-- VIDEO PLAYBACK PREFERENCE -->
 <div class="video-sound-overlay" id="videoSoundOverlay" role="dialog" aria-modal="true">
   <div class="video-sound-box">
-    <h2>PLAY VIDEO WITH SOUND?</h2>
-    <p>Allow the intro video to play with audio.</p>
-    <button class="video-sound-btn" id="enableVideoSoundBtn" type="button">
-      🔊 PLAY WITH SOUND
-    </button>
+    <div class="video-permission-icon" aria-hidden="true">▶</div>
+    <h2>HOW SHOULD THE VIDEO PLAY?</h2>
+    <p>Choose whether the intro video can start automatically with sound, or only when you manually click it.</p>
+
+    <div class="video-permission-actions">
+      <button class="video-sound-btn" id="enableVideoSoundBtn" type="button">
+        🔊 ALLOW &amp; PLAY WITH SOUND
+      </button>
+
+      <button class="video-manual-btn" id="manualVideoBtn" type="button">
+        NO, I DON'T WANT — I'LL PLAY IT MYSELF
+      </button>
+    </div>
+
+    <small class="video-permission-note">
+      You can always click the video to play or pause it.
+    </small>
   </div>
 </div>
 
@@ -4415,30 +4482,74 @@ if (heroVideo) {
   const enableVideoSoundBtn =
     document.getElementById("enableVideoSoundBtn");
 
-  const soundWasEnabled =
-    localStorage.getItem("prachiVideoSoundEnabled") === "1";
+  const manualVideoBtn =
+    document.getElementById("manualVideoBtn");
 
-  if (soundWasEnabled) {
+  /*
+    Video preference:
+      "sound"  = autoplay when visible with sound
+      "manual" = NEVER autoplay; user must click the video
+      null     = show the permission dialog
+  */
+  const savedVideoPreference =
+    localStorage.getItem("prachiVideoPreference");
+
+  let videoPlaybackMode =
+    savedVideoPreference === "sound" || savedVideoPreference === "manual"
+      ? savedVideoPreference
+      : null;
+
+  const hideVideoPermission = () => {
     videoSoundOverlay?.classList.add("hidden");
-  }
+  };
 
   const enableVideoSound = async () => {
     try {
+      videoPlaybackMode = "sound";
+      localStorage.setItem("prachiVideoPreference", "sound");
+      localStorage.removeItem("prachiVideoSoundEnabled");
+
       heroVideo.muted = false;
       heroVideo.defaultMuted = false;
       await heroVideo.play();
 
-      localStorage.setItem("prachiVideoSoundEnabled", "1");
-      videoSoundOverlay?.classList.add("hidden");
+      hideVideoPermission();
     } catch (error) {
       console.warn("Video sound could not be enabled.", error);
+
+      // If the browser blocks audio autoplay, keep the choice but
+      // fall back to a muted video rather than trapping the user.
+      videoPlaybackMode = "sound";
       heroVideo.muted = true;
       heroVideo.defaultMuted = true;
-      alert("Your browser blocked video audio. Please try again.");
+      hideVideoPermission();
+
+      try { await heroVideo.play(); } catch (_) {}
     }
   };
 
+  const chooseManualVideo = () => {
+    videoPlaybackMode = "manual";
+    localStorage.setItem("prachiVideoPreference", "manual");
+    localStorage.removeItem("prachiVideoSoundEnabled");
+
+    heroVideo.pause();
+    heroVideo.muted = true;
+    heroVideo.defaultMuted = true;
+
+    hideVideoPermission();
+
+    if (heroMedia) heroMedia.classList.add("is-paused");
+    if (videoControlHint) videoControlHint.textContent = "▶";
+  };
+
   enableVideoSoundBtn?.addEventListener("click", enableVideoSound);
+  manualVideoBtn?.addEventListener("click", chooseManualVideo);
+
+  // A saved preference means the permission dialog does not return.
+  if (videoPlaybackMode) {
+    hideVideoPermission();
+  }
 
   // UI-only enhancement: click the existing video to pause/play it.
   const heroMedia = document.getElementById("heroMedia");
@@ -4452,10 +4563,22 @@ if (heroVideo) {
 
   heroVideo.addEventListener("click", async () => {
     if (heroVideo.paused) {
-      try { await heroVideo.play(); } catch (_) {}
+      // Manual mode always starts muted; the click itself is the user's
+      // explicit playback permission.
+      if (videoPlaybackMode === "manual") {
+        heroVideo.muted = true;
+        heroVideo.defaultMuted = true;
+      }
+
+      try {
+        await heroVideo.play();
+      } catch (error) {
+        console.debug("Manual hero video playback was blocked.", error);
+      }
     } else {
       heroVideo.pause();
     }
+
     if (heroMedia) heroMedia.classList.toggle("is-paused", heroVideo.paused);
     if (videoControlHint) videoControlHint.textContent = heroVideo.paused ? "▶" : "Ⅱ";
     flashVideoState();
@@ -4476,16 +4599,25 @@ if (heroVideo) {
   const playHeroVideo = async () => {
     if (!videoVisible || document.hidden) return;
 
+    // "No, I don't want" means NO automatic playback.
+    // The video remains visible and clickable so the user stays in control.
+    if (videoPlaybackMode === "manual") {
+      heroVideo.pause();
+      return;
+    }
+
+    // No choice yet: keep the video stopped until the user chooses.
+    if (!videoPlaybackMode) {
+      heroVideo.pause();
+      return;
+    }
+
     try {
-      const soundEnabled =
-        localStorage.getItem("prachiVideoSoundEnabled") === "1";
-
-      heroVideo.muted = !soundEnabled;
-      heroVideo.defaultMuted = !soundEnabled;
-
+      heroVideo.muted = videoPlaybackMode !== "sound";
+      heroVideo.defaultMuted = videoPlaybackMode !== "sound";
       await heroVideo.play();
     } catch (_) {
-      console.debug("Hero video playback was blocked.");
+      console.debug("Hero video autoplay was blocked.");
     }
   };
 
