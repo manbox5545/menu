@@ -2082,6 +2082,356 @@ body:has(.settings-overlay.show) .bottom-nav{
   pointer-events:none !important;
 }
 
+
+/* =========================================================
+   SCROLL PAPER EXPERIENCE
+   Presentation-only. Existing menu/order logic is untouched.
+========================================================= */
+
+html{
+  scroll-behavior:smooth;
+  scroll-padding-top:18px;
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  overscroll-behavior-y:auto;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+}
+
+.paper-scroll-zone{
+  position:relative;
+  width:100%;
+  min-height:calc(100vh * 5.9);
+  padding:10vh 0 7vh;
+  perspective:1200px;
+  perspective-origin:50% 35%;
+  isolation:isolate;
+}
+
+.paper-scroll-intro{
+  position:relative;
+  z-index:2;
+  width:min(900px,calc(100% - 30px));
+  margin:0 auto 8vh;
+  text-align:center;
+  color:#fff;
+  text-shadow:0 3px 18px rgba(0,0,0,.55);
+}
+
+.paper-scroll-intro span{
+  display:block;
+  margin-bottom:8px;
+  color:#ffd166;
+  font:900 11px/1 Inter,sans-serif;
+  letter-spacing:3px;
+}
+
+.paper-scroll-intro strong{
+  display:block;
+  font:800 clamp(22px,4vw,42px)/1.05 Anton,Inter,sans-serif;
+  letter-spacing:.5px;
+}
+
+.paper-stack{
+  position:relative;
+  width:min(760px,calc(100% - 30px));
+  margin:0 auto;
+  transform-style:preserve-3d;
+}
+
+.scroll-paper{
+  --paper-bg:#fffaf2;
+  --paper-ink:#111;
+  --paper-tilt:-2deg;
+  --paper-x:0px;
+  --paper-scale:1;
+  --paper-y:0px;
+
+  position:sticky;
+  top:9vh;
+  /* Later sheets must rise above earlier sheets as they reach the stack. */
+  z-index:calc(100 + var(--paper-index,0));
+  width:100%;
+  min-height:min(72vh,680px);
+  margin:0 auto 7vh;
+  padding:clamp(42px,7vw,82px) clamp(28px,7vw,76px);
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  transform:
+    translate3d(var(--paper-x),var(--paper-y),0)
+    rotateZ(var(--paper-tilt))
+    rotateX(var(--paper-fold,0deg))
+    scale(var(--paper-scale));
+  transform-origin:50% 0%;
+  transform-style:preserve-3d;
+  will-change:transform,opacity;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.045) 1px,transparent 1px),
+    linear-gradient(rgba(0,0,0,.025) 1px,transparent 1px),
+    var(--paper-bg);
+  background-size:24px 24px,24px 24px,var(--paper-bg);
+  color:var(--paper-ink);
+  border:1px solid rgba(0,0,0,.13);
+  border-radius:3px 7px 5px 2px;
+  box-shadow:
+    0 34px 70px rgba(0,0,0,.38),
+    0 8px 18px rgba(0,0,0,.22),
+    inset 0 0 0 1px rgba(255,255,255,.5);
+  transition:none;
+  backface-visibility:hidden;
+}
+
+.scroll-paper::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg,transparent 0 45%,rgba(0,0,0,.045) 49%,transparent 53%),
+    linear-gradient(180deg,rgba(255,255,255,.5),transparent 18%,transparent 82%,rgba(0,0,0,.05));
+  opacity:.8;
+}
+
+.scroll-paper::after{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.08),transparent 9%,transparent 90%,rgba(0,0,0,.05));
+  mix-blend-mode:multiply;
+}
+
+.scroll-paper:nth-child(1){--paper-index:1}
+.scroll-paper:nth-child(2){--paper-index:2}
+.scroll-paper:nth-child(3){--paper-index:3}
+.scroll-paper:nth-child(4){--paper-index:4}
+.scroll-paper:nth-child(5){--paper-index:5}
+.scroll-paper:nth-child(6){--paper-index:6}
+
+.paper-a{--paper-bg:#fff8df;--paper-tilt:-1.4deg}
+.paper-b{--paper-bg:#ffdd57;--paper-tilt:1.2deg}
+.paper-c{--paper-bg:#d8f3ff;--paper-tilt:-1.8deg}
+.paper-d{--paper-bg:#ffd9e2;--paper-tilt:1.5deg}
+.paper-e{--paper-bg:#e8dcff;--paper-tilt:-1.1deg}
+.paper-f{--paper-bg:#e5ffd9;--paper-tilt:1deg}
+
+.paper-content{
+  position:relative;
+  z-index:3;
+  width:min(100%,600px);
+}
+
+.paper-content small{
+  display:block;
+  margin-bottom:13px;
+  font:900 11px/1 Inter,sans-serif;
+  letter-spacing:2.2px;
+  opacity:.58;
+}
+
+.paper-content h2{
+  margin:0;
+  font:900 clamp(52px,9vw,112px)/.86 Anton,Impact,sans-serif;
+  letter-spacing:-1px;
+  text-wrap:balance;
+}
+
+.paper-content p{
+  max-width:520px;
+  margin-top:24px;
+  font:700 clamp(14px,2vw,19px)/1.5 Inter,sans-serif;
+  opacity:.72;
+}
+
+.paper-tape{
+  position:absolute;
+  top:22px;
+  right:26px;
+  z-index:4;
+  padding:7px 11px;
+  background:rgba(255,255,255,.56);
+  border:1px solid rgba(0,0,0,.09);
+  font:900 9px/1 Inter,sans-serif;
+  letter-spacing:1.5px;
+  transform:rotate(2deg);
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+
+.paper-emoji{
+  position:absolute;
+  z-index:4;
+  display:block;
+  font-size:clamp(28px,5vw,62px);
+  line-height:1;
+  pointer-events:none;
+  user-select:none;
+  filter:drop-shadow(0 7px 7px rgba(0,0,0,.13));
+  will-change:transform,opacity;
+  animation:paperEmojiFloat var(--emoji-time,2.7s) ease-in-out infinite;
+  animation-delay:var(--emoji-delay,0s);
+}
+
+.paper-emoji.e1{left:8%;top:15%;--emoji-time:2.2s}
+.paper-emoji.e2{right:8%;top:48%;--emoji-time:3s;--emoji-delay:-.8s}
+.paper-emoji.e3{right:18%;bottom:12%;--emoji-time:2.5s;--emoji-delay:-1.3s}
+
+@keyframes paperEmojiFloat{
+  0%,100%{transform:translate3d(0,8px,35px) rotate(-5deg) scale(.92);opacity:.25}
+  35%{transform:translate3d(7px,-17px,55px) rotate(8deg) scale(1.08);opacity:1}
+  70%{transform:translate3d(-5px,-4px,45px) rotate(-4deg) scale(1);opacity:.82}
+}
+
+.paper-a .paper-content h2{
+  position:relative;
+}
+
+.paper-a .paper-content h2::after{
+  content:"↑";
+  display:inline-block;
+  margin-left:12px;
+  font-size:.55em;
+  animation:paperArrow 1.2s ease-in-out infinite;
+}
+
+@keyframes paperArrow{
+  0%,100%{transform:translateY(8px)}
+  50%{transform:translateY(-8px)}
+}
+
+/* PAPER STACK SAFETY: never let a departing sheet remain readable over the next sheet. */
+.paper-stack{
+  isolation:isolate;
+}
+.scroll-paper{
+  transform-origin:50% 0%;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  contain:layout paint;
+}
+.scroll-paper .paper-content,
+.scroll-paper .paper-tape,
+.scroll-paper .paper-emoji{
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+@media(max-width:700px){
+  .paper-scroll-zone{
+    min-height:calc(100vh * 5.9);
+    padding-top:7vh;
+    padding-bottom:4vh;
+    perspective:900px;
+  }
+
+  .paper-scroll-intro{
+    margin-bottom:5vh;
+  }
+
+  .paper-stack{
+    width:calc(100% - 18px);
+  }
+
+  .scroll-paper{
+    top:7vh;
+    min-height:66vh;
+    margin-bottom:5vh;
+    padding:48px 25px 58px;
+    border-radius:3px 6px 4px 2px;
+  }
+
+  .paper-content h2{
+    font-size:clamp(48px,15vw,78px);
+  }
+
+  .paper-content p{
+    font-size:14px;
+    max-width:92%;
+  }
+
+  .paper-emoji{
+    font-size:35px;
+  }
+
+  .paper-emoji.e1{left:7%;top:10%}
+  .paper-emoji.e2{right:6%;top:55%}
+  .paper-emoji.e3{right:13%;bottom:9%}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .scroll-paper{
+    transition:none;
+  }
+  .paper-emoji,.paper-a .paper-content h2::after{
+    animation:none !important;
+  }
+}
+
+/* Native touch scrolling remains responsive; only visual scroll work is rAF-throttled. */
+@media(pointer:coarse){
+  body{
+    touch-action:pan-y;
+  }
+  .scroll-paper{
+    transition:none;
+  }
+}
+
+/* Bottom navigation yields the stage to the paper sequence. */
+body.paper-zone-active .bottom-nav{
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  transform:translate(-50%,24px) !important;
+}
+
+.paper-go-top{
+  position:relative;
+  z-index:20;
+  display:flex;
+  justify-content:center;
+  padding:18px 20px 42px;
+  background:transparent;
+}
+
+.paper-go-top button{
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:999px;
+  padding:13px 20px;
+  background:rgba(15,15,15,.92);
+  color:#fff;
+  font:900 12px/1 Inter,sans-serif;
+  letter-spacing:1.2px;
+  cursor:pointer;
+  box-shadow:0 14px 35px rgba(0,0,0,.32);
+  transition:transform .18s ease,background .18s ease;
+}
+
+.paper-go-top button:hover{
+  transform:translateY(-2px);
+  background:#222;
+}
+
+.paper-go-top button span{
+  margin-left:7px;
+}
+
+@media(max-width:600px){
+  .paper-go-top{
+    padding:14px 16px calc(28px + env(safe-area-inset-bottom));
+  }
+  .paper-go-top button{
+    width:min(220px,100%);
+    padding:14px 18px;
+  }
+}
+
 </style>
 
   <!-- EmailJS -->
@@ -2685,6 +3035,94 @@ body:has(.settings-overlay.show) .bottom-nav{
   </div>
 </div>
 
+<!-- ================= SCROLL PAPER EXPERIENCE ================= -->
+<section class="paper-scroll-zone" id="paperScrollZone" aria-label="Scroll experience">
+  <div class="paper-scroll-intro">
+    <span>KEEP SCROLLING</span>
+    <strong>There is something waiting down here ↓</strong>
+  </div>
+
+  <div class="paper-stack">
+    <article class="scroll-paper paper-a" data-paper="0">
+      <span class="paper-tape">NOTE #01</span>
+      <div class="paper-content">
+        <small>YOU MADE IT THIS FAR</small>
+        <h2>SCROLLED TO HERE?</h2>
+        <p>Good. Keep going. The kitchen has more nonsense waiting for you.</p>
+      </div>
+      <span class="paper-emoji e1">👀</span>
+      <span class="paper-emoji e2">🍽️</span>
+      <span class="paper-emoji e3">✨</span>
+    </article>
+
+    <article class="scroll-paper paper-b" data-paper="1">
+      <span class="paper-tape">URGENT</span>
+      <div class="paper-content">
+        <small>THIS IS YOUR SIGN</small>
+        <h2>GO FAAST<br>AND ORDER<br>YOUR FOOD!!</h2>
+        <p>Before your stomach starts sending formal complaints.</p>
+      </div>
+      <span class="paper-emoji e1">🏃</span>
+      <span class="paper-emoji e2">🔥</span>
+      <span class="paper-emoji e3">🍕</span>
+    </article>
+
+    <article class="scroll-paper paper-c" data-paper="2">
+      <span class="paper-tape">CONFIDENTIAL</span>
+      <div class="paper-content">
+        <small>KITCHEN INTELLIGENCE</small>
+        <h2>HUNGER<br>DETECTED.</h2>
+        <p>Probability of you thinking about food right now: extremely suspicious.</p>
+      </div>
+      <span class="paper-emoji e1">🚨</span>
+      <span class="paper-emoji e2">😋</span>
+      <span class="paper-emoji e3">💨</span>
+    </article>
+
+    <article class="scroll-paper paper-d" data-paper="3">
+      <span class="paper-tape">IMPORTANT</span>
+      <div class="paper-content">
+        <small>ONE SIMPLE RULE</small>
+        <h2>DON'T<br>SCROLL<br>HUNGRY.</h2>
+        <p>Seriously. We warned you.</p>
+      </div>
+      <span class="paper-emoji e1">🤤</span>
+      <span class="paper-emoji e2">⚡</span>
+      <span class="paper-emoji e3">🍛</span>
+    </article>
+
+    <article class="scroll-paper paper-e" data-paper="4">
+      <span class="paper-tape">FINAL NOTE</span>
+      <div class="paper-content">
+        <small>ALMOST THERE</small>
+        <h2>NOW<br>LOOK DOWN.</h2>
+        <p>One last fold. Then you get the boring responsible footer.</p>
+      </div>
+      <span class="paper-emoji e1">👇</span>
+      <span class="paper-emoji e2">😂</span>
+      <span class="paper-emoji e3">🧾</span>
+    </article>
+
+    <article class="scroll-paper paper-f" data-paper="5">
+      <span class="paper-tape">THE END</span>
+      <div class="paper-content">
+        <small>MISSION COMPLETE</small>
+        <h2>OKAY.<br>NOW GO EAT.</h2>
+        <p>Thanks for surviving the scroll. The footer is finally below.</p>
+      </div>
+      <span class="paper-emoji e1">🎉</span>
+      <span class="paper-emoji e2">🍴</span>
+      <span class="paper-emoji e3">👋</span>
+    </article>
+  </div>
+</section>
+
+<div class="paper-go-top" id="paperGoTop">
+  <button type="button" id="goTopBtn" aria-label="Go back to top">
+    ↑ <span>GO TO TOP</span>
+  </button>
+</div>
+
 <!-- ================= FOOTER ================= -->
 
 <footer class="footer">
@@ -2700,6 +3138,116 @@ body:has(.settings-overlay.show) .bottom-nav{
 </footer>
 
 
+
+
+<script>
+/* =========================================================
+   SMOOTH SCROLL + 3D PAPER FOLD CONTROLLER
+   Presentation-only. Does not touch ordering/cart logic.
+========================================================= */
+(() => {
+  const zone = document.getElementById("paperScrollZone");
+  const papers = zone ? [...zone.querySelectorAll(".scroll-paper")] : [];
+
+  if (!zone || !papers.length) return;
+
+  // Randomize the paper's emoji entrance timing once per page load.
+  papers.forEach((paper) => {
+    paper.querySelectorAll(".paper-emoji").forEach((emoji) => {
+      emoji.style.setProperty("--emoji-delay", `${-(Math.random() * 2.2).toFixed(2)}s`);
+      emoji.style.setProperty("--emoji-time", `${(2.1 + Math.random() * 1.7).toFixed(2)}s`);
+    });
+  });
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  let ticking = false;
+
+  const updatePapers = () => {
+    ticking = false;
+
+    if (reducedMotion.matches) {
+      papers.forEach((paper) => {
+        paper.style.removeProperty("--paper-x");
+        paper.style.removeProperty("--paper-y");
+        paper.style.removeProperty("--paper-scale");
+        paper.style.removeProperty("--paper-fold");
+        paper.style.removeProperty("opacity");
+        paper.style.removeProperty("pointer-events");
+      });
+      return;
+    }
+
+    const vh = window.innerHeight || 800;
+
+    papers.forEach((paper, index) => {
+      const rect = paper.getBoundingClientRect();
+      const start = vh * 0.10;
+      const progress = Math.max(0, Math.min(1, (start - rect.top) / (vh * 0.72)));
+
+      // Each sheet exits completely before the next sheet becomes visually dominant.
+      // This prevents text, colors and diagonals from bleeding through one another.
+      const exit = Math.max(0, Math.min(1, (progress - 0.08) / 0.52));
+      const fold = exit * 7;
+      const scale = 1 - exit * 0.025;
+      const x = Math.sin(exit * Math.PI) * (index % 2 ? -3 : 3);
+      const y = -exit * 34;
+      const opacity = exit >= 1 ? 0 : (1 - exit);
+
+      paper.style.setProperty("--paper-fold", `${fold.toFixed(2)}deg`);
+      paper.style.setProperty("--paper-scale", scale.toFixed(4));
+      paper.style.setProperty("--paper-x", `${x.toFixed(2)}px`);
+      paper.style.setProperty("--paper-y", `${y.toFixed(2)}px`);
+      paper.style.opacity = opacity.toFixed(3);
+      paper.style.pointerEvents = opacity < 0.05 ? "none" : "auto";
+    });
+  };
+
+  const requestPaperUpdate = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(updatePapers);
+    }
+  };
+
+  window.addEventListener("scroll", requestPaperUpdate, { passive:true });
+  window.addEventListener("resize", requestPaperUpdate, { passive:true });
+  reducedMotion.addEventListener?.("change", requestPaperUpdate);
+
+  updatePapers();
+})();
+
+/* Paper-zone navigation controller. Presentation only. */
+(() => {
+  const zone = document.getElementById("paperScrollZone");
+  const goTop = document.getElementById("goTopBtn");
+  if (!zone || !goTop) return;
+
+  let ticking = false;
+  const updateStageState = () => {
+    ticking = false;
+    const top = zone.offsetTop;
+    const bottom = top + zone.offsetHeight;
+    const y = window.scrollY || window.pageYOffset || 0;
+    const active = y + 80 >= top && y < bottom + 120;
+    document.body.classList.toggle("paper-zone-active", active);
+  };
+
+  const requestStageState = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(updateStageState);
+    }
+  };
+
+  window.addEventListener("scroll", requestStageState, {passive:true});
+  window.addEventListener("resize", requestStageState, {passive:true});
+  goTop.addEventListener("click", () => {
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+  updateStageState();
+})();
+</script>
 
 <script>
 /* =========================================================
