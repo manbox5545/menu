@@ -2436,6 +2436,16 @@ body.paper-zone-active .bottom-nav{
 
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+.coupon-box{margin:16px 0;padding:16px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:rgba(255,255,255,.06)}
+.coupon-box label{display:block;font-weight:800;font-size:12px;letter-spacing:.8px;margin-bottom:8px}
+.coupon-row{display:flex;gap:8px}.coupon-row input{flex:1;min-width:0;padding:13px;border:2px solid #555;border-radius:12px;background:#111;color:#fff;text-transform:uppercase;font-weight:700}
+.coupon-row button{border:0;border-radius:12px;padding:0 18px;background:#fff;color:#111;font-weight:900;cursor:pointer}.coupon-row button:disabled{opacity:.6}
+.coupon-message{margin-top:8px;font-size:13px;font-weight:700;min-height:18px}.coupon-message.good{color:#54d88a}.coupon-message.bad{color:#ff6b6b}
+.coupon-breakdown{margin-top:10px;display:grid;gap:7px;font-size:14px}.coupon-breakdown div{display:flex;justify-content:space-between}.coupon-breakdown .discount{color:#54d88a;font-weight:800}
+</style>
+
 </head>
 
 <body>
@@ -2597,6 +2607,13 @@ body.paper-zone-active .bottom-nav{
         <small>Pay your exact order total online</small>
       </div>
       <b id="repeatOnlinePaymentCheck"></b>
+    </div>
+
+    <div class="coupon-box">
+      <label for="repeatCouponCode">DISCOUNT COUPON</label>
+      <div class="coupon-row"><input id="repeatCouponCode" type="text" maxlength="40" placeholder="ENTER COUPON CODE" autocomplete="off"><button id="applyRepeatCouponBtn" type="button">APPLY</button></div>
+      <div class="coupon-message" id="repeatCouponMessage"></div>
+      <div class="coupon-breakdown" id="repeatCouponBreakdown"></div>
     </div>
 
     <div class="repeat-online-payment" id="repeatOnlinePayment" hidden>
@@ -3368,7 +3385,7 @@ import { initializeApp }
   from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
-  getDatabase, ref, onValue, push, serverTimestamp, update,
+  getDatabase, ref, onValue, get, push, serverTimestamp, update,
   query, orderByChild, equalTo
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
@@ -4184,6 +4201,7 @@ let repeatCart = {};
 let repeatSubtotal = 0;
 let repeatDelivery = 0;
 let repeatPaymentMethod = "Cash on Delivery";
+let repeatCouponCode = "", repeatCouponPercent = 0, repeatDiscount = 0;
 
 
 /* =========================================================
@@ -4304,7 +4322,8 @@ async function openOrders() {
     ordersList.innerHTML = mine.map(([id, order]) => {
       const status = order.status || "Our admin is receiving your order";
       const delivery = order.deliveryCharge || 0;
-      const finalBill = order.finalBill ?? (Number(order.bill || 0) + delivery);
+      const discount = Number(order.discount || 0);
+      const finalBill = order.finalBill ?? (Number(order.bill || 0) - discount + delivery);
       return `
         <div class="order-card">
           <strong>ORDER #${escapeHtmlIndex(id.slice(-7))}</strong>
@@ -4313,6 +4332,7 @@ async function openOrders() {
             🏢 Block ${escapeHtmlIndex(order.block)}<br>
             🍽️ ${(order.food || []).map(x => `${escapeHtmlIndex(x.name)} × ${escapeHtmlIndex(x.quantity)}`).join(", ")}<br>
             💵 Subtotal: ₹${escapeHtmlIndex(order.bill)}<br>
+            ${discount ? `🎟️ Coupon ${escapeHtmlIndex(order.couponCode || "")}: -₹${escapeHtmlIndex(discount)}<br>` : ""}
             🚚 Delivery: ₹${escapeHtmlIndex(delivery)}<br>
             <strong>Final bill: ₹${escapeHtmlIndex(finalBill)}</strong>
           </div>
@@ -4762,6 +4782,45 @@ repeatOnlinePaymentOption.onkeydown = (event) => {
    REPEAT CHECKOUT NEXT
 ========================================================= */
 
+
+function repeatFinalTotal(){
+  return Math.max(0, repeatSubtotal - repeatDiscount) + repeatDelivery;
+}
+function renderRepeatCoupon(){
+  const box=document.getElementById("repeatCouponBreakdown");
+  if(!box)return;
+  box.innerHTML=repeatCouponCode
+    ? `<div><span>Subtotal</span><strong>₹${repeatSubtotal.toFixed(2)}</strong></div><div class="discount"><span>${escapeHtmlIndex(repeatCouponCode)} (${repeatCouponPercent}% OFF)</span><strong>-₹${repeatDiscount.toFixed(2)}</strong></div><div><span>Delivery</span><strong>${repeatDelivery?"₹"+repeatDelivery:"FREE"}</strong></div>`
+    : `<div><span>Subtotal</span><strong>₹${repeatSubtotal.toFixed(2)}</strong></div><div><span>Delivery</span><strong>${repeatDelivery?"₹"+repeatDelivery:"FREE"}</strong></div>`;
+  document.getElementById("repeatTotal").innerHTML=`
+    <span>Subtotal</span><span>₹${repeatSubtotal.toFixed(2)}</span>
+    ${repeatCouponCode?`<span>Discount (${repeatCouponPercent}%)</span><span class="discount">-₹${repeatDiscount.toFixed(2)}</span>`:""}
+    <span>Delivery</span><span>${repeatDelivery?"₹"+repeatDelivery:"FREE"}</span>
+    <strong><span>Total</span><span>₹${repeatFinalTotal().toFixed(2)}</span></strong>`;
+  document.getElementById("repeatOnlineExpectedAmount").textContent=`₹${repeatFinalTotal().toFixed(2)}`;
+}
+async function applyRepeatCoupon(){
+  const input=document.getElementById("repeatCouponCode"),btn=document.getElementById("applyRepeatCouponBtn"),msg=document.getElementById("repeatCouponMessage");
+  const code=(input.value||"").trim().toUpperCase();
+  repeatCouponCode="";repeatCouponPercent=0;repeatDiscount=0;renderRepeatCoupon();
+  if(!code){msg.textContent="Enter a coupon code.";msg.className="coupon-message bad";return}
+  btn.disabled=true;msg.textContent="Checking coupon...";msg.className="coupon-message";
+  try{
+    const snap=await get(ref(prachiDb,`coupons/${code}`));
+    const coupon=snap.val(),pct=Number(coupon?.discountPercent);
+    if(!snap.exists()||!coupon||!Number.isFinite(pct)||pct<=0||pct>100)throw new Error("Invalid coupon.");
+    repeatCouponCode=code;repeatCouponPercent=pct;repeatDiscount=Math.round(repeatSubtotal*pct)/100;
+    msg.textContent=`✓ ${code} applied — ${pct}% discount`;msg.className="coupon-message good";renderRepeatCoupon();
+  }catch(error){
+    msg.textContent=error.message==="Invalid coupon."?"Invalid or unavailable coupon.":"Could not check the coupon. Please try again.";
+    msg.className="coupon-message bad";renderRepeatCoupon();
+  }finally{btn.disabled=false}
+}
+document.getElementById("applyRepeatCouponBtn")?.addEventListener("click",applyRepeatCoupon);
+document.getElementById("repeatCouponCode")?.addEventListener("input",()=>{
+  const msg=document.getElementById("repeatCouponMessage");msg.textContent="";msg.className="coupon-message";
+});
+
 document.getElementById(
   "repeatNextBtn"
 ).onclick = () => {
@@ -4819,23 +4878,12 @@ document.getElementById(
   });
 
 
-  const finalBill =
-    repeatSubtotal + repeatDelivery;
+  const finalBill = repeatFinalTotal();
 
-
-  document.getElementById(
-    "repeatTotal"
-  ).innerHTML = `
-    <span>Subtotal</span>
-    <span>₹${repeatSubtotal}</span>
-    <span>Delivery</span>
-    <span>${repeatDelivery ? "₹" + repeatDelivery : "FREE"}</span>
-    <strong><span>Total</span><span>₹${finalBill}</span></strong>
-  `;
-
+  renderRepeatCoupon();
 
   repeatOnlineExpectedAmount.textContent =
-    `₹${finalBill}`;
+    `₹${finalBill.toFixed(2)}`;
 
   selectRepeatPaymentMethod("Cash on Delivery");
 
@@ -4891,8 +4939,7 @@ document.getElementById(
       throw new Error("Some items in this order are no longer available.");
     }
 
-    const finalBill =
-      repeatSubtotal + repeatDelivery;
+    const finalBill = repeatFinalTotal();
 
     /*
       IMPORTANT:
@@ -4919,6 +4966,12 @@ document.getElementById(
       paymentMethod: "Cash on Delivery",
 
       bill: repeatSubtotal,
+
+      discount: repeatDiscount,
+
+      couponCode: repeatCouponCode || "",
+
+      couponPercent: repeatCouponPercent || 0,
 
       deliveryCharge: repeatDelivery,
 
