@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="favicon.png">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1343169593398339"
@@ -2433,6 +2435,26 @@ body.paper-zone-active .bottom-nav{
   }
 }
 
+@media(max-width:600px){
+  body::before{position:absolute;transform:none;background-attachment:scroll;contain:strict}
+  .hero{min-height:auto;padding:72px 14px 36px}
+  .hero h1{font-size:clamp(38px,10vw,62px);letter-spacing:2px;text-wrap:balance}
+  .hero p{font-size:16px}
+  .hero-video{max-height:38vh}
+  .sectionTitle{font-size:clamp(28px,8vw,38px);letter-spacing:2px;margin:48px 0 20px}
+  .menu{padding:10px}
+  .item{padding:15px 14px;grid-template-columns:minmax(0,1fr) 80px;gap:8px}
+  .name,.price{font-size:17px}
+  .card{content-visibility:auto;contain-intrinsic-size:280px}
+  .cart-flight{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* CUSTOM FOOD REQUEST */
+.custom-food-ad{margin:14px auto 18px;width:min(1100px,calc(100% - 24px));padding:15px 18px;border-radius:18px;background:linear-gradient(110deg,#fff0d6,#ffe2b0);color:#251707;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.custom-food-ad strong{display:block;font-size:clamp(15px,2.4vw,20px);font-weight:900}.custom-food-ad span{display:block;font-size:12px;margin-top:4px;line-height:1.4}.custom-food-ad button{flex:0 0 auto;border:0;border-radius:12px;background:#17120d;color:#fff;font-weight:900;padding:12px 15px;cursor:pointer}
+.custom-food-overlay{position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:16px}.custom-food-overlay.show{display:flex}.custom-food-card{width:min(540px,100%);max-height:92vh;overflow:auto;background:#fff;color:#151515;border-radius:22px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.3)}.custom-food-card h2{font-size:25px;margin-bottom:6px}.custom-food-card p{font-size:13px;color:#555;line-height:1.5;margin-bottom:14px}.custom-food-card label{display:block;font-size:12px;font-weight:800;margin:12px 0 6px}.custom-food-card input,.custom-food-card textarea{width:100%;border:1px solid #d5d5d5;border-radius:11px;padding:12px;font:inherit;font-size:14px}.custom-food-card textarea{min-height:100px;resize:vertical}.custom-food-actions{display:flex;gap:9px;margin-top:14px}.custom-food-actions button{flex:1;border:0;border-radius:11px;padding:13px;font-weight:900;cursor:pointer}.custom-food-submit{background:#171717;color:#fff}.custom-food-cancel{background:#eee;color:#111}.custom-food-note{background:#fff5d9;border-radius:10px;padding:10px;font-size:12px;color:#6d4d00;margin-top:10px}.custom-food-status{font-size:12px;font-weight:700;margin-top:10px;min-height:16px}.custom-food-status.error{color:#b42318}.custom-food-status.success{color:#16803c}
+@media(max-width:520px){.custom-food-ad{align-items:flex-start;flex-direction:column}.custom-food-ad button{width:100%}.custom-food-card{padding:18px}}
 </style>
 
   <!-- EmailJS -->
@@ -2450,6 +2472,28 @@ body.paper-zone-active .bottom-nav{
 </head>
 
 <body>
+<!-- CUSTOM FOOD FEATURE PROMO -->
+<section class="custom-food-ad" id="customFoodAd" aria-label="New custom food ordering feature">
+  <div><strong>NEW: Craving something not on the menu?</strong><span>Tell us what you want. We’ll confirm availability and price before preparing it.</span></div>
+  <button type="button" id="customFoodAdBtn">ORDER CUSTOM FOOD →</button>
+</section>
+<div class="custom-food-overlay" id="customFoodOverlay" role="dialog" aria-modal="true" aria-labelledby="customFoodTitle">
+  <form class="custom-food-card" id="customFoodForm">
+    <h2 id="customFoodTitle">Request a Custom Food Item</h2>
+    <p>Describe the dish and any preferences. This is a request only—no price is charged now. We’ll confirm the price and availability before accepting it.</p>
+    <label for="customFoodName">What food would you like?</label>
+    <textarea id="customFoodName" maxlength="500" required placeholder="Example: Paneer roll, extra spicy, no onion..."></textarea>
+    <label for="customCustomerName">Your name</label>
+    <input id="customCustomerName" maxlength="100" required autocomplete="name" placeholder="Full name">
+    <label for="customCustomerPhone">Phone number</label>
+    <input id="customCustomerPhone" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number">
+    <label for="customCustomerAddress">Delivery address</label>
+    <textarea id="customCustomerAddress" maxlength="500" required autocomplete="street-address" placeholder="Apartment/block or full outside address"></textarea>
+    <div class="custom-food-note">₹0 charged at request time • Price and availability confirmed by the order taker</div>
+    <div class="custom-food-status" id="customFoodStatus" role="status"></div>
+    <div class="custom-food-actions"><button type="button" class="custom-food-cancel" id="customFoodCancel">CANCEL</button><button type="submit" class="custom-food-submit" id="customFoodSubmit">SEND REQUEST</button></div>
+  </form>
+</div>
 
 <!-- VIDEO PLAYBACK PREFERENCE -->
 <div class="video-sound-overlay" id="videoSoundOverlay" role="dialog" aria-modal="true">
@@ -2665,7 +2709,7 @@ body.paper-zone-active .bottom-nav{
       muted
       loop
       playsinline
-      preload="metadata"
+      preload="none"
       aria-label="Prachi Cloud Kitchen intro video">
 
       <source
@@ -3346,7 +3390,9 @@ if (typeof emailjs !== "undefined") {
 
 async function sendEmailOrderAlert(orderId, order) {
   const items = (order.food || [])
-    .map(item => `• ${item.name} × ${item.quantity} — ₹${item.subtotal}`)
+    .map(item => order.customOrder
+      ? `CUSTOM FOOD REQUEST: ${item.name} (price/availability to be confirmed; no charge taken)`
+      : `• ${item.name} × ${item.quantity} — ₹${item.subtotal}`)
     .join("\n");
 
   const templateParams = {
@@ -3354,10 +3400,12 @@ async function sendEmailOrderAlert(orderId, order) {
     customer_name: order.customerName || "",
     customer_phone: order.phone || "",
     customer_block: order.block || "",
+    customer_address: order.deliveryAddress || "",
+    order_type: order.customOrder ? "CUSTOM FOOD REQUEST — PRICE NOT YET CONFIRMED" : "Regular menu order",
     items,
-    subtotal: order.bill ?? 0,
+    subtotal: order.customOrder ? "Pending confirmation (₹0 charged)" : (order.bill ?? 0),
     delivery_charge: order.deliveryCharge ? `₹${order.deliveryCharge}` : "FREE",
-    total: order.finalBill ?? 0,
+    total: order.customOrder ? "Pending confirmation — no charge" : (order.finalBill ?? 0),
     payment_method: order.paymentMethod || "",
     customer_email: order.customerEmail || "Not provided",
     order_status: order.status || "Order received"
@@ -5057,6 +5105,92 @@ document.getElementById(
 
 };
 
+
+/* =========================================================
+   CUSTOM FOOD REQUEST (NO UPFRONT PRICE / CHARGE)
+========================================================= */
+const customFoodOverlay = document.getElementById("customFoodOverlay");
+const customFoodForm = document.getElementById("customFoodForm");
+const customFoodStatus = document.getElementById("customFoodStatus");
+const customFoodSubmit = document.getElementById("customFoodSubmit");
+function openCustomFoodRequest() {
+  customFoodStatus.textContent = "";
+  customFoodStatus.className = "custom-food-status";
+  const profileRaw = localStorage.getItem("prachiProfile");
+  if (profileRaw) {
+    try {
+      const saved = JSON.parse(profileRaw);
+      document.getElementById("customCustomerName").value ||= saved.name || "";
+      document.getElementById("customCustomerPhone").value ||= String(saved.phone || "").replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
+      document.getElementById("customCustomerAddress").value ||= saved.deliveryAddress || "";
+    } catch (_) {}
+  }
+  customFoodOverlay.classList.add("show");
+  setTimeout(() => document.getElementById("customFoodName").focus(), 0);
+}
+document.getElementById("customFoodAdBtn")?.addEventListener("click", openCustomFoodRequest);
+document.getElementById("customFoodCancel")?.addEventListener("click", () => customFoodOverlay.classList.remove("show"));
+customFoodOverlay?.addEventListener("click", e => { if (e.target === customFoodOverlay) customFoodOverlay.classList.remove("show"); });
+customFoodForm?.addEventListener("submit", async e => {
+  e.preventDefault();
+  const requestedFood = document.getElementById("customFoodName").value.trim();
+  const customerName = document.getElementById("customCustomerName").value.trim();
+  const phoneDigits = document.getElementById("customCustomerPhone").value.replace(/\D/g, "");
+  const address = document.getElementById("customCustomerAddress").value.trim();
+  if (!requestedFood || !customerName || phoneDigits.length !== 10 || !address) {
+    customFoodStatus.textContent = "Enter the food request, name, valid 10-digit phone number, and delivery address.";
+    customFoodStatus.className = "custom-food-status error";
+    return;
+  }
+  customFoodSubmit.disabled = true;
+  customFoodSubmit.textContent = "SENDING...";
+  customFoodStatus.textContent = "";
+  try {
+    const user = await authReady;
+    if (!user) throw new Error("Customer session unavailable");
+    const order = {
+      ownerUid: user.uid,
+      customerName,
+      phone: "+91" + phoneDigits,
+      block: "Custom food request",
+      deliveryAddress: address,
+      deliveryArea: "Customer-provided address",
+      paymentMethod: "Price to be confirmed — no charge taken",
+      bill: 0,
+      discount: 0,
+      couponCode: "",
+      couponPercent: 0,
+      deliveryCharge: 0,
+      finalBill: 0,
+      food: [{ name: requestedFood, price: 0, quantity: 1, subtotal: 0 }],
+      customOrder: true,
+      customFoodDescription: requestedFood,
+      customerEmail: "",
+      status: "Custom request — awaiting confirmation",
+      createdAt: Date.now(),
+      serverCreatedAt: serverTimestamp()
+    };
+    const orderRef = await push(ref(prachiDb, "orders"), order);
+    if (!orderRef.key) throw new Error("Could not create order request");
+    const emailSent = await sendEmailOrderAlert(orderRef.key, order);
+    localStorage.setItem("prachiLastOrderId", orderRef.key);
+    localStorage.setItem("prachiLastCustomRequest", JSON.stringify({ ...order, orderId: orderRef.key }));
+    customFoodStatus.textContent = emailSent
+      ? `Request sent! Reference: ${orderRef.key}. We’ll confirm the price and availability before accepting it.`
+      : `Request saved with reference ${orderRef.key}, but the email alert could not be confirmed. Please contact the kitchen if you don't hear back.`;
+    customFoodStatus.className = "custom-food-status success";
+    customFoodForm.reset();
+    customFoodSubmit.textContent = "REQUEST SENT";
+    setTimeout(() => customFoodOverlay.classList.remove("show"), 2600);
+  } catch (err) {
+    console.error("Custom food request failed:", err);
+    customFoodStatus.textContent = "Could not send the request. Check your connection and try again.";
+    customFoodStatus.className = "custom-food-status error";
+  } finally {
+    customFoodSubmit.disabled = false;
+    if (customFoodSubmit.textContent !== "REQUEST SENT") customFoodSubmit.textContent = "SEND REQUEST";
+  }
+});
 
 /* =========================================================
    INITIAL CART UI

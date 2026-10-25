@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="favicon.png">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prachi Cloud Kitchen — Checkout</title>
@@ -30,7 +32,9 @@ label{display:block;font-weight:800;font-size:13px;margin:0 0 7px}.field{margin-
 .account-box{background:#111;color:#fff;border-radius:21px;padding:20px;margin-bottom:16px}.account-box h2{font-family:Anton,sans-serif;font-size:28px;letter-spacing:1px}.account-box p{color:#ccc;font-size:12px;line-height:1.5;margin:4px 0 15px}.account-fields{display:grid;gap:10px}.account-fields input{border:0}.account-note{font-size:11px;color:#bbb;margin-top:10px}.switch{color:#fff;text-decoration:underline;cursor:pointer;background:none;border:0;font-weight:700}
 .status{display:none;margin-top:10px;padding:11px 13px;border-radius:12px;font-size:12px;font-weight:700}.status.show{display:block}.status.bad{background:#ffe9e9;color:#a51f1f}.status.good{background:#e9f8ef;color:#18743f}
 .success-overlay,.closed,.outside{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.7);backdrop-filter:blur(7px);z-index:50}.success-overlay.active,.closed.show,.outside.show{display:flex}.card{width:min(570px,100%);background:#fff;border-radius:27px;padding:27px;box-shadow:var(--shadow);max-height:92vh;overflow:auto;text-align:center}.tick{width:70px;height:70px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:35px;margin:0 auto 14px}.card h2{font-family:Anton,sans-serif;font-size:38px}.info{margin-top:18px;background:#f6f6f6;border-radius:16px;padding:15px;text-align:left;line-height:1.65;font-size:13px}.live{margin-top:16px;text-align:left;padding:16px;border-radius:17px;border:1px solid var(--line)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-right:7px}
-@media(max-width:600px){body{padding:10px}.checkout{padding:21px 15px;border-radius:24px}.choice-grid{grid-template-columns:1fr}.choice{min-height:88px}.buildings{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){body{background-attachment:scroll;padding:10px}.checkout{padding:21px 15px;border-radius:24px}.choice-grid{grid-template-columns:1fr}.choice{min-height:88px}.buildings{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.step.active{animation:none}.choice,.primary,.secondary{transition:none}.card{backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
 </style>
 
   <!-- EmailJS -->
@@ -54,7 +58,14 @@ label{display:block;font-weight:800;font-size:13px;margin:0 0 7px}.field{margin-
 <body>
 
 <div class="closed" id="closedOverlay"><div class="card"><h2>🔴 STORE CLOSED</h2><p id="closedMessage">The store is currently closed.</p><button class="primary" id="closedBtn">OK</button></div></div>
-<div class="outside" id="outsideOverlay"><div class="card"><h2>DELIVERY UNAVAILABLE</h2><p class="lead">We currently deliver only inside Star Galaxy Apartments.</p><button class="primary" id="outsideBtn">I UNDERSTAND</button></div></div>
+<div class="outside" id="outsideOverlay"><div class="card">
+  <h2>DELIVERY ADDRESS</h2><p class="lead">Enter your address or detect your location. Outside Star Galaxy Apartments, you can place an order from any location. Please provide an accurate delivery address.</p>
+  <div class="field" style="text-align:left"><label for="outsideAddress">FULL DELIVERY ADDRESS</label><input id="outsideAddress" autocomplete="street-address" placeholder="House, road, locality, Patna"></div>
+  <button class="primary" id="detectLocationBtn" type="button">USE MY CURRENT LOCATION</button>
+  <button class="primary" id="checkAddressBtn" type="button">CHECK DELIVERY AREA</button>
+  <div class="status" id="addressStatus" role="status"></div>
+  <button class="secondary" id="cancelOutsideBtn" type="button">BACK</button>
+</div></div>
 
 <main class="checkout">
   <header class="brand"><div class="logo">PRACHI</div><p class="subtitle">Cloud Kitchen • Secure Checkout</p></header>
@@ -68,8 +79,8 @@ label{display:block;font-weight:800;font-size:13px;margin:0 0 7px}.field{margin-
   <section class="step" id="step2">
     <h1>DELIVERY DETAILS</h1><p class="lead">Tell us where to bring your order.</p>
     <div class="section-card">
-      <label>BUILDING / BLOCK</label>
-      <div class="buildings">
+      <label id="blockLabel">BUILDING / BLOCK</label>
+      <div class="buildings" id="buildingChoices">
         <button class="building" data-block="A"><div class="tower"></div>A</button>
         <button class="building" data-block="B"><div class="tower"></div>B</button>
         <button class="building" data-block="C"><div class="tower"></div>C</button>
@@ -157,6 +168,7 @@ async function sendEmailOrderAlert(orderId, order) {
     customer_name: order.customerName || "",
     customer_phone: order.phone || "",
     customer_block: order.block || "",
+    customer_address: order.deliveryAddress || "Star Galaxy Apartments",
     items,
     subtotal: order.bill ?? 0,
     delivery_charge: order.deliveryCharge ? `₹${order.deliveryCharge}` : "FREE",
@@ -201,7 +213,7 @@ const $=id=>document.getElementById(id);
 const raw=localStorage.getItem("prachiOrderCart");
 const cart=raw?JSON.parse(raw):{};
 const subtotal=Number(localStorage.getItem("prachiOrderTotal")||0);
-let selectedBlock="",paymentMethod="Cash on Delivery",deliveryCharge=0,currentUser=null,signInMode=false,storeIsOpen=true,storeLoaded=false,menuAvailability={};
+let selectedBlock="",deliveryAddress="",outsideDelivery=false,paymentMethod="Cash on Delivery",deliveryCharge=0,currentUser=null,signInMode=false,storeIsOpen=true,storeLoaded=false,menuAvailability={};
 let appliedCouponCode="",appliedCouponPercent=0,discountAmount=0;
 
 onAuthStateChanged(auth,user=>{currentUser=user||null;if(user){$("email").value=user.email||"";$("password").value="";}});
@@ -266,13 +278,59 @@ function step(n){
  document.querySelectorAll(".step").forEach(x=>x.classList.remove("active"));
  $("step"+n).classList.add("active");
  for(let i=1;i<=4;i++)$("p"+i).classList.toggle("active",i<=n);
- window.scrollTo({top:0,behavior:"smooth"});
+ window.scrollTo({top:0,behavior:"auto"});
 }
 function message(el,text,good=false){el.textContent=text;el.className="status show "+(good?"good":"bad")}
 
-$("yesBtn").onclick=()=>{if(!storeLoaded||!storeIsOpen)return;summary();renderAvailability();step(2)};
+$("yesBtn").onclick=()=>{if(!storeLoaded||!storeIsOpen)return;outsideDelivery=false;deliveryAddress="";selectedBlock="";$("buildingChoices").style.display="grid";$("blockLabel").textContent="BUILDING / BLOCK";summary();renderAvailability();step(2)};
+
 $("noBtn").onclick=()=>$("outsideOverlay").classList.add("show");
-$("outsideBtn").onclick=()=>location.href="index.html";
+$("cancelOutsideBtn").onclick=()=>$("outsideOverlay").classList.remove("show");
+// Outside Star Galaxy Apartments, all locations are accepted; there is no locality whitelist.
+async function resolveAddress(query){
+ const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=in&q="+encodeURIComponent(query);
+ const r=await fetch(url,{headers:{"Accept":"application/json"}});
+ if(!r.ok)return null;
+ const results=await r.json();
+ return results.length ? results[0] : null;
+}
+async function checkOutsideAddress(address){
+ const status=$("addressStatus"),btn=$("checkAddressBtn");
+ const value=String(address||"").trim();
+ if(value.length<8){message(status,"Enter a more complete address, including your locality and Patna.");return}
+ btn.disabled=true;btn.textContent="CHECKING...";
+ status.className="status show";status.textContent="Checking the delivery area...";
+ try{
+   // Address lookup improves formatting when available, but must never block an outside-area order.
+   let result=null;
+   try{result=await resolveAddress(value)}catch(_){result=null}
+   const display=(result&&result.display_name)||value;
+   $("outsideAddress").value=display;
+   deliveryAddress=display;outsideDelivery=true;selectedBlock="Outside apartment";
+   $("buildingChoices").style.display="none";$("blockLabel").textContent="DELIVERY AREA";
+   $("orderSummary").insertAdjacentHTML("afterbegin",'<div class="notice"><strong>DELIVERY ADDRESS</strong><span id="confirmedAddress"></span></div>');
+   $("confirmedAddress").textContent=deliveryAddress;
+   $("outsideOverlay").classList.remove("show");
+   summary();renderAvailability();step(2);
+ }catch(e){message(status,e.message||"Could not check this address. Try again.");}
+ finally{btn.disabled=false;btn.textContent="CHECK DELIVERY AREA"}
+}
+$("checkAddressBtn").onclick=()=>checkOutsideAddress($("outsideAddress").value);
+$("detectLocationBtn").onclick=()=>{
+ const status=$("addressStatus");
+ if(!navigator.geolocation){message(status,"Location detection isn't supported. Enter your address manually.");return}
+ const b=$("detectLocationBtn");b.disabled=true;b.textContent="DETECTING LOCATION...";
+ navigator.geolocation.getCurrentPosition(async pos=>{
+  try{
+   const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`;
+   const r=await fetch(url,{headers:{"Accept":"application/json"}});if(!r.ok)throw new Error("Could not resolve your location.");
+   const data=await r.json();$("outsideAddress").value=data.display_name||"";
+   if(!$("outsideAddress").value)throw new Error("Location address not found.");
+   message(status,"Location detected. Check the address to confirm delivery.");
+  }catch(e){message(status,e.message||"Could not detect address. Enter it manually.");}
+  finally{b.disabled=false;b.textContent="USE MY CURRENT LOCATION"}
+ },err=>{message(status,err.code===1?"Location permission was denied. Enter your address manually.":"Location unavailable. Enter your address manually.");b.disabled=false;b.textContent="USE MY CURRENT LOCATION"},{enableHighAccuracy:false,timeout:10000,maximumAge:300000});
+};
 $("closedBtn").onclick=()=>$("closedOverlay").classList.remove("show");
 $("applyCouponBtn").onclick=applyCoupon;
 $("couponCode").addEventListener("input",()=>{ $("couponMessage").textContent=""; $("couponMessage").className="coupon-message"; });
@@ -281,7 +339,7 @@ document.querySelectorAll(".building").forEach(b=>b.onclick=()=>{document.queryS
 $("customerPhone").oninput=e=>{e.target.value=e.target.value.replace(/\D/g,"").slice(0,10);$("phoneError").classList.remove("show")};
 
 $("continueBtn").onclick=()=>{
- if(!selectedBlock){message($("availabilityWarning"),"Select your building / block first.");return}
+ if(!selectedBlock||(!outsideDelivery&&!selectedBlock)){message($("availabilityWarning"),"Select your building / block first.");return}
  if(!$("customerName").value.trim()){ $("customerName").focus();return}
  if(!/^\d{10}$/.test($("customerPhone").value.trim())){$("phoneError").classList.add("show");return}
  if(!Object.keys(cart).length){message($("availabilityWarning"),"Your cart is empty.");return}
@@ -298,7 +356,7 @@ $("accountBtn").onclick=async()=>{
  try{
   const cred=signInMode?await signInWithEmailAndPassword(auth,email,password):await createUserWithEmailAndPassword(auth,email,password);
   currentUser=cred.user;
-  const profile={name:$("customerName").value.trim(),phone:"+91"+$("customerPhone").value.trim(),block:selectedBlock,email:currentUser.email,updatedAt:serverTimestamp()};
+  const profile={name:$("customerName").value.trim(),phone:"+91"+$("customerPhone").value.trim(),block:selectedBlock,deliveryAddress:deliveryAddress||"Star Galaxy Apartments",deliveryArea:outsideDelivery?"Outside apartment":"Star Galaxy Apartments",email:currentUser.email,updatedAt:serverTimestamp()};
   await set(ref(db,`customers/${currentUser.uid}`),profile);
   message($("accountStatus"),"Account ready.",true);
   calculateTotal();step(4);
@@ -343,6 +401,8 @@ function buildPendingOrder(){
   customerName:name,
   phone,
   block:selectedBlock,
+  deliveryAddress:deliveryAddress||"Star Galaxy Apartments",
+  deliveryArea:outsideDelivery?"Outside apartment":"Star Galaxy Apartments",
   paymentMethod,
   bill:subtotal,
   discount:discountAmount,
@@ -372,7 +432,7 @@ $("confirmOrderBtn").onclick=async()=>{
  btn.disabled=true;btn.textContent="PLACING ORDER...";
  const name=$("customerName").value.trim(),phone="+91"+$("customerPhone").value.trim();
  const food=Object.entries(cart).map(([foodName,item])=>({name:foodName,price:Number(item.price),quantity:Number(item.quantity),subtotal:Number(item.price)*Number(item.quantity)}));
- const order={ownerUid:currentUser.uid,customerName:name,phone,block:selectedBlock,paymentMethod,bill:subtotal,discount:discountAmount,couponCode:appliedCouponCode||"",couponPercent:appliedCouponPercent||0,deliveryCharge,finalBill:finalCheckoutTotal(),food,customerEmail:currentUser.email||"",status:"Order received",createdAt:Date.now(),serverCreatedAt:serverTimestamp()};
+ const order={ownerUid:currentUser.uid,customerName:name,phone,block:selectedBlock,deliveryAddress:deliveryAddress||"Star Galaxy Apartments",deliveryArea:outsideDelivery?"Outside apartment":"Star Galaxy Apartments",paymentMethod,bill:subtotal,discount:discountAmount,couponCode:appliedCouponCode||"",couponPercent:appliedCouponPercent||0,deliveryCharge,finalBill:finalCheckoutTotal(),food,customerEmail:currentUser.email||"",status:"Order received",createdAt:Date.now(),serverCreatedAt:serverTimestamp()};
  try{
   const orderRef=push(ref(db,"orders"));await set(orderRef,order);
   if(!orderRef.key)throw new Error("No order ID");
@@ -381,7 +441,7 @@ $("confirmOrderBtn").onclick=async()=>{
   localStorage.setItem("prachiLastOrder",JSON.stringify(saved));localStorage.setItem("prachiLastOrderId",orderRef.key);
   localStorage.setItem("prachiProfile",JSON.stringify({ownerUid:currentUser.uid,name,phone,block:selectedBlock,email:currentUser.email||""}));
   $("successText").textContent=`Thank you ${escapeHtml(name)}. Your order has been received.`;
-  $("finalInfo").innerHTML=`<strong>ORDER ID</strong><br>${escapeHtml(orderRef.key)}<br><br><strong>CUSTOMER</strong><br>${escapeHtml(name)}<br>📱 ${escapeHtml(phone)}<br>🏢 Block ${escapeHtml(selectedBlock)}<br>💵 ${escapeHtml(paymentMethod)}<br>${appliedCouponCode?`🎟️ Coupon ${escapeHtml(appliedCouponCode)} (${appliedCouponPercent}% OFF)<br>💸 Discount ₹${discountAmount.toFixed(2)}<br>`:""}🚚 Delivery ${deliveryCharge?"₹"+deliveryCharge:"FREE"}<br>🧾 Final bill ₹${finalCheckoutTotal().toFixed(2)}`;
+  $("finalInfo").innerHTML=`<strong>ORDER ID</strong><br>${escapeHtml(orderRef.key)}<br><br><strong>CUSTOMER</strong><br>${escapeHtml(name)}<br>📱 ${escapeHtml(phone)}<br>📍 ${escapeHtml(deliveryAddress||("Star Galaxy Apartments, Block "+selectedBlock))}<br>💵 ${escapeHtml(paymentMethod)}<br>${appliedCouponCode?`🎟️ Coupon ${escapeHtml(appliedCouponCode)} (${appliedCouponPercent}% OFF)<br>💸 Discount ₹${discountAmount.toFixed(2)}<br>`:""}🚚 Delivery ${deliveryCharge?"₹"+deliveryCharge:"FREE"}<br>🧾 Final bill ₹${finalCheckoutTotal().toFixed(2)}`;
   $("successOverlay").classList.add("active");watchStatus(orderRef.key);
  }catch(e){console.error(e);message($("orderError"),"Order could not be saved. Please try again. Your order was NOT marked as placed.");}
  finally{btn.disabled=false;btn.textContent="PLACE ORDER"}
